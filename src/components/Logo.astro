@@ -1,16 +1,34 @@
 <style>
-  img {
-    display: block;
-    width: 75px;
+  .logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+  }
+
+  .site-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: inherit;
+    display: inline-block;
+    transition: opacity 0.2s ease;
+  }
+
+  .site-title span {
+    color: #2563eb;
+  }
+
+  .logo-link:hover .site-title {
+    opacity: 0.85;
   }
 
   @media screen and (max-width: 520px) {
-    img {
-      display: none;
+    .site-title {
+      font-size: 1.15rem;
     }
   }
 </style>
 
-<a href="/">
-  <img alt="Blog Logo" src="/assets/logo.webp" width="75" height="50" />
+<a href="/" class="logo-link">
+  <span class="site-title">Cyprus <span>Student Guide</span></span>
 </a>
