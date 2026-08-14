@@ -1,8 +1,7 @@
 ---
 title: "Smart Student Grocery Shopping in Cyprus: Lidl vs Smart vs Alphamega"
-publishDate: "14 Aug 2026"
+publishDate: "14 August 2026"
 description: "A complete practical guide for international students in Cyprus on how to budget monthly groceries, compare supermarket prices, and save money on food."
-tags: ["grocery", "budgeting", "student life", "cyprus"]
 ---
 
 Moving to Cyprus as an international student comes with exciting opportunities, but managing living expenses—especially your monthly food budget—can quickly become overwhelming if you don't know where to shop.
