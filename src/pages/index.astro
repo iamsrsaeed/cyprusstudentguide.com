@@ -9,9 +9,19 @@ const permalink = Astro.site.href;
 <BaseLayout title={title} description={description} permalink={permalink}>
   <div class="home-container">
     <div class="home-copy">
-      <h1>Welcome to your new Astro Blog</h1>
-      <p>Check out the docs on <a href="https://www.github.com/Charca/astro-blog-template" target="_blank" rel="noopener">GitHub</a> to get started.</p>
-    </div>
+      <h1 class="text-4xl font-bold tracking-tight">Your Practical Survival Guide for Student Life in Cyprus</h1>
+<p class="mt-4 text-lg text-gray-600 dark:text-gray-300">
+  Clear, actionable advice on smart grocery budgeting, legal part-time work rules, affordable housing, and university living for international students.
+</p>
+<div class="mt-6 flex gap-4">
+  <a href="/blog" class="inline-block rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700">
+    Explore Student Guides
+  </a>
+  <a href="/about" class="inline-block rounded-lg border border-gray-300 px-5 py-3 text-sm font-semibold hover:bg-gray-50 dark:border-gray-700">
+    About This Project
+  </a>
+</div>
+</div>
 
     <div class="hero-image-container">
       <picture>
