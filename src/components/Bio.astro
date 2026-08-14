@@ -1,36 +1,50 @@
-<div>
-  <img 
-    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80" 
-    alt="Cyprus Student Guide Founder" 
-  />
-  <p>
-    Hi, I'm <strong>Saeed</strong>, an international postgraduate student in Cyprus. I created <strong>Cyprus Student Guide</strong> to share practical, real-world advice on student budgeting, legal work regulations, and daily essentials to help newcomers settle in smoothly.
-  </p>
+<div class="bio-container">
+  <div class="bio-avatar">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+      <!-- Graduation Cap & Knowledge Icon -->
+      <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
+      <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z" opacity="0.85"/>
+    </svg>
+  </div>
+  <div class="bio-text">
+    <p>
+      <strong>Cyprus Student Guide</strong> is an independent resource hub providing international students with practical advice on grocery budgeting, legal part-time employment, and everyday life in Cyprus.
+    </p>
+  </div>
 </div>
 
 <style>
-  div {
+  .bio-container {
     align-items: center;
     display: flex;
     gap: 1.25rem;
-    margin-top: 2rem;
+    margin-top: 2.5rem;
     padding-top: 1.5rem;
     border-top: 1px solid rgba(150, 150, 150, 0.2);
   }
 
-  img {
+  .bio-avatar {
+    width: 64px;
+    height: 64px;
+    min-width: 64px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #ffffff;
     border-radius: 50%;
-    display: block;
-    height: 75px;
-    width: 75px;
-    min-width: 75px;
-    object-fit: cover;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
   }
 
-  p {
+  .bio-avatar svg {
+    width: 34px;
+    height: 34px;
+  }
+
+  .bio-text p {
     font-size: 0.95rem;
-    line-height: 1.5;
+    line-height: 1.55;
     margin: 0;
+    opacity: 0.9;
   }
 </style>
