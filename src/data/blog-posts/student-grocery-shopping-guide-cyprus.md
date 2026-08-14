@@ -1,6 +1,7 @@
 ---
+layout: ../../layouts/BlogPostLayout.astro
 title: "Smart Student Grocery Shopping in Cyprus: Lidl vs Smart vs Alphamega"
-publishDate: "2026-08-14"
+publishDate: "14 Aug 2026"
 description: "A complete practical guide for international students in Cyprus on how to budget monthly groceries, compare supermarket prices, and save money on food."
 ---
 
