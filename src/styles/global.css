@@ -414,3 +414,35 @@ table td:nth-child(3), table th:nth-child(3) {
   white-space: normal;
   min-width: 150px;
 }
+/* Mobile Optimization & Tight Padding */
+@media screen and (max-width: 640px) {
+  html, body {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  main, article, .content, .post-content, .layout {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    box-sizing: border-box !important;
+  }
+
+  /* আর্টিকেলের মূল টাইটেল মোবাইলে ব্যালেন্সড করা */
+  h1, .post-title {
+    font-size: 1.75rem !important;
+    line-height: 1.25 !important;
+    word-break: normal !important;
+    hyphens: auto;
+  }
+
+  /* হেডার মোবাইলে যেন এক লাইনে থাকে */
+  header {
+    padding: 1rem 0.5rem !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+  }
+}
