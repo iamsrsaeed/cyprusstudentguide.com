@@ -1,48 +1,97 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-const title = 'About';
-const description = 'About your blog.';
-const permalink = `${Astro.site.href}about`;
+const title = 'About | Cyprus Student Guide';
+const description = 'Learn more about Cyprus Student Guide and our mission to support international students in Cyprus.';
+const permalink = 'https://cyprusstudentguide.com/about/';
 ---
 
 <BaseLayout title={title} description={description} permalink={permalink} current="about">
-  <div class="container">
-    <h1>About</h1>
-    <figure class="about-image">
-      <img src="/assets/about-illustration.webp" alt="Illustration of a notebook" width="330">
-      <figcaption>
-        Illustration by
-        <a href="https://icons8.com/illustrations/author/5c07e68d82bcbc0092519bb6" target="_blank" rel="noopener">Icons 8</a>
-        from
-        <a href="https://icons8.com/illustrations" target="_blank" rel="noopener">Ouch!</a>
-      </figcaption>
-    </figure>
-    <p>Text placeholder via <a href="https://jeffsum.com/" target="_blank">Jeffsum</a>.</p>
-    <p>So you two dig up, dig up dinosaurs? What do they got in there? King Kong? My dad once told me, laugh and the world laughs with you, Cry, and I'll give you something to cry about you little bastard! Life finds a way. God creates dinosaurs. God destroys dinosaurs. God creates Man. Man destroys God. Man creates Dinosaurs.</p>
-    <p>You really think you can fly that thing? You know what? It is beets. I've crashed into a beet truck. Forget the fat lady! You're obsessed with the fat lady! Drive us out of here! Is this my espresso machine? Wh-what is-h-how did you get my espresso machine?</p>
-    <p>Hey, you know how I'm, like, always trying to save the planet? Here's my chance. Hey, take a look at the earthlings. Goodbye! I was part of something special. Just my luck, no ice. You're a very talented young man, with your own clever thoughts and ideas. Do you need a manager?</p>
-    <p>Jaguar shark! So tell me - does it really exist? This thing comes fully loaded. AM/FM radio, reclining bucket seats, and... power windows. Yes, Yes, without the oops! You're a very talented young man, with your own clever thoughts and ideas. Do you need a manager?</p>
-    <p>Yes, Yes, without the oops! Do you have any idea how long it takes those cups to decompose. They're using our own satellites against us. And the clock is ticking. Do you have any idea how long it takes those cups to decompose. My dad once told me, laugh and the world laughs with you, Cry, and I'll give you something to cry about you little bastard!</p>
+  <div class="about-container">
+    <h1>About <span>Cyprus Student Guide</span></h1>
+    
+    <p class="lead">
+      Empowering international students in Cyprus with practical, verified, and real-world information to make their academic and daily journey smooth and affordable.
+    </p>
+
+    <div class="mission-card">
+      <h2>🎯 Our Mission</h2>
+      <p>
+        Moving to a new country for higher education comes with excitement, but navigating grocery budgeting, part-time work regulations, accommodation, and transportation can often be challenging. 
+      </p>
+      <p>
+        <strong>Cyprus Student Guide</strong> was built by international students for international students. We break down complex local rules and share tested everyday hacks—without unnecessary clutter.
+      </p>
+    </div>
+
+    <h2>📚 What We Cover</h2>
+    <ul class="coverage-list">
+      <li><strong>Smart Budgeting & Grocery Deals:</strong> Practical guides on Lidl Plus, local discount supermarkets, and weekly fruit markets.</li>
+      <li><strong>Legal Employment & Regulations:</strong> Clarity on Non-EU student work rights, 20-hour weekly limits, eligible employment sectors, and contract procedures.</li>
+      <li><strong>Local Living Essentials:</strong> Affordable SIM plans, public transit options, e-scooter rules, and finding student accommodation.</li>
+    </ul>
+
+    <h2>🤝 Independent & Community-Driven</h2>
+    <p>
+      All guides published here are based on firsthand experiences, official ministry guidelines, and real student feedback across Nicosia, Limassol, Larnaca, and Paphos.
+    </p>
   </div>
 </BaseLayout>
 
 <style>
-  .about-image {
-    float: right;
-    margin: -3em -7em 2em 2em;
-    max-width: 300px;
+  .about-container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 2rem 0;
+    line-height: 1.7;
   }
 
-  .about-image img {
+  h1 {
+    font-size: 2.25rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+  }
+
+  h1 span {
+    color: #2563eb;
+  }
+
+  .lead {
+    font-size: 1.15rem;
+    opacity: 0.9;
+    margin-bottom: 2rem;
+    font-weight: 500;
+  }
+
+  .mission-card {
+    background: rgba(37, 99, 235, 0.05);
+    border-left: 4px solid #2563eb;
+    padding: 1.5rem;
     border-radius: 8px;
-    margin-bottom: 1.5em;
+    margin: 2rem 0;
   }
 
-  @media (max-width: 1020px) {
-    .about-image {
-      float: none;
-      margin: 0 auto 2em;
-    }
+  .mission-card h2 {
+    margin-top: 0;
+    font-size: 1.4rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .coverage-list {
+    padding-left: 1.25rem;
+    margin: 1.25rem 0;
+  }
+
+  .coverage-list li {
+    margin-bottom: 0.75rem;
+  }
+
+  .coverage-list strong {
+    color: #2563eb;
   }
 </style>
