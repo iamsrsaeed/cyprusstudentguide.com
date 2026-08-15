@@ -1,7 +1,8 @@
 ---
 title: "Working Part-Time in Cyprus as a Non-EU Student: Rules, Limits & Unspoken Reality"
-description: "Complete 2026 legal guide for Non-EU international students working in Cyprus. Learn the 20-hour limit, eligible sectors, required contracts, and practical job-search tips."
-pubDate: 2026-08-15
+description: "Complete legal guide for Non-EU international students working in Cyprus. Learn the 20-hour limit, eligible sectors, required contracts, and practical job-search tips."
+publishDate: "2026-08-15"
+slug: "non-eu-student-part-time-work-cyprus-legal-guide"
 author: "Saidur Rahman"
 category: "Legal & Jobs"
 tags: ["Cyprus Student Visa", "Part Time Jobs", "Work Permit", "Living in Cyprus"]
