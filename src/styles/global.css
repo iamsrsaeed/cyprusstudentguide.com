@@ -186,11 +186,54 @@ figure {
   margin: 0 0 3em 0;
 }
 
+/* Responsive Modern Table with Scroll Indicator */
+article table,
+.post-content table,
 table {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border-collapse: collapse;
-  font-family: var(--font-family-sans);
-  font-size: 1.125em;
-  margin: 2em 0;
+  margin: 1.5rem 0;
+  border-radius: 8px;
+  border: 1px solid rgba(150, 150, 150, 0.2);
+  /* স্ক্রোল ইঙ্গিত দেওয়ার জন্য হালকা শ্যাডো */
+  box-shadow: inset -10px 0 8px -8px rgba(0, 0, 0, 0.15);
+}
+
+table th,
+table td {
+  padding: 0.85rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(150, 150, 150, 0.15);
+  font-size: 0.95rem;
+}
+
+table th {
+  background: rgba(37, 99, 235, 0.08);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* কলামগুলোর সাইজ সুন্দরভাবে ব্যালেন্স করার জন্য */
+table td:first-child {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+table td:nth-child(2) {
+  white-space: nowrap;
+}
+
+table td:nth-child(3) {
+  min-width: 160px;
+  white-space: normal;
+}
+
+table td:last-child {
+  white-space: nowrap;
 }
 
 th {
