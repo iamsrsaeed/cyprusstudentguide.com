@@ -1,9 +1,15 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
 
 const title = 'Cyprus Student Guide | Survival & Living Tips';
 const description = 'Practical survival guides for international students in Cyprus: grocery budgeting, legal part-time work, accommodation, and university living.';
 const permalink = Astro.site ? Astro.site.href : '/';
+
+// লেটেস্ট ৩টি পোস্ট ফেচ করা
+const latestPosts = (await getCollection('blog'))
+  .sort((a, b) => new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf())
+  .slice(0, 3);
 ---
 
 <BaseLayout title={title} description={description} permalink={permalink} current="home">
@@ -58,6 +64,30 @@ const permalink = Astro.site ? Astro.site.href : '/';
         <p>Affordable telecom plans, bus passes, e-scooter rules, and housing tips.</p>
       </div>
     </div>
+
+    <!-- Latest Guides Section -->
+    <section class="latest-guides-section">
+      <div class="section-header">
+        <h2>Latest Guides & Articles</h2>
+        <a href="/blog" class="view-all-link">View All Posts →</a>
+      </div>
+
+      <div class="posts-grid">
+        {latestPosts.map((post) => (
+          <article class="post-card">
+            <div class="card-meta">
+              <span class="category-badge">{post.data.category || 'Guide'}</span>
+              <time>{new Date(post.data.pubDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</time>
+            </div>
+            <h3>
+              <a href={`/blog/${post.slug}/`}>{post.data.title}</a>
+            </h3>
+            <p class="card-desc">{post.data.description}</p>
+            <a href={`/blog/${post.slug}/`} class="read-link">Read Guide →</a>
+          </article>
+        ))}
+      </div>
+    </section>
   </div>
 </BaseLayout>
 
@@ -161,6 +191,7 @@ const permalink = Astro.site ? Astro.site.href : '/';
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 1.25rem;
     text-align: left;
+    margin-bottom: 3.5rem;
   }
 
   .feature-card {
@@ -188,6 +219,103 @@ const permalink = Astro.site ? Astro.site.href : '/';
     opacity: 0.8;
   }
 
+  /* Latest Guides Section Styling */
+  .latest-guides-section {
+    padding-top: 2rem;
+    border-top: 1px solid rgba(150, 150, 150, 0.15);
+    text-align: left;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0;
+  }
+
+  .view-all-link {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .post-card {
+    border: 1px solid rgba(150, 150, 150, 0.2);
+    border-radius: 10px;
+    padding: 1.25rem;
+    background: rgba(150, 150, 150, 0.03);
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+
+  .post-card:hover {
+    transform: translateY(-2px);
+    border-color: #2563eb;
+  }
+
+  .card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    font-size: 0.78rem;
+  }
+
+  .category-badge {
+    background: rgba(37, 99, 235, 0.1);
+    color: #2563eb;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  .card-meta time {
+    color: var(--text-secondary, #888);
+  }
+
+  .post-card h3 {
+    font-size: 1.05rem;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.4;
+    font-weight: 700;
+  }
+
+  .post-card h3 a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .card-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary, #666);
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    flex-grow: 1;
+  }
+
+  .read-link {
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 0.85rem;
+    margin-top: auto;
+  }
+
   @media screen and (max-width: 640px) {
     .home-container {
       margin-top: 1.5rem;
@@ -199,6 +327,9 @@ const permalink = Astro.site ? Astro.site.href : '/';
       height: 200px;
     }
     .feature-grid {
+      grid-template-columns: 1fr;
+    }
+    .posts-grid {
       grid-template-columns: 1fr;
     }
   }
