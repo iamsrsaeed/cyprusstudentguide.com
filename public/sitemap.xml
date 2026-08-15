@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://cyprusstudentguide.com/</loc>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://cyprusstudentguide.com/about/</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cyprusstudentguide.com/blog/</loc>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://cyprusstudentguide.com/blog/non-eu-student-part-time-work-cyprus-legal-guide/</loc>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://cyprusstudentguide.com/blog/how-to-use-lidl-plus-app-cyprus/</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cyprusstudentguide.com/blog/smart-student-grocery-shopping-cyprus/</loc>
+    <priority>0.8</priority>
+  </url>
+</urlset>
