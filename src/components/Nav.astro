@@ -54,90 +54,53 @@ const { current = '' } = Astro.props;
     width: 75px;
   }
 
+  .lang-select-wrapper {
+    margin-left: 1rem;
+  }
+
+  .lang-select-wrapper select {
+    background: rgba(150, 150, 150, 0.1);
+    color: inherit;
+    border: 1px solid rgba(150, 150, 150, 0.25);
+    border-radius: 6px;
+    padding: 0.3rem 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+  }
+
   @media screen and (max-width: 520px) {
     .theme-toggle-container {
-      margin-right: 1em;
+      margin-right: 0.5em;
     }
   }
-/* Ensure theme toggle remains visible on mobile */
-:global(.theme-toggle) {
-  display: flex !important;
-  align-items: center;
-  margin-left: 0.5rem;
-}
-.lang-select-wrapper select {
-  background: rgba(150, 150, 150, 0.1);
-  color: inherit;
-  border: 1px solid rgba(150, 150, 150, 0.25);
-  border-radius: 6px;
-  padding: 0.25rem 0.4rem;
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
-  outline: none;
-  margin-left: 0.5rem;
-}
-/* Hide Google Translate top banner and default UI elements */
-.goog-te-banner-frame.skiptranslate,
-.goog-te-banner-frame {
-  display: none !important;
-}
 
-body {
-  top: 0px !important;
-}
+  :global(.theme-toggle) {
+    display: flex !important;
+    align-items: center;
+    margin-left: 0.5rem;
+  }
 
-/* Hide default Google Translate gadget on the top right */
-.skiptranslate:not(.lang-select-wrapper *) {
-  display: none !important;
-}
+  /* Hide Google Translate top banner & auto widget elements */
+  :global(.goog-te-banner-frame),
+  :global(.goog-te-gadget),
+  :global(#google_translate_element) {
+    display: none !important;
+    visibility: hidden !important;
+  }
 
-#google_translate_element {
-  display: none !important;
-}
-/* Hide Google's default injected widget completely */
-:global(.goog-te-gadget),
-:global(.goog-te-banner-frame),
-:global(#google_translate_element) {
-  display: none !important;
-  visibility: hidden !important;
-}
-
-:global(body) {
-  top: 0px !important;
-}
-:global(.goog-te-gadget),
-:global(.VIpgJd-ZVi9od-OR95ae-LgbsSe),
-:global(.goog-te-combo) {
-  display: none !important;
-  visibility: hidden !important;
-}
-
-:global(#google_translate_element) {
-  display: none !important;
-  height: 0 !important;
-  overflow: hidden !important;
-}
-
+  :global(body) {
+    top: 0px !important;
+  }
 </style>
 
 <nav>
   <a class={current === "" ? "selected" : ""} href='/'>home</a>
   <a class={current === "about" ? "selected" : ""} href='/about'>about</a>
   <a class={current === "blog" ? "selected" : ""} href='/blog'>blog</a>
-<div class="lang-select-wrapper">
-  <select id="language-switcher" aria-label="Select Language">
-    <option value="en">🇬🇧 EN</option>
-    <option value="bn">🇧🇩 BN</option>
-    <option value="el">🇨🇾 EL</option>
-    <option value="hi">🇮🇳 HI</option>
-  </select>
-</div>  
-<div class="theme-toggle-container">
-    <ThemeToggleButton client:load />
-  </div>
-</nav>
-<div class="lang-select-wrapper">
+  
+  <div class="lang-select-wrapper">
     <select id="language-switcher" aria-label="Select Language">
       <option value="en">🇬🇧 EN</option>
       <option value="bn">🇧🇩 BN</option>
@@ -145,12 +108,15 @@ body {
       <option value="hi">🇮🇳 HI</option>
     </select>
   </div>
+
+  <div class="theme-toggle-container">
+    <ThemeToggleButton client:load />
+  </div>
 </nav>
 
-<!-- এখানে বসাবেন (</nav> এর ঠিক পরে) -->
 <div id="google_translate_element" style="display:none;"></div>
 
-<script type="text/javascript">
+<script is:inline>
   function googleTranslateElementInit() {
     new google.translate.TranslateElement({
       pageLanguage: 'en',
@@ -159,18 +125,34 @@ body {
     }, 'google_translate_element');
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  // Cookie-based Translation Switcher
+  function applyLanguageSwitch() {
     const select = document.getElementById('language-switcher');
-    if (select) {
-      select.addEventListener('change', (e) => {
-        const lang = e.target.value;
-        const combo = document.querySelector('.goog-te-combo');
-        if (combo) {
-          combo.value = lang;
-          combo.dispatchEvent(new Event('change'));
-        }
-      });
+    if (!select) return;
+
+    // Read current cookie
+    const match = document.cookie.match(/googtrans=\/en\/([a-z]{2})/);
+    if (match && match[1]) {
+      select.value = match[1];
     }
-  });
+
+    select.addEventListener('change', (e) => {
+      const lang = e.target.value;
+      const domain = window.location.hostname;
+      
+      // Set translate cookie
+      document.cookie = `googtrans=/en/${lang}; path=/; domain=${domain}`;
+      document.cookie = `googtrans=/en/${lang}; path=/;`;
+      
+      // Reload page to apply translation cleanly
+      window.location.reload();
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyLanguageSwitch);
+  } else {
+    applyLanguageSwitch();
+  }
 </script>
-<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async defer></script>
+<script is:inline type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
