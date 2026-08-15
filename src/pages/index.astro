@@ -6,9 +6,10 @@ const title = 'Cyprus Student Guide | Survival & Living Tips';
 const description = 'Practical survival guides for international students in Cyprus: grocery budgeting, legal part-time work, accommodation, and university living.';
 const permalink = Astro.site ? Astro.site.href : '/';
 
-// লেটেস্ট ৩টি পোস্ট ফেচ করা
-const latestPosts = (await getCollection('blog'))
-  .sort((a, b) => new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf())
+// সঠিক কালেকশন নাম 'posts' এবং সঠিক ডেট ফিল্ড 'publishDate'
+const allPosts = await getCollection('posts');
+const latestPosts = allPosts
+  .sort((a, b) => new Date(b.data.publishDate).valueOf() - new Date(a.data.publishDate).valueOf())
   .slice(0, 3);
 ---
 
