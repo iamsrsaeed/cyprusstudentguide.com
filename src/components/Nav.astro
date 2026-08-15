@@ -59,6 +59,12 @@ const { current = '' } = Astro.props;
       margin-right: 1em;
     }
   }
+/* Ensure theme toggle remains visible on mobile */
+:global(.theme-toggle) {
+  display: flex !important;
+  align-items: center;
+  margin-left: 0.5rem;
+}
 
 </style>
 
