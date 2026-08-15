@@ -67,28 +67,31 @@ const latestPosts = allPosts
     </div>
 
     <!-- Latest Guides Section -->
-    <section class="latest-guides-section">
-      <div class="section-header">
-        <h2>Latest Guides & Articles</h2>
-        <a href="/blog" class="view-all-link">View All Posts →</a>
-      </div>
+  <section class="latest-guides-section">
+  <div class="section-header">
+    <h2>Latest Guides & Articles</h2>
+    <a href="/blog" class="view-all-link">View All Posts →</a>
+  </div>
 
-      <div class="posts-grid">
-        {latestPosts.map((post) => (
-          <article class="post-card">
-            <div class="card-meta">
-              <span class="category-badge">{post.data.category || 'Guide'}</span>
-              <time>{new Date(post.data.pubDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</time>
-            </div>
-            <h3>
-              <a href={`/blog/${post.slug}/`}>{post.data.title}</a>
-            </h3>
-            <p class="card-desc">{post.data.description}</p>
-            <a href={`/blog/${post.slug}/`} class="read-link">Read Guide →</a>
-          </article>
-        ))}
-      </div>
-    </section>
+  <div class="posts-grid">
+    {latestPosts.map((post) => {
+      const slug = post.data.slug || post.slug;
+      return (
+        <article class="post-card">
+          <div class="card-meta">
+            <span class="category-badge">{post.data.category || 'Guide'}</span>
+            <time>{new Date(post.data.publishDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</time>
+          </div>
+          <h3>
+            <a href={`/blog/${slug}/`}>{post.data.title}</a>
+          </h3>
+          <p class="card-desc">{post.data.description}</p>
+          <a href={`/blog/${slug}/`} class="read-link">Read Guide →</a>
+        </article>
+      );
+    })}
+  </div>
+</section>
   </div>
 </BaseLayout>
 
