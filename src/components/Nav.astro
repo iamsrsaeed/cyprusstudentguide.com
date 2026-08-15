@@ -95,6 +95,17 @@ body {
 #google_translate_element {
   display: none !important;
 }
+/* Hide Google's default injected widget completely */
+:global(.goog-te-gadget),
+:global(.goog-te-banner-frame),
+:global(#google_translate_element) {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+:global(body) {
+  top: 0px !important;
+}
 
 </style>
 
