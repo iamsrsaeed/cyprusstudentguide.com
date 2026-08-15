@@ -279,3 +279,27 @@ input[name='theme-toggle'] {
     margin: 1em 0;
   }
 }
+/* Responsive Markdown Tables */
+article table,
+.post-content table,
+table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+}
+
+table th,
+table td {
+  padding: 0.75rem 1rem;
+  white-space: nowrap;
+  vertical-align: top;
+  text-align: left;
+}
+
+table td:nth-child(3) {
+  white-space: normal;
+  min-width: 180px;
+}
