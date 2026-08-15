@@ -5,57 +5,41 @@ const { current = '' } = Astro.props;
 
 <style>
   nav {
-    align-items: center;
     display: flex;
-    flex: 1;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 0.5rem 0;
+    margin-bottom: 1rem;
     font-family: var(--font-family-sans);
     font-weight: 700;
-    justify-content: flex-end;
     text-transform: uppercase;
   }
 
-  a {
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .nav-links a {
     color: inherit;
     text-decoration: none;
-    padding: 10px 5px;
-    display: block;
+    padding: 6px 4px;
+    font-size: 0.9rem;
     position: relative;
-    margin-left: 20px;
-    min-width: 70px;
-    text-align: center;
+    opacity: 0.75;
   }
 
-  a:not(.selected) {
-    opacity: 0.7;
+  .nav-links a.selected {
+    opacity: 1;
+    color: var(--primary-color, #2563eb);
   }
 
-  a::before {
-    content: '';
-    position: absolute;
-    transition: transform .3s ease;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    height: 2px;
-    background: var(--text-secondary);
-    transform: scaleX(0);
-  }
-
-  a:hover::before,
-  .selected::before {
-    transform: scaleX(1);
-  }
-
-  .selected::before {
-    background: var(--primary-color);
-  }
-
-  .theme-toggle-container {
-    width: 75px;
-  }
-
-  .lang-select-wrapper {
-    margin-left: 1rem;
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   .lang-select-wrapper select {
@@ -64,25 +48,44 @@ const { current = '' } = Astro.props;
     border: 1px solid rgba(150, 150, 150, 0.25);
     border-radius: 6px;
     padding: 0.25rem 0.4rem;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
     outline: none;
   }
 
-  @media screen and (max-width: 520px) {
-    .theme-toggle-container {
-      margin-right: 0.5em;
-    }
+  .theme-toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   :global(.theme-toggle) {
     display: flex !important;
     align-items: center;
-    margin-left: 0.5rem;
+    cursor: pointer;
   }
 
-  /* Hide Google Translate top banner & auto widget */
+  /* Mobile Responsive Fix */
+  @media screen and (max-width: 600px) {
+    nav {
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .nav-links {
+      gap: 0.5rem;
+    }
+    .nav-links a {
+      font-size: 0.8rem;
+      padding: 4px 2px;
+    }
+    .lang-select-wrapper select {
+      padding: 0.2rem 0.3rem;
+      font-size: 0.75rem;
+    }
+  }
+
+  /* Hide Google Translate raw elements */
   :global(.goog-te-banner-frame),
   :global(.goog-te-gadget),
   :global(#google_translate_element) {
@@ -96,21 +99,25 @@ const { current = '' } = Astro.props;
 </style>
 
 <nav>
-  <a class={current === "" ? "selected" : ""} href='/'>home</a>
-  <a class={current === "about" ? "selected" : ""} href='/about'>about</a>
-  <a class={current === "blog" ? "selected" : ""} href='/blog'>blog</a>
-  
-  <div class="lang-select-wrapper">
-    <select id="language-switcher" aria-label="Select Language">
-      <option value="en">🇬🇧 EN</option>
-      <option value="bn">🇧🇩 BN</option>
-      <option value="el">🇨🇾 EL</option>
-      <option value="hi">🇮🇳 HI</option>
-    </select>
+  <div class="nav-links">
+    <a class={current === "" ? "selected" : ""} href='/'>home</a>
+    <a class={current === "about" ? "selected" : ""} href='/about'>about</a>
+    <a class={current === "blog" ? "selected" : ""} href='/blog'>blog</a>
   </div>
 
-  <div class="theme-toggle-container">
-    <ThemeToggleButton client:load />
+  <div class="nav-actions">
+    <div class="lang-select-wrapper">
+      <select id="language-switcher" aria-label="Select Language">
+        <option value="en">🇬🇧 EN</option>
+        <option value="bn">🇧🇩 BN</option>
+        <option value="el">🇨🇾 EL</option>
+        <option value="hi">🇮🇳 HI</option>
+      </select>
+    </div>
+
+    <div class="theme-toggle-container">
+      <ThemeToggleButton client:load />
+    </div>
   </div>
 </nav>
 
