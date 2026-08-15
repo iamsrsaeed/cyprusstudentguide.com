@@ -186,7 +186,21 @@ figure {
   margin: 0 0 3em 0;
 }
 
-/* Responsive Modern Table with Scroll Indicator */
+//* Responsive Table with Automatic Mobile Scroll Hint */
+@media screen and (max-width: 640px) {
+  article table::before,
+  .post-content table::before {
+    content: "Swipe left/right to view full table ⟷";
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #2563eb;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
 article table,
 .post-content table,
 table {
@@ -199,7 +213,6 @@ table {
   margin: 1.5rem 0;
   border-radius: 8px;
   border: 1px solid rgba(150, 150, 150, 0.2);
-  /* স্ক্রোল ইঙ্গিত দেওয়ার জন্য হালকা শ্যাডো */
   box-shadow: inset -10px 0 8px -8px rgba(0, 0, 0, 0.15);
 }
 
@@ -217,7 +230,6 @@ table th {
   white-space: nowrap;
 }
 
-/* কলামগুলোর সাইজ সুন্দরভাবে ব্যালেন্স করার জন্য */
 table td:first-child {
   font-weight: 600;
   white-space: nowrap;
@@ -235,7 +247,6 @@ table td:nth-child(3) {
 table td:last-child {
   white-space: nowrap;
 }
-
 th {
   border-bottom: 2px solid #cccccc;
   padding: 0.4em 0.8em;
