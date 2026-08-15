@@ -2,7 +2,13 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 
-const posts = await getCollection('blog');
+// সঠিক কালেকশন নাম 'posts' থেকে ডেটা নেওয়া
+const rawPosts = await getCollection('posts');
+
+// তারিখ অনুযায়ী পোস্ট সাজানো
+const posts = rawPosts.sort(
+  (a, b) => new Date(b.data.publishDate).valueOf() - new Date(a.data.publishDate).valueOf()
+);
 
 const title = "Student Guides & Articles | Cyprus Student Hub";
 const description = "Browse all practical survival guides, supermarket hacks, and legal work regulations for students in Cyprus.";
@@ -26,39 +32,43 @@ const description = "Browse all practical survival guides, supermarket hacks, an
     </header>
 
     <div id="posts-grid" class="posts-grid">
-      {posts.map((post) => (
-        <article 
-          class="post-card" 
-          data-date={new Date(post.data.pubDate).valueOf()}
-          data-featured={post.data.isFeatured ? "1" : "0"}
-        >
-          <div class="post-meta">
-            {post.data.category && <span class="category-tag">{post.data.category}</span>}
-            <time datetime={new Date(post.data.pubDate).toISOString()}>
-              {new Date(post.data.pubDate).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-              })}
-            </time>
-          </div>
-          
-          <h2>
-            <a href={`/blog/${post.slug}/`}>{post.data.title}</a>
-          </h2>
-          
-          <p class="excerpt">{post.data.description}</p>
-          
-          <div class="card-footer">
-            <a href={`/blog/${post.slug}/`} class="read-more">Read Guide →</a>
-          </div>
-        </article>
-      ))}
+      {posts.map((post) => {
+        const postSlug = post.data.slug || post.slug;
+        const postDate = post.data.publishDate;
+        
+        return (
+          <article 
+            class="post-card" 
+            data-date={new Date(postDate).valueOf()}
+            data-featured={post.data.isFeatured ? "1" : "0"}
+          >
+            <div class="post-meta">
+              {post.data.category && <span class="category-tag">{post.data.category}</span>}
+              <time datetime={new Date(postDate).toISOString()}>
+                {new Date(postDate).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric'
+                })}
+              </time>
+            </div>
+            
+            <h2>
+              <a href={`/blog/${postSlug}/`}>{post.data.title}</a>
+            </h2>
+            
+            <p class="excerpt">{post.data.description}</p>
+            
+            <div class="card-footer">
+              <a href={`/blog/${postSlug}/`} class="read-more">Read Guide →</a>
+            </div>
+          </article>
+        );
+      })}
     </div>
   </div>
 </BaseLayout>
 
-<!-- Client-side Fast Sorting Script -->
 <script>
   const sortSelect = document.getElementById('sort-select') as HTMLSelectElement;
   const postsGrid = document.getElementById('posts-grid');
@@ -80,13 +90,9 @@ const description = "Browse all practical survival guides, supermarket hacks, an
         return 0;
       });
 
-      // Clear & append sorted cards
       postsGrid.innerHTML = '';
       cards.forEach((card) => postsGrid.appendChild(card));
     });
-
-    // Default trigger on page load (Newest First)
-    sortSelect.dispatchEvent(new Event('change'));
   }
 </script>
 
@@ -110,7 +116,6 @@ const description = "Browse all practical survival guides, supermarket hacks, an
     font-size: 1.05rem;
     margin-bottom: 1.5rem;
   }
-  
   .filter-controls {
     display: flex;
     justify-content: flex-end;
@@ -131,7 +136,6 @@ const description = "Browse all practical survival guides, supermarket hacks, an
     cursor: pointer;
     outline: none;
   }
-
   .posts-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
