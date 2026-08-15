@@ -77,6 +77,24 @@ const { current = '' } = Astro.props;
   outline: none;
   margin-left: 0.5rem;
 }
+/* Hide Google Translate top banner and default UI elements */
+.goog-te-banner-frame.skiptranslate,
+.goog-te-banner-frame {
+  display: none !important;
+}
+
+body {
+  top: 0px !important;
+}
+
+/* Hide default Google Translate gadget on the top right */
+.skiptranslate:not(.lang-select-wrapper *) {
+  display: none !important;
+}
+
+#google_translate_element {
+  display: none !important;
+}
 
 </style>
 
