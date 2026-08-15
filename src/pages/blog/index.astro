@@ -1,53 +1,196 @@
 ---
-import { getCollection } from 'astro:content'
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
 
-const title = 'Blog';
-const description = 'Latest articles.';
-const permalink = `${Astro.site.href}blog`;
+const posts = await getCollection('blog');
 
-let allPosts = await getCollection('posts')
-allPosts = allPosts.sort((a, b) => new Date(b.data.publishDate).valueOf() - new Date(a.data.publishDate).valueOf());
+const title = "Student Guides & Articles | Cyprus Student Hub";
+const description = "Browse all practical survival guides, supermarket hacks, and legal work regulations for students in Cyprus.";
 ---
 
-<BaseLayout title={title} description={description} permalink={permalink} current="blog">
-  <div class="container">
-    <h1>Blog</h1>
-    {allPosts.map((post, index) => {
-      const href = `/blog/${post.data.slug}`;
-      return (
-        <div>
-          { index !== 0 && <hr /> }
-          <div class="post-item">
-            <h2>
-              <a href={href}>{post.data.title}</a>
-            </h2>
-            <p>{post.data.description}</p>
-            <div class="post-item-footer">
-              <span class="post-item-date">— {post.data.publishDate}</span>
-            </div>
+<BaseLayout title={title} description={description} current="blog">
+  <div class="blog-container">
+    <header class="blog-header">
+      <h1>Student Guides & Articles</h1>
+      <p class="subtitle">Practical, actionable advice to help you navigate life and studies in Cyprus.</p>
+      
+      <!-- Filter & Sort Controls -->
+      <div class="filter-controls">
+        <label for="sort-select">Sort by:</label>
+        <select id="sort-select" class="sort-dropdown">
+          <option value="newest">Newest First</option>
+          <option value="popular">Popular / Featured</option>
+          <option value="oldest">Oldest First</option>
+        </select>
+      </div>
+    </header>
+
+    <div id="posts-grid" class="posts-grid">
+      {posts.map((post) => (
+        <article 
+          class="post-card" 
+          data-date={new Date(post.data.pubDate).valueOf()}
+          data-featured={post.data.isFeatured ? "1" : "0"}
+        >
+          <div class="post-meta">
+            {post.data.category && <span class="category-tag">{post.data.category}</span>}
+            <time datetime={new Date(post.data.pubDate).toISOString()}>
+              {new Date(post.data.pubDate).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+              })}
+            </time>
           </div>
-        </div>
-      )
-    })}
+          
+          <h2>
+            <a href={`/blog/${post.slug}/`}>{post.data.title}</a>
+          </h2>
+          
+          <p class="excerpt">{post.data.description}</p>
+          
+          <div class="card-footer">
+            <a href={`/blog/${post.slug}/`} class="read-more">Read Guide →</a>
+          </div>
+        </article>
+      ))}
+    </div>
   </div>
 </BaseLayout>
 
+<!-- Client-side Fast Sorting Script -->
+<script>
+  const sortSelect = document.getElementById('sort-select') as HTMLSelectElement;
+  const postsGrid = document.getElementById('posts-grid');
+
+  if (sortSelect && postsGrid) {
+    sortSelect.addEventListener('change', () => {
+      const cards = Array.from(postsGrid.querySelectorAll('.post-card')) as HTMLElement[];
+      const criteria = sortSelect.value;
+
+      cards.sort((a, b) => {
+        const dateA = parseInt(a.dataset.date || '0', 10);
+        const dateB = parseInt(b.dataset.date || '0', 10);
+        const featA = parseInt(a.dataset.featured || '0', 10);
+        const featB = parseInt(b.dataset.featured || '0', 10);
+
+        if (criteria === 'newest') return dateB - dateA;
+        if (criteria === 'oldest') return dateA - dateB;
+        if (criteria === 'popular') return featB - featA || dateB - dateA;
+        return 0;
+      });
+
+      // Clear & append sorted cards
+      postsGrid.innerHTML = '';
+      cards.forEach((card) => postsGrid.appendChild(card));
+    });
+
+    // Default trigger on page load (Newest First)
+    sortSelect.dispatchEvent(new Event('change'));
+  }
+</script>
+
 <style>
-  h2,
-  .post-item-footer {
-    font-family: var(--font-family-sans);
+  .blog-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1rem 0 3rem 0;
+  }
+  .blog-header {
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  .blog-header h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+  }
+  .subtitle {
+    color: var(--text-secondary, #666);
+    font-size: 1.05rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .filter-controls {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  .sort-dropdown {
+    background: rgba(150, 150, 150, 0.1);
+    color: inherit;
+    border: 1px solid rgba(150, 150, 150, 0.25);
+    border-radius: 6px;
+    padding: 0.35rem 0.6rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+  .post-card {
+    border: 1px solid rgba(150, 150, 150, 0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    background: rgba(150, 150, 150, 0.03);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+  .post-card:hover {
+    transform: translateY(-3px);
+    border-color: #2563eb;
+  }
+  .post-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
+  }
+  .category-tag {
+    background: rgba(37, 99, 235, 0.1);
+    color: #2563eb;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .post-meta time {
+    color: var(--text-secondary, #888);
+  }
+  .post-card h2 {
+    font-size: 1.25rem;
     font-weight: 700;
+    margin: 0 0 0.75rem 0;
+    line-height: 1.4;
   }
-
-  .post-item-date {
-    color: var(--text-secondary);
-    text-align: left;
-    text-transform: uppercase;
-    margin-right: 16px;
+  .post-card h2 a {
+    text-decoration: none;
+    color: inherit;
   }
-
-  hr {
-    margin: 60px auto;
+  .excerpt {
+    color: var(--text-secondary, #666);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    margin: 0 0 1.25rem 0;
+    flex-grow: 1;
+  }
+  .card-footer {
+    margin-top: auto;
+  }
+  .read-more {
+    text-decoration: none;
+    color: #2563eb;
+    font-weight: 600;
+    font-size: 0.9rem;
   }
 </style>
