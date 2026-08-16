@@ -1,19 +1,17 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
 
-const title = 'Blog & Student Guides';
-const description = 'Practical guides, tips, and essential survival advice for international students in Cyprus.';
-const permalink = 'https://cyprusstudentguide.com/blog/';
+const title = 'Cyprus Student Guide - Practical Guide for International Students';
+const description = 'Hype-free, factual, and practical survival guides for international students in Cyprus. Part-time work rules, banking, bus passes, and grocery budgeting.';
+const permalink = 'https://cyprusstudentguide.com/';
 
-// Load all markdown files
-const postFiles = import.meta.glob('/src/data/blog-posts/*.md', { eager: true });
-const relativeFiles = import.meta.glob('../../data/blog-posts/*.md', { eager: true });
-const allPostModules = Object.keys(postFiles).length > 0 ? postFiles : relativeFiles;
+// Fetch all blog markdown files
+const postFiles = import.meta.glob('../data/blog-posts/*.md', { eager: true });
 
-const allPosts = Object.entries(allPostModules).map(([filePath, post]: [string, any]) => {
+const posts = Object.entries(postFiles).map(([filePath, post]: [string, any]) => {
   const frontmatter = post.frontmatter || {};
-  const fileNameSlug = filePath.split('/').pop()?.replace('.md', '') || '';
-  const slug = frontmatter.slug || fileNameSlug;
+  const fileSlug = filePath.split('/').pop()?.replace('.md', '') || '';
+  const slug = frontmatter.slug || fileSlug;
   
   return {
     slug,
@@ -23,90 +21,68 @@ const allPosts = Object.entries(allPostModules).map(([filePath, post]: [string, 
     author: frontmatter.author || 'Saidur Rahman',
     category: frontmatter.category || 'General',
   };
-});
+}).sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime());
 
-// Default sort: Newest first
-const sortedPosts = allPosts.sort((a, b) => {
-  return new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime();
-});
+const featuredPosts = posts.slice(0, 6);
 ---
 
-<BaseLayout title={title} description={description} permalink={permalink} current="blog">
-  <div class="blog-container">
-    <header class="blog-header">
-      <span class="badge">KNOWLEDGE BASE</span>
-      <h1>Student Guides & Articles</h1>
-      <p>Practical, hype-free insights on part-time work, banking, public transit, and smart budgeting in Cyprus.</p>
-    </header>
-
-    <div class="controls-bar">
-      <div class="post-count">
-        Showing <span id="visible-count">{sortedPosts.length}</span> articles
-      </div>
-      
-      <div class="sort-wrapper">
-        <label for="sort-select">Sort by:</label>
-        <select id="sort-select" aria-label="Sort blog posts">
-          <option value="newest">Newest First</option>
-          <option value="oldest">Oldest First</option>
-          <option value="title">Title (A-Z)</option>
-        </select>
+<BaseLayout title={title} description={description} permalink={permalink} current="home">
+  <section class="hero-section">
+    <div class="hero-content">
+      <span class="hero-badge">THE AUTHENTIC STUDENT RESOURCE</span>
+      <h1>Master Student Life in Cyprus With Real-World Insights</h1>
+      <p>Independent, hype-free guides covering immigration, part-time jobs, student banking, transport discounts, and smart living across Limassol, Nicosia, Larnaca, and Paphos.</p>
+      <div class="hero-actions">
+        <a href="/blog/" class="btn-primary">Browse All Guides →</a>
+        <a href="/about/" class="btn-secondary">About The Guide</a>
       </div>
     </div>
+  </section>
 
-    {sortedPosts.length === 0 ? (
-      <div class="no-posts">
-        <p>No articles found.</p>
-      </div>
-    ) : (
-      <div class="posts-grid" id="posts-container">
-        {sortedPosts.map((post) => {
-          const publishTime = new Date(post.publishDate).getTime();
-          const formattedDate = new Date(post.publishDate).toLocaleDateString('en-GB', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric'
-          });
+  <section class="recent-posts-section">
+    <div class="section-header">
+      <h2>Latest Practical Guides</h2>
+      <a href="/blog/" class="view-all-link">View all {posts.length} articles →</a>
+    </div>
 
-          return (
-            <article 
-              class="post-card" 
-              data-date={publishTime} 
-              data-title={post.title.toLowerCase()}
-            >
-              <div class="post-meta">
-                <span class="post-category">{post.category}</span>
-                <time datetime={post.publishDate}>{formattedDate}</time>
-              </div>
-              <h2>
-                <a href={`/blog/${post.slug}/`}>{post.title}</a>
-              </h2>
-              <p>{post.description}</p>
-              <div class="post-footer">
-                <span class="author">By {post.author}</span>
-                <a href={`/blog/${post.slug}/`} class="read-more">Read Guide →</a>
-              </div>
-            </article>
-          );
-        })}
-      </div>
-    )}
-  </div>
+    <div class="posts-grid">
+      {featuredPosts.map((post) => {
+        const formattedDate = new Date(post.publishDate).toLocaleDateString('en-GB', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric'
+        });
+
+        return (
+          <article class="post-card">
+            <div class="post-meta">
+              <span class="post-category">{post.category}</span>
+              <time datetime={post.publishDate}>{formattedDate}</time>
+            </div>
+            <h3>
+              <a href={`/blog/${post.slug}/`}>{post.title}</a>
+            </h3>
+            <p>{post.description}</p>
+            <div class="post-footer">
+              <span class="author">By {post.author}</span>
+              <a href={`/blog/${post.slug}/`} class="read-more">Read Guide →</a>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+  </section>
 </BaseLayout>
 
 <style>
-  .blog-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 2rem 1rem 4rem;
-  }
-
-  .blog-header {
+  .hero-section {
     text-align: center;
-    margin-bottom: 2.5rem;
+    padding: 4rem 1rem 3rem;
+    max-width: 900px;
+    margin: 0 auto;
   }
 
-  .badge {
+  .hero-badge {
     background: rgba(37, 99, 235, 0.15);
     color: #3b82f6;
     padding: 0.35rem 0.85rem;
@@ -115,49 +91,82 @@ const sortedPosts = allPosts.sort((a, b) => {
     font-weight: 700;
     letter-spacing: 0.05em;
     display: inline-block;
-    margin-bottom: 0.75rem;
+    margin-bottom: 1.25rem;
   }
 
-  .blog-header h1 {
-    font-size: 2.2rem;
-    margin-bottom: 0.5rem;
+  .hero-section h1 {
+    font-size: 2.75rem;
+    line-height: 1.2;
+    margin-bottom: 1.25rem;
+    font-weight: 800;
     color: var(--heading-color, inherit);
   }
 
-  .blog-header p {
-    color: var(--text-muted, #94a3b8);
-    max-width: 650px;
-    margin: 0 auto;
-    line-height: 1.5;
+  .hero-section p {
+    font-size: 1.15rem;
+    color: #94a3b8;
+    line-height: 1.6;
+    margin-bottom: 2rem;
   }
 
-  .controls-bar {
+  :global(html:not(.dark)) .hero-section p {
+    color: #475569;
+  }
+
+  .hero-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .btn-primary {
+    background: #2563eb;
+    color: #ffffff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s ease;
+  }
+
+  .btn-primary:hover {
+    background: #1d4ed8;
+  }
+
+  .btn-secondary {
+    background: rgba(150, 150, 150, 0.12);
+    color: inherit;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid rgba(150, 150, 150, 0.25);
+  }
+
+  .recent-posts-section {
+    max-width: 1050px;
+    margin: 2rem auto 5rem;
+    padding: 0 1rem;
+  }
+
+  .section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 0.75rem;
     border-bottom: 1px solid rgba(150, 150, 150, 0.2);
-    font-size: 0.9rem;
-    color: var(--text-muted, #94a3b8);
   }
 
-  .sort-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+  .section-header h2 {
+    font-size: 1.75rem;
+    margin: 0;
   }
 
-  .sort-wrapper select {
-    background: rgba(150, 150, 150, 0.15);
-    color: inherit;
-    border: 1px solid rgba(150, 150, 150, 0.3);
-    border-radius: 6px;
-    padding: 0.35rem 0.6rem;
-    font-size: 0.85rem;
+  .view-all-link {
+    color: #3b82f6;
+    text-decoration: none;
     font-weight: 600;
-    cursor: pointer;
-    outline: none;
   }
 
   .posts-grid {
@@ -166,7 +175,6 @@ const sortedPosts = allPosts.sort((a, b) => {
     gap: 1.5rem;
   }
 
-  /* Card Styling compatible with Dark & Light Mode */
   .post-card {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(150, 150, 150, 0.2);
@@ -175,7 +183,7 @@ const sortedPosts = allPosts.sort((a, b) => {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.2s ease, border-color 0.2s ease;
   }
 
   :global(html:not(.dark)) .post-card {
@@ -210,19 +218,19 @@ const sortedPosts = allPosts.sort((a, b) => {
     font-weight: 600;
   }
 
-  .post-card h2 {
-    font-size: 1.25rem;
+  .post-card h3 {
+    font-size: 1.2rem;
     line-height: 1.4;
     margin: 0 0 0.75rem;
   }
 
-  .post-card h2 a {
+  .post-card h3 a {
     color: inherit;
     text-decoration: none;
     font-weight: 700;
   }
 
-  .post-card h2 a:hover {
+  .post-card h3 a:hover {
     color: #3b82f6;
   }
 
@@ -254,59 +262,15 @@ const sortedPosts = allPosts.sort((a, b) => {
     font-weight: 700;
   }
 
-  .read-more:hover {
-    text-decoration: underline;
-  }
-
-  .no-posts {
-    text-align: center;
-    padding: 3rem;
-    color: #94a3b8;
-  }
-
-  @media (max-width: 600px) {
-    .controls-bar {
+  @media (max-width: 640px) {
+    .hero-section h1 {
+      font-size: 2rem;
+    }
+    .hero-actions {
       flex-direction: column;
-      align-items: flex-start;
-      gap: 0.75rem;
     }
     .posts-grid {
       grid-template-columns: 1fr;
     }
   }
 </style>
-
-<script is:inline>
-  function initPostSorting() {
-    const sortSelect = document.getElementById('sort-select');
-    const postsContainer = document.getElementById('posts-container');
-    
-    if (!sortSelect || !postsContainer) return;
-
-    sortSelect.addEventListener('change', () => {
-      const criteria = sortSelect.value;
-      const cards = Array.from(postsContainer.querySelectorAll('.post-card'));
-
-      cards.sort((a, b) => {
-        const dateA = parseInt(a.getAttribute('data-date') || '0', 10);
-        const dateB = parseInt(b.getAttribute('data-date') || '0', 10);
-        const titleA = (a.getAttribute('data-title') || '').trim();
-        const titleB = (b.getAttribute('data-title') || '').trim();
-
-        if (criteria === 'newest') {
-          return dateB - dateA;
-        } else if (criteria === 'oldest') {
-          return dateA - dateB;
-        } else if (criteria === 'title') {
-          return titleA.localeCompare(titleB);
-        }
-        return 0;
-      });
-
-      postsContainer.innerHTML = '';
-      cards.forEach(card => postsContainer.appendChild(card));
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded', initPostSorting);
-</script>
