@@ -1,31 +1,33 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
 
 const title = 'Blog & Student Guides';
 const description = 'Practical guides, tips, and essential survival advice for international students in Cyprus.';
 const permalink = 'https://cyprusstudentguide.com/blog/';
 
-// Fetch from content collections (Fallback handles either 'blog-posts' or 'blog')
-let allPosts = [];
-try {
-  allPosts = await getCollection('blog-posts');
-  if (!allPosts || allPosts.length === 0) {
-    allPosts = await getCollection('blog');
-  }
-} catch (e) {
-  try {
-    allPosts = await getCollection('blog');
-  } catch (err) {
-    allPosts = [];
-  }
-}
+// Load all markdown files directly using import.meta.glob (Safe across all structures)
+const postFiles = import.meta.glob('../../data/blog-posts/*.md', { eager: true });
+const fallbackFiles = import.meta.glob('../../../src/data/blog-posts/*.md', { eager: true });
+const postsSource = Object.keys(postFiles).length > 0 ? postFiles : fallbackFiles;
+
+const allPosts = Object.values(postsSource).map((post: any) => {
+  const frontmatter = post.frontmatter || {};
+  const fileSlug = post.file ? post.file.split('/').pop().replace('.md', '') : '';
+  const slug = frontmatter.slug || fileSlug;
+  
+  return {
+    slug,
+    title: frontmatter.title || 'Untitled Post',
+    description: frontmatter.description || '',
+    publishDate: frontmatter.publishDate || '2026-08-16',
+    author: frontmatter.author || 'Saidur Rahman',
+    category: frontmatter.category || 'General',
+  };
+});
 
 // Default sort: Newest first
-const sortedPosts = (allPosts || []).sort((a, b) => {
-  const dateA = a.data.publishDate ? new Date(a.data.publishDate).getTime() : 0;
-  const dateB = b.data.publishDate ? new Date(b.data.publishDate).getTime() : 0;
-  return dateB - dateA;
+const sortedPosts = allPosts.sort((a, b) => {
+  return new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime();
 });
 ---
 
@@ -52,46 +54,37 @@ const sortedPosts = (allPosts || []).sort((a, b) => {
       </div>
     </div>
 
-    {sortedPosts.length === 0 ? (
-      <div class="no-posts">
-        <p>No articles found. Please check content collection name.</p>
-      </div>
-    ) : (
-      <div class="posts-grid" id="posts-container">
-        {sortedPosts.map((post) => {
-          const publishDateStr = post.data.publishDate || '2026-08-16';
-          const publishTime = new Date(publishDateStr).getTime();
-          const formattedDate = new Date(publishDateStr).toLocaleDateString('en-GB', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric'
-          });
-          const postTitle = post.data.title || 'Untitled Post';
-          const postSlug = post.slug || post.data.slug;
+    <div class="posts-grid" id="posts-container">
+      {sortedPosts.map((post) => {
+        const publishTime = new Date(post.publishDate).getTime();
+        const formattedDate = new Date(post.publishDate).toLocaleDateString('en-GB', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric'
+        });
 
-          return (
-            <article 
-              class="post-card" 
-              data-date={publishTime} 
-              data-title={postTitle.toLowerCase()}
-            >
-              <div class="post-meta">
-                <span class="post-category">{post.data.category || 'General'}</span>
-                <time datetime={publishDateStr}>{formattedDate}</time>
-              </div>
-              <h2>
-                <a href={`/blog/${postSlug}/`}>{postTitle}</a>
-              </h2>
-              <p>{post.data.description || ''}</p>
-              <div class="post-footer">
-                <span class="author">By {post.data.author || 'Admin'}</span>
-                <a href={`/blog/${postSlug}/`} class="read-more">Read Guide →</a>
-              </div>
-            </article>
-          );
-        })}
-      </div>
-    )}
+        return (
+          <article 
+            class="post-card" 
+            data-date={publishTime} 
+            data-title={post.title.toLowerCase()}
+          >
+            <div class="post-meta">
+              <span class="post-category">{post.category}</span>
+              <time datetime={post.publishDate}>{formattedDate}</time>
+            </div>
+            <h2>
+              <a href={`/blog/${post.slug}/`}>{post.title}</a>
+            </h2>
+            <p>{post.description}</p>
+            <div class="post-footer">
+              <span class="author">By {post.author}</span>
+              <a href={`/blog/${post.slug}/`} class="read-more">Read Guide →</a>
+            </div>
+          </article>
+        );
+      })}
+    </div>
   </div>
 </BaseLayout>
 
@@ -235,12 +228,6 @@ const sortedPosts = (allPosts || []).sort((a, b) => {
     color: var(--primary-color, #2563eb);
     text-decoration: none;
     font-weight: 700;
-  }
-
-  .no-posts {
-    text-align: center;
-    padding: 3rem;
-    color: var(--text-secondary, #64748b);
   }
 
   @media (max-width: 600px) {
