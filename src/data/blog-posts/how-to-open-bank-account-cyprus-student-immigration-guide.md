@@ -60,7 +60,7 @@ Opening an account digitally via the **Bank of Cyprus Mobile App (1App)** is oft
 
 * **Appointment Swapping / Reference:** If a senior student or peer has an unneeded bank appointment, ask whether the customer desk can transfer that scheduled slot to your name.
 * **University Banking Days:** Many institutions (such as UCLan Cyprus, Frederick, or University of Nicosia) organize dedicated "Bank Days" on campus where bank representatives collect student applications in bulk. Check with your international student office immediately upon registration.
-* **Initial Funding:** Keep your mandatory initial deposit funds (usually €850 required by the immigration authority) ready to fund the account the day your IBAN is generated. Initial deposited money in Eurobank will be frozen till completion of migration while deposited money in Bank of Cyprus can be withdraw after generation of bank statement. 
+* **Initial Funding:** Keep your mandatory initial deposit funds (usually €850 required by the immigration authority) ready to fund the account the day your IBAN is generated. Initial deposited money in the Eurobank will be frozen till completion of migration while deposited money in the Bank of Cyprus can be withdrew after generation of bank statement. 
 
 ---
 
