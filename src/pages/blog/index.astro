@@ -5,30 +5,23 @@ const title = 'Blog & Student Guides';
 const description = 'Practical guides, tips, and essential survival advice for international students in Cyprus.';
 const permalink = 'https://cyprusstudentguide.com/blog/';
 
-// Load all markdown files directly using import.meta.glob (Safe across all structures)
+// Load all markdown files for blog page
 const postFiles = import.meta.glob('../../data/blog-posts/*.md', { eager: true });
-const fallbackFiles = import.meta.glob('../../../src/data/blog-posts/*.md', { eager: true });
-const postsSource = Object.keys(postFiles).length > 0 ? postFiles : fallbackFiles;
 
-const allPosts = Object.values(postsSource).map((post: any) => {
+const allPosts = Object.entries(postFiles).map(([filePath, post]: [string, any]) => {
   const frontmatter = post.frontmatter || {};
-  const fileSlug = post.file ? post.file.split('/').pop().replace('.md', '') : '';
+  const fileSlug = filePath.split('/').pop()?.replace('.md', '') || '';
   const slug = frontmatter.slug || fileSlug;
   
   return {
     slug,
-    title: frontmatter.title || 'Untitled Post',
+    title: frontmatter.title || 'Untitled Guide',
     description: frontmatter.description || '',
     publishDate: frontmatter.publishDate || '2026-08-16',
     author: frontmatter.author || 'Saidur Rahman',
     category: frontmatter.category || 'General',
   };
-});
-
-// Default sort: Newest first
-const sortedPosts = allPosts.sort((a, b) => {
-  return new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime();
-});
+}).sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime());
 ---
 
 <BaseLayout title={title} description={description} permalink={permalink} current="blog">
@@ -41,7 +34,7 @@ const sortedPosts = allPosts.sort((a, b) => {
 
     <div class="controls-bar">
       <div class="post-count">
-        Showing <span id="visible-count">{sortedPosts.length}</span> articles
+        Showing <span id="visible-count">{allPosts.length}</span> articles
       </div>
       
       <div class="sort-wrapper">
@@ -55,7 +48,7 @@ const sortedPosts = allPosts.sort((a, b) => {
     </div>
 
     <div class="posts-grid" id="posts-container">
-      {sortedPosts.map((post) => {
+      {allPosts.map((post) => {
         const publishTime = new Date(post.publishDate).getTime();
         const formattedDate = new Date(post.publishDate).toLocaleDateString('en-GB', {
           day: 'numeric',
@@ -101,8 +94,8 @@ const sortedPosts = allPosts.sort((a, b) => {
   }
 
   .badge {
-    background: rgba(37, 99, 235, 0.1);
-    color: var(--primary-color, #2563eb);
+    background: rgba(37, 99, 235, 0.15);
+    color: #3b82f6;
     padding: 0.35rem 0.85rem;
     border-radius: 50px;
     font-size: 0.75rem;
@@ -115,11 +108,11 @@ const sortedPosts = allPosts.sort((a, b) => {
   .blog-header h1 {
     font-size: 2.2rem;
     margin-bottom: 0.5rem;
-    color: var(--text-main, #1e293b);
+    color: var(--heading-color, inherit);
   }
 
   .blog-header p {
-    color: var(--text-secondary, #64748b);
+    color: var(--text-muted, #94a3b8);
     max-width: 650px;
     margin: 0 auto;
     line-height: 1.5;
@@ -133,7 +126,7 @@ const sortedPosts = allPosts.sort((a, b) => {
     padding-bottom: 1rem;
     border-bottom: 1px solid rgba(150, 150, 150, 0.2);
     font-size: 0.9rem;
-    color: var(--text-secondary, #64748b);
+    color: var(--text-muted, #94a3b8);
   }
 
   .sort-wrapper {
@@ -143,7 +136,7 @@ const sortedPosts = allPosts.sort((a, b) => {
   }
 
   .sort-wrapper select {
-    background: rgba(150, 150, 150, 0.08);
+    background: rgba(150, 150, 150, 0.15);
     color: inherit;
     border: 1px solid rgba(150, 150, 150, 0.3);
     border-radius: 6px;
@@ -156,24 +149,34 @@ const sortedPosts = allPosts.sort((a, b) => {
 
   .posts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 1.5rem;
   }
 
   .post-card {
-    background: var(--card-bg, #ffffff);
+    background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(150, 150, 150, 0.2);
     border-radius: 12px;
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+
+  :global(html:not(.dark)) .post-card {
+    background: #ffffff;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  }
+
+  :global(html.dark) .post-card {
+    background: #1e293b;
+    border-color: rgba(255, 255, 255, 0.1);
   }
 
   .post-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08);
+    border-color: #3b82f6;
   }
 
   .post-meta {
@@ -181,38 +184,44 @@ const sortedPosts = allPosts.sort((a, b) => {
     justify-content: space-between;
     align-items: center;
     font-size: 0.75rem;
-    color: var(--text-secondary, #64748b);
+    color: #94a3b8;
     margin-bottom: 0.75rem;
   }
 
   .post-category {
-    background: rgba(150, 150, 150, 0.15);
+    background: rgba(59, 130, 246, 0.12);
+    color: #3b82f6;
     padding: 0.2rem 0.5rem;
     border-radius: 4px;
     font-weight: 600;
   }
 
   .post-card h2 {
-    font-size: 1.2rem;
+    font-size: 1.25rem;
     line-height: 1.4;
     margin: 0 0 0.75rem;
   }
 
   .post-card h2 a {
-    color: var(--text-main, #1e293b);
+    color: inherit;
     text-decoration: none;
+    font-weight: 700;
   }
 
   .post-card h2 a:hover {
-    color: var(--primary-color, #2563eb);
+    color: #3b82f6;
   }
 
   .post-card p {
-    color: var(--text-secondary, #64748b);
-    font-size: 0.9rem;
-    line-height: 1.5;
+    color: #94a3b8;
+    font-size: 0.92rem;
+    line-height: 1.55;
     margin-bottom: 1.25rem;
     flex-grow: 1;
+  }
+
+  :global(html:not(.dark)) .post-card p {
+    color: #475569;
   }
 
   .post-footer {
@@ -222,12 +231,17 @@ const sortedPosts = allPosts.sort((a, b) => {
     font-size: 0.8rem;
     border-top: 1px solid rgba(150, 150, 150, 0.15);
     padding-top: 0.75rem;
+    color: #94a3b8;
   }
 
   .read-more {
-    color: var(--primary-color, #2563eb);
+    color: #3b82f6;
     text-decoration: none;
     font-weight: 700;
+  }
+
+  .read-more:hover {
+    text-decoration: underline;
   }
 
   @media (max-width: 600px) {
