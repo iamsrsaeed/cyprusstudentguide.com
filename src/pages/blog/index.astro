@@ -6,12 +6,26 @@ const title = 'Blog & Student Guides';
 const description = 'Practical guides, tips, and essential survival advice for international students in Cyprus.';
 const permalink = 'https://cyprusstudentguide.com/blog/';
 
-// Get all blog posts from content collection
-const allPosts = await getCollection('blog-posts');
+// Fetch from content collections (Fallback handles either 'blog-posts' or 'blog')
+let allPosts = [];
+try {
+  allPosts = await getCollection('blog-posts');
+  if (!allPosts || allPosts.length === 0) {
+    allPosts = await getCollection('blog');
+  }
+} catch (e) {
+  try {
+    allPosts = await getCollection('blog');
+  } catch (err) {
+    allPosts = [];
+  }
+}
 
 // Default sort: Newest first
-const sortedPosts = allPosts.sort((a, b) => {
-  return new Date(b.data.publishDate).getTime() - new Date(a.data.publishDate).getTime();
+const sortedPosts = (allPosts || []).sort((a, b) => {
+  const dateA = a.data.publishDate ? new Date(a.data.publishDate).getTime() : 0;
+  const dateB = b.data.publishDate ? new Date(b.data.publishDate).getTime() : 0;
+  return dateB - dateA;
 });
 ---
 
@@ -38,38 +52,46 @@ const sortedPosts = allPosts.sort((a, b) => {
       </div>
     </div>
 
-    <div class="posts-grid" id="posts-container">
-      {sortedPosts.map((post) => {
-        const publishTime = new Date(post.data.publishDate).getTime();
-        const formattedDate = new Date(post.data.publishDate).toLocaleDateString('en-GB', {
-          day: 'numeric',
-          month: 'short',
-          year: 'numeric'
-        });
-        const postTitle = post.data.title;
+    {sortedPosts.length === 0 ? (
+      <div class="no-posts">
+        <p>No articles found. Please check content collection name.</p>
+      </div>
+    ) : (
+      <div class="posts-grid" id="posts-container">
+        {sortedPosts.map((post) => {
+          const publishDateStr = post.data.publishDate || '2026-08-16';
+          const publishTime = new Date(publishDateStr).getTime();
+          const formattedDate = new Date(publishDateStr).toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+          });
+          const postTitle = post.data.title || 'Untitled Post';
+          const postSlug = post.slug || post.data.slug;
 
-        return (
-          <article 
-            class="post-card" 
-            data-date={publishTime} 
-            data-title={postTitle.toLowerCase()}
-          >
-            <div class="post-meta">
-              <span class="post-category">{post.data.category || 'General'}</span>
-              <time datetime={post.data.publishDate}>{formattedDate}</time>
-            </div>
-            <h2>
-              <a href={`/blog/${post.slug}/`}>{postTitle}</a>
-            </h2>
-            <p>{post.data.description}</p>
-            <div class="post-footer">
-              <span class="author">By {post.data.author || 'Admin'}</span>
-              <a href={`/blog/${post.slug}/`} class="read-more">Read Guide →</a>
-            </div>
-          </article>
-        );
-      })}
-    </div>
+          return (
+            <article 
+              class="post-card" 
+              data-date={publishTime} 
+              data-title={postTitle.toLowerCase()}
+            >
+              <div class="post-meta">
+                <span class="post-category">{post.data.category || 'General'}</span>
+                <time datetime={publishDateStr}>{formattedDate}</time>
+              </div>
+              <h2>
+                <a href={`/blog/${postSlug}/`}>{postTitle}</a>
+              </h2>
+              <p>{post.data.description || ''}</p>
+              <div class="post-footer">
+                <span class="author">By {post.data.author || 'Admin'}</span>
+                <a href={`/blog/${postSlug}/`} class="read-more">Read Guide →</a>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    )}
   </div>
 </BaseLayout>
 
@@ -215,6 +237,12 @@ const sortedPosts = allPosts.sort((a, b) => {
     font-weight: 700;
   }
 
+  .no-posts {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-secondary, #64748b);
+  }
+
   @media (max-width: 600px) {
     .controls-bar {
       flex-direction: column;
@@ -254,12 +282,10 @@ const sortedPosts = allPosts.sort((a, b) => {
         return 0;
       });
 
-      // Clear container and append sorted cards
       postsContainer.innerHTML = '';
       cards.forEach(card => postsContainer.appendChild(card));
     });
   }
 
-  // Execute on initial DOM load & view transitions
   document.addEventListener('DOMContentLoaded', initPostSorting);
 </script>
