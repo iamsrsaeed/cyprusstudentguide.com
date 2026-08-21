@@ -12,7 +12,7 @@ Sending money from Cyprus back home to your family or managing living expenses c
 
 For international students and workers in Cyprus, **Taptap Send** has become the go-to app for sending money instantly to mobile wallets (bKash, Nagad, Easypaisa, JazzCash) and local bank accounts at official market exchange rates with **0% transfer fees**.
 
-Use our verified community promo code **`MDSAIDUR240`** to receive an instant **cash credit bonus** directly added to your first transfer.
+Use our verified community promo code **`MDSAIDUR240`** to receive an instant **cash credit bonus** directly added to your first qualifying transfer.
 
 ---
 
@@ -27,27 +27,27 @@ Use our verified community promo code **`MDSAIDUR240`** to receive an instant **
 
 ---
 
-## 2. Exclusive Bonus Code for Students
+## 2. Exclusive Bonus Code & Minimum Transfer Rules
 
-When sending your first transfer of even €1 or more, entering the student community voucher code adds bonus money straight to your payout amount:
+When sending your first remittance from Cyprus, entering the student community voucher code adds bonus money straight to your payout amount:
 
 * **Promo / Referral Code:** `MDSAIDUR240`
-* **Eligibility:** All new users sending money from Cyprus (or Europe/UK) to South Asia, Africa, or Latin America.
-* **Benefit:** You get an extra instant cashback bonus credited directly to your recipient's payout, and you unlock your own referral link to earn continuous bonuses by inviting campus friends!
+* **Minimum Qualifying Transfer:** To ensure the welcome cashback bonus is fully triggered, make sure your first transaction is at least **€100 to €200** (or the exact minimum threshold displayed in your app).
+* **Benefit:** You get an extra instant cashback credit bonus added to your recipient's payout, and you immediately unlock your own referral dashboard to start inviting friends and earning referral rewards!
 
 ---
 
 ## 3. Step-by-Step Guide: How to Claim Your Bonus
 
-Follow these simple steps to make sure your bonus activates on your first transaction:
+Follow these simple steps to ensure your bonus activates without issues:
 
 1. **Download the App:** Install the official **Taptap Send** app from Google Play Store or Apple App Store.
 2. **Sign Up:** Register your account using your Cyprus mobile number (`+357`) and email address.
-3. **Choose Destination:** Select your receiver’s country (e.g., Bangladesh, Pakistan, India, Nepal, Philippines, Nigeria, Ghana, etc.).
+3. **Choose Destination & Amount:** Select your receiver’s country (e.g., Bangladesh, Pakistan, India, Nepal, Philippines, Nigeria, Ghana, etc.) and enter **€200** (or your desired amount) to trigger the qualifying reward.
 4. **Enter Recipient Details:** Type your receiver’s mobile wallet number (e.g., bKash Personal Number) or bank account details.
-5. **Apply Promo Code:** In the payment screen before sending, tap on **"Have a promo or referral code?"** and enter:
+5. **Apply Promo Code:** In the payment screen before hitting confirm, tap on **"Have a promo or referral code?"** and enter:
    > **`MDSAIDUR240`**
-6. **Payment:** Fund the transfer using your Cyprus debit card (Bank of Cyprus, Eurobank, Hellenic Bank, or Revolut).
+6. **Payment:** Fund the transfer using your local Cyprus debit card (Bank of Cyprus, Eurobank, Hellenic Bank, or Revolut).
 7. **Instant Delivery:** The money and your extra bonus arrive in your recipient's wallet within 60 to 120 seconds!
 
 ---
@@ -57,7 +57,7 @@ Follow these simple steps to make sure your bonus activates on your first transa
 Once your first transfer is complete, you can generate your own referral code inside the app:
 * Navigate to the **"Invite Friends" / Gift Icon 🎁** tab in the Taptap Send app.
 * Share your code with fellow roommates, university classmates, and coworkers in Cyprus.
-* When they send their first transfer with your code, **they get bonus credit, and you earn direct bonus cash** on your next transaction!
+* When they send their first qualifying transfer with your code, **they get bonus credit, and you earn direct bonus cash** toward your next transaction!
 
 ---
 
