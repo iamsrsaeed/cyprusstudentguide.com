@@ -19,7 +19,7 @@ const { title, description, permalink, current = '' } = Astro.props;
     <link rel="canonical" href={permalink} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-    <!-- Immediate Theme Application Script (Prevents Theme Flash & Persists Selection) -->
+    <!-- Immediate Theme Persistence -->
     <script is:inline>
       const savedTheme = localStorage.getItem('theme');
       if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -67,7 +67,7 @@ const { title, description, permalink, current = '' } = Astro.props;
       </div>
     </header>
 
-    <main>
+    <main class="main-content">
       <slot />
     </main>
 
@@ -85,6 +85,8 @@ const { title, description, permalink, current = '' } = Astro.props;
         --card-bg: #ffffff;
         --border-color: rgba(0, 0, 0, 0.08);
         --primary-blue: #2563eb;
+        --table-bg: #ffffff;
+        --table-stripe: #f1f5f9;
       }
 
       html.dark {
@@ -94,6 +96,8 @@ const { title, description, permalink, current = '' } = Astro.props;
         --card-bg: #1e293b;
         --border-color: rgba(255, 255, 255, 0.1);
         --primary-blue: #38bdf8;
+        --table-bg: #1e293b;
+        --table-stripe: #182234;
       }
 
       body {
@@ -102,7 +106,7 @@ const { title, description, permalink, current = '' } = Astro.props;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         background-color: var(--bg-color);
         color: var(--text-main);
-        line-height: 1.6;
+        line-height: 1.7;
         transition: background-color 0.2s ease, color 0.2s ease;
       }
 
@@ -110,8 +114,8 @@ const { title, description, permalink, current = '' } = Astro.props;
       .promo-top-bar {
         background: linear-gradient(90deg, #1e3a8a, #2563eb, #0284c7);
         color: #ffffff;
-        padding: 0.55rem 1rem;
-        font-size: 0.88rem;
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
         box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       }
 
@@ -129,23 +133,29 @@ const { title, description, permalink, current = '' } = Astro.props;
       .promo-tag {
         background: #facc15;
         color: #000000;
-        font-size: 0.72rem;
+        font-size: 0.75rem;
         font-weight: 800;
-        padding: 0.15rem 0.5rem;
+        padding: 0.2rem 0.55rem;
         border-radius: 4px;
         letter-spacing: 0.03em;
       }
 
       .promo-code {
-        background: rgba(0, 0, 0, 0.3);
+        background: #0f172a;
         border: 1px dashed #facc15;
         color: #facc15;
-        padding: 0.15rem 0.5rem;
+        padding: 0.2rem 0.6rem;
         border-radius: 4px;
         font-family: monospace;
-        font-weight: 700;
+        font-size: 0.95rem;
+        font-weight: 800;
+        letter-spacing: 0.05em;
         cursor: pointer;
-        user-select: all;
+        display: inline-block;
+      }
+
+      .promo-code:hover {
+        background: #1e293b;
       }
 
       .promo-link {
@@ -162,7 +172,7 @@ const { title, description, permalink, current = '' } = Astro.props;
       /* Site Header & Navigation */
       .site-header {
         border-bottom: 1px solid var(--border-color);
-        background: rgba(255, 255, 255, 0.9);
+        background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(8px);
         position: sticky;
         top: 0;
@@ -170,7 +180,7 @@ const { title, description, permalink, current = '' } = Astro.props;
       }
 
       html.dark .site-header {
-        background: rgba(11, 17, 32, 0.85);
+        background: rgba(11, 17, 32, 0.9);
       }
 
       .header-container {
@@ -212,7 +222,6 @@ const { title, description, permalink, current = '' } = Astro.props;
         color: var(--primary-blue);
       }
 
-      /* Language Select */
       .lang-dropdown select {
         background: rgba(150, 150, 150, 0.12);
         color: inherit;
@@ -225,7 +234,6 @@ const { title, description, permalink, current = '' } = Astro.props;
         outline: none;
       }
 
-      /* Theme Toggle Button */
       .theme-btn {
         background: rgba(150, 150, 150, 0.12);
         border: 1px solid var(--border-color);
@@ -234,22 +242,99 @@ const { title, description, permalink, current = '' } = Astro.props;
         cursor: pointer;
         display: flex;
         align-items: center;
-        gap: 0.25rem;
         font-size: 0.85rem;
         color: inherit;
       }
 
-      html.dark .sun-icon {
-        display: inline;
+      html.dark .sun-icon { display: inline; }
+      html.dark .moon-icon { display: none; }
+      html:not(.dark) .sun-icon { display: none; }
+      html:not(.dark) .moon-icon { display: inline; }
+
+      /* Global Markdown Article & Table Styling */
+      .main-content {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem 1.25rem 4rem;
       }
-      html.dark .moon-icon {
-        display: none;
+
+      .main-content h1 {
+        font-size: 2.25rem;
+        line-height: 1.3;
+        margin-bottom: 1rem;
       }
-      html:not(.dark) .sun-icon {
-        display: none;
+
+      .main-content h2 {
+        font-size: 1.6rem;
+        margin-top: 2.5rem;
+        margin-bottom: 0.85rem;
+        color: var(--primary-blue);
       }
-      html:not(.dark) .moon-icon {
-        display: inline;
+
+      .main-content h3 {
+        font-size: 1.25rem;
+        margin-top: 1.75rem;
+        margin-bottom: 0.65rem;
+      }
+
+      .main-content p {
+        margin-bottom: 1.25rem;
+        font-size: 1.05rem;
+      }
+
+      .main-content ul, .main-content ol {
+        margin-bottom: 1.5rem;
+        padding-left: 1.5rem;
+      }
+
+      .main-content li {
+        margin-bottom: 0.5rem;
+        font-size: 1.02rem;
+      }
+
+      .main-content hr {
+        border: 0;
+        height: 1px;
+        background: var(--border-color);
+        margin: 2.5rem 0;
+      }
+
+      /* Clean Markdown Tables */
+      .main-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1.75rem 0;
+        background: var(--table-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        overflow: hidden;
+        font-size: 0.95rem;
+      }
+
+      .main-content th {
+        background: rgba(37, 99, 235, 0.12);
+        color: var(--primary-blue);
+        text-align: left;
+        padding: 0.85rem 1rem;
+        font-weight: 700;
+        border-bottom: 2px solid var(--border-color);
+      }
+
+      .main-content td {
+        padding: 0.85rem 1rem;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .main-content tr:nth-child(even) {
+        background-color: var(--table-stripe);
+      }
+
+      .main-content blockquote {
+        border-left: 4px solid var(--primary-blue);
+        background: rgba(37, 99, 235, 0.06);
+        margin: 1.5rem 0;
+        padding: 1rem 1.25rem;
+        border-radius: 0 8px 8px 0;
       }
 
       .site-footer {
@@ -260,19 +345,26 @@ const { title, description, permalink, current = '' } = Astro.props;
         color: var(--text-muted);
         margin-top: 4rem;
       }
+
+      @media (max-width: 768px) {
+        .main-content table {
+          display: block;
+          overflow-x: auto;
+          white-space: nowrap;
+        }
+      }
     </style>
 
     <script is:inline>
-      // Theme Toggle Logic with LocalStorage Persistence
       const themeBtn = document.getElementById('theme-toggle');
       if (themeBtn) {
         themeBtn.addEventListener('click', () => {
-          const isDark = document.documentElement.classList.toggle('dark');
+          document.documentElement.classList.toggle('dark');
+          const isDark = document.documentElement.classList.contains('dark');
           localStorage.setItem('theme', isDark ? 'dark' : 'light');
         });
       }
 
-      // Copy Code Alert
       const promoBtn = document.getElementById('promo-code-btn');
       if (promoBtn) {
         promoBtn.addEventListener('click', () => {
