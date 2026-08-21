@@ -19,6 +19,11 @@ const { title, description, permalink, current = '' } = Astro.props;
     <link rel="canonical" href={permalink} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
+    <!-- Google Fonts: Inter & Plus Jakarta Sans for Modern Visual Appeal -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
     <!-- Immediate Theme Persistence -->
     <script is:inline>
       const savedTheme = localStorage.getItem('theme');
@@ -30,24 +35,30 @@ const { title, description, permalink, current = '' } = Astro.props;
     </script>
   </head>
   <body>
-    <!-- Top Highlight Banner for Taptap Send Referral -->
+    <!-- Top Glowing Highlight Banner for Taptap Send Referral -->
     <div class="promo-top-bar">
       <div class="promo-inner">
-        <span class="promo-tag">🎁 EXCLUSIVE BONUS</span>
-        <span class="promo-text">Send money from Cyprus with <strong>0% fee</strong>! Use promo code <span class="promo-code" id="promo-code-btn" title="Click to copy">MDSAIDUR240</span> for an instant cashback bonus!</span>
-        <a href="/blog/how-to-send-money-from-cyprus-taptap-send-bonus-guide/" class="promo-link">Claim Bonus →</a>
+        <span class="promo-tag">🎁 EXCLUSIVE CASHBACK</span>
+        <span class="promo-text">Send money with <strong>0% fee</strong>! Enter verified student promo code <span class="promo-code" id="promo-code-btn" title="Click to copy">MDSAIDUR240</span> for instant bonus credit!</span>
+        <a href="/blog/how-to-send-money-from-cyprus-taptap-send-bonus-guide/" class="promo-link">Claim Bonus ➔</a>
       </div>
     </div>
 
-    <!-- Navigation Header -->
+    <!-- Glowing Background Mesh -->
+    <div class="bg-mesh-glow"></div>
+
+    <!-- Navigation Header with Glassmorphism -->
     <header class="site-header">
       <div class="header-container">
-        <a href="/" class="site-logo">Cyprus <span>Student Guide</span></a>
+        <a href="/" class="site-logo">
+          <span class="logo-badge">CY</span>
+          <span>Cyprus <strong>Student Guide</strong></span>
+        </a>
         
         <nav class="site-nav">
-          <a href="/" class={current === 'home' ? 'active' : ''}>HOME</a>
-          <a href="/about/" class={current === 'about' ? 'active' : ''}>ABOUT</a>
-          <a href="/blog/" class={current === 'blog' ? 'active' : ''}>BLOG</a>
+          <a href="/" class={current === 'home' ? 'active' : ''}>Home</a>
+          <a href="/about/" class={current === 'about' ? 'active' : ''}>About</a>
+          <a href="/blog/" class={current === 'blog' ? 'active' : ''}>All Guides</a>
 
           <!-- Language Selector -->
           <div class="lang-dropdown">
@@ -71,65 +82,102 @@ const { title, description, permalink, current = '' } = Astro.props;
       <slot />
     </main>
 
-    <!-- Global Footer with Contact Email & Website Share Widget -->
+    <!-- Global Visual Footer -->
     <footer class="site-footer">
       <div class="footer-container">
+        <div class="footer-brand">
+          <a href="/" class="site-logo footer-logo">
+            <span class="logo-badge">CY</span>
+            <span>Cyprus <strong>Student Guide</strong></span>
+          </a>
+          <p class="footer-tagline">The most trusted, verified, and hype-free resource portal for international students in Cyprus.</p>
+        </div>
+
         <div class="footer-share-section">
-          <p class="share-site-label">Spread the word to fellow students:</p>
+          <p class="share-site-label">Share This Knowledge Base:</p>
           <div class="footer-share-links">
-            <a href="https://api.whatsapp.com/send?text=Check%20out%20Cyprus%20Student%20Guide%20-%20The%20authentic%20survival%20resource%20for%20international%20students%3A%20https%3A%2F%2Fcyprusstudentguide.com" target="_blank" rel="noopener noreferrer" class="foot-share-btn">💬 WhatsApp</a>
+            <a href="https://api.whatsapp.com/send?text=Check%20out%20Cyprus%20Student%20Guide%20-%20The%20definitive%20resource%20for%20students%20in%20Cyprus%3A%20https%3A%2F%2Fcyprusstudentguide.com" target="_blank" rel="noopener noreferrer" class="foot-share-btn">💬 WhatsApp</a>
             <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fcyprusstudentguide.com" target="_blank" rel="noopener noreferrer" class="foot-share-btn">📘 Facebook</a>
-            <a href="https://twitter.com/intent/tweet?text=Check%20out%20Cyprus%20Student%20Guide&url=https%3A%2F%2Fcyprusstudentguide.com" target="_blank" rel="noopener noreferrer" class="foot-share-btn">𝕏 Share</a>
+            <a href="https://twitter.com/intent/tweet?text=Check%20out%20Cyprus%20Student%20Guide&url=https%3A%2F%2Fcyprusstudentguide.com" target="_blank" rel="noopener noreferrer" class="foot-share-btn">𝕏 Post</a>
           </div>
         </div>
 
         <div class="footer-contact">
-          <p>Questions or student inquiries? Contact us at: <a href="mailto:contact@cyprusstudentguide.com" class="footer-email">contact@cyprusstudentguide.com</a></p>
+          <p>Official Contact: <a href="mailto:contact@cyprusstudentguide.com" class="footer-email">contact@cyprusstudentguide.com</a></p>
         </div>
 
-        <p class="copyright">&copy; 2026 CyprusStudentGuide.com - Built with authenticity for international students.</p>
+        <div class="footer-bottom">
+          <p class="copyright">&copy; 2026 CyprusStudentGuide.com • Built with precision & authentic field data.</p>
+        </div>
       </div>
     </footer>
 
     <style is:global>
       :root {
+        --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        --font-mono: 'JetBrains Mono', monospace;
+        
         --bg-color: #f8fafc;
         --text-main: #0f172a;
-        --text-muted: #64748b;
+        --text-muted: #475569;
         --card-bg: #ffffff;
-        --border-color: rgba(0, 0, 0, 0.08);
+        --card-border: rgba(15, 23, 42, 0.08);
         --primary-blue: #2563eb;
+        --primary-glow: rgba(37, 99, 235, 0.15);
         --table-bg: #ffffff;
-        --table-stripe: #f1f5f9;
+        --table-stripe: #f8fafc;
       }
 
       html.dark {
-        --bg-color: #0b1120;
+        --bg-color: #080d1a;
         --text-main: #f8fafc;
         --text-muted: #94a3b8;
-        --card-bg: #1e293b;
-        --border-color: rgba(255, 255, 255, 0.1);
+        --card-bg: #0f172a;
+        --card-border: rgba(255, 255, 255, 0.08);
         --primary-blue: #38bdf8;
-        --table-bg: #1e293b;
-        --table-stripe: #182234;
+        --primary-glow: rgba(56, 189, 248, 0.15);
+        --table-bg: #0f172a;
+        --table-stripe: #131d31;
+      }
+
+      * {
+        box-sizing: border-box;
       }
 
       body {
         margin: 0;
         padding: 0;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        font-family: var(--font-main);
         background-color: var(--bg-color);
         color: var(--text-main);
-        line-height: 1.7;
-        transition: background-color 0.2s ease, color 0.2s ease;
+        line-height: 1.75;
+        position: relative;
+        overflow-x: hidden;
+        transition: background-color 0.25s ease, color 0.25s ease;
       }
 
+      /* Ambient Radial Lighting Glow */
+      .bg-mesh-glow {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100vw;
+        height: 480px;
+        background: radial-gradient(circle at 50% 10%, var(--primary-glow) 0%, transparent 65%);
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* Top Highlight Bar */
       .promo-top-bar {
-        background: linear-gradient(90deg, #1e3a8a, #2563eb, #0284c7);
+        background: linear-gradient(90deg, #1d4ed8, #2563eb, #0284c7);
         color: #ffffff;
-        padding: 0.6rem 1rem;
-        font-size: 0.9rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        padding: 0.65rem 1rem;
+        font-size: 0.88rem;
+        position: relative;
+        z-index: 60;
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.25);
       }
 
       .promo-inner {
@@ -139,79 +187,97 @@ const { title, description, permalink, current = '' } = Astro.props;
         align-items: center;
         justify-content: center;
         flex-wrap: wrap;
-        gap: 0.6rem;
+        gap: 0.65rem;
         text-align: center;
       }
 
       .promo-tag {
         background: #facc15;
         color: #000000;
-        font-size: 0.75rem;
+        font-size: 0.72rem;
         font-weight: 800;
         padding: 0.2rem 0.55rem;
-        border-radius: 4px;
-        letter-spacing: 0.03em;
+        border-radius: 6px;
+        letter-spacing: 0.04em;
       }
 
       .promo-code {
-        background: #0f172a;
+        background: #0b1120;
         border: 1px dashed #facc15;
         color: #facc15;
-        padding: 0.2rem 0.6rem;
-        border-radius: 4px;
-        font-family: monospace;
-        font-size: 0.95rem;
-        font-weight: 800;
-        letter-spacing: 0.05em;
+        padding: 0.2rem 0.65rem;
+        border-radius: 6px;
+        font-family: var(--font-mono);
+        font-size: 0.92rem;
+        font-weight: 700;
         cursor: pointer;
+        transition: transform 0.15s ease, background 0.15s ease;
         display: inline-block;
       }
 
       .promo-code:hover {
         background: #1e293b;
+        transform: scale(1.04);
       }
 
       .promo-link {
         color: #ffffff;
         font-weight: 700;
         text-decoration: underline;
-        margin-left: 0.25rem;
+        text-underline-offset: 3px;
+        margin-left: 0.35rem;
       }
 
       .promo-link:hover {
         color: #facc15;
       }
 
+      /* Header & Glassmorphism Navigation */
       .site-header {
-        border-bottom: 1px solid var(--border-color);
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(8px);
         position: sticky;
         top: 0;
         z-index: 50;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--card-border);
       }
 
       html.dark .site-header {
-        background: rgba(11, 17, 32, 0.9);
+        background: rgba(8, 13, 26, 0.82);
       }
 
       .header-container {
         max-width: 1100px;
         margin: 0 auto;
-        padding: 0.85rem 1rem;
+        padding: 0.9rem 1.25rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
       }
 
       .site-logo {
-        font-size: 1.35rem;
-        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
         text-decoration: none;
         color: var(--text-main);
+        font-size: 1.25rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
       }
 
-      .site-logo span {
+      .logo-badge {
+        background: linear-gradient(135deg, #2563eb, #38bdf8);
+        color: #ffffff;
+        font-size: 0.75rem;
+        font-weight: 800;
+        padding: 0.3rem 0.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+      }
+
+      .site-logo strong {
         color: var(--primary-blue);
       }
 
@@ -224,9 +290,9 @@ const { title, description, permalink, current = '' } = Astro.props;
       .site-nav a {
         text-decoration: none;
         color: var(--text-muted);
-        font-size: 0.9rem;
+        font-size: 0.92rem;
         font-weight: 600;
-        transition: color 0.2s ease;
+        transition: color 0.15s ease;
       }
 
       .site-nav a:hover,
@@ -235,11 +301,11 @@ const { title, description, permalink, current = '' } = Astro.props;
       }
 
       .lang-dropdown select {
-        background: rgba(150, 150, 150, 0.12);
+        background: rgba(150, 150, 150, 0.08);
         color: inherit;
-        border: 1px solid var(--border-color);
-        padding: 0.3rem 0.5rem;
-        border-radius: 6px;
+        border: 1px solid var(--card-border);
+        padding: 0.35rem 0.6rem;
+        border-radius: 8px;
         font-size: 0.85rem;
         font-weight: 600;
         cursor: pointer;
@@ -247,14 +313,14 @@ const { title, description, permalink, current = '' } = Astro.props;
       }
 
       .theme-btn {
-        background: rgba(150, 150, 150, 0.12);
-        border: 1px solid var(--border-color);
-        padding: 0.3rem 0.6rem;
-        border-radius: 6px;
+        background: rgba(150, 150, 150, 0.08);
+        border: 1px solid var(--card-border);
+        padding: 0.35rem 0.65rem;
+        border-radius: 8px;
         cursor: pointer;
         display: flex;
         align-items: center;
-        font-size: 0.85rem;
+        font-size: 0.9rem;
         color: inherit;
       }
 
@@ -263,82 +329,204 @@ const { title, description, permalink, current = '' } = Astro.props;
       html:not(.dark) .sun-icon { display: none; }
       html:not(.dark) .moon-icon { display: inline; }
 
+      /* Main Body Content Styling */
       .main-content {
-        max-width: 900px;
+        max-width: 860px;
         margin: 0 auto;
-        padding: 2rem 1.25rem 4rem;
+        padding: 2.5rem 1.25rem 5rem;
+        position: relative;
+        z-index: 1;
       }
 
-      .main-content h1 { font-size: 2.25rem; line-height: 1.3; margin-bottom: 1rem; }
-      .main-content h2 { font-size: 1.6rem; margin-top: 2.5rem; margin-bottom: 0.85rem; color: var(--primary-blue); }
-      .main-content h3 { font-size: 1.25rem; margin-top: 1.75rem; margin-bottom: 0.65rem; }
-      .main-content p { margin-bottom: 1.25rem; font-size: 1.05rem; }
-      .main-content ul, .main-content ol { margin-bottom: 1.5rem; padding-left: 1.5rem; }
-      .main-content li { margin-bottom: 0.5rem; font-size: 1.02rem; }
-      .main-content hr { border: 0; height: 1px; background: var(--border-color); margin: 2.5rem 0; }
+      .main-content h1 {
+        font-size: 2.4rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1.25;
+        margin-bottom: 1.25rem;
+      }
 
+      .main-content h2 {
+        font-size: 1.65rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        margin-top: 2.75rem;
+        margin-bottom: 1rem;
+        color: var(--primary-blue);
+      }
+
+      .main-content h3 {
+        font-size: 1.28rem;
+        font-weight: 700;
+        margin-top: 2rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .main-content p {
+        margin-bottom: 1.35rem;
+        font-size: 1.05rem;
+        color: var(--text-main);
+      }
+
+      .main-content ul, .main-content ol {
+        margin-bottom: 1.75rem;
+        padding-left: 1.5rem;
+      }
+
+      .main-content li {
+        margin-bottom: 0.6rem;
+        font-size: 1.02rem;
+      }
+
+      .main-content hr {
+        border: 0;
+        height: 1px;
+        background: var(--card-border);
+        margin: 3rem 0;
+      }
+
+      /* Premium Markdown Tables */
       .main-content table {
         width: 100%;
-        border-collapse: collapse;
-        margin: 1.75rem 0;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin: 2rem 0;
         background: var(--table-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
+        border: 1px solid var(--card-border);
+        border-radius: 12px;
         overflow: hidden;
-        font-size: 0.95rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
       }
 
       .main-content th {
-        background: rgba(37, 99, 235, 0.12);
+        background: rgba(37, 99, 235, 0.08);
         color: var(--primary-blue);
         text-align: left;
-        padding: 0.85rem 1rem;
+        padding: 0.95rem 1.1rem;
         font-weight: 700;
-        border-bottom: 2px solid var(--border-color);
+        font-size: 0.95rem;
+        border-bottom: 1px solid var(--card-border);
       }
 
-      .main-content td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border-color); }
-      .main-content tr:nth-child(even) { background-color: var(--table-stripe); }
+      .main-content td {
+        padding: 0.95rem 1.1rem;
+        border-bottom: 1px solid var(--card-border);
+        font-size: 0.95rem;
+      }
+
+      .main-content tr:last-child td {
+        border-bottom: none;
+      }
+
+      .main-content tr:nth-child(even) {
+        background-color: var(--table-stripe);
+      }
 
       .main-content blockquote {
         border-left: 4px solid var(--primary-blue);
-        background: rgba(37, 99, 235, 0.06);
-        margin: 1.5rem 0;
-        padding: 1rem 1.25rem;
-        border-radius: 0 8px 8px 0;
+        background: var(--primary-glow);
+        margin: 1.75rem 0;
+        padding: 1.15rem 1.35rem;
+        border-radius: 0 12px 12px 0;
+        font-size: 1.02rem;
+        font-style: normal;
       }
 
+      /* Footer Design */
       .site-footer {
-        border-top: 1px solid var(--border-color);
-        padding: 2.5rem 1rem;
+        border-top: 1px solid var(--card-border);
+        background: rgba(150, 150, 150, 0.03);
+        padding: 4rem 1.25rem 3rem;
+        position: relative;
+        z-index: 1;
+      }
+
+      .footer-container {
+        max-width: 900px;
+        margin: 0 auto;
         text-align: center;
+      }
+
+      .footer-brand {
+        margin-bottom: 2rem;
+      }
+
+      .footer-logo {
+        justify-content: center;
+        margin-bottom: 0.6rem;
+      }
+
+      .footer-tagline {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        max-width: 550px;
+        margin: 0 auto;
+      }
+
+      .footer-share-section {
+        margin-bottom: 2rem;
+      }
+
+      .share-site-label {
+        font-size: 0.9rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+      }
+
+      .footer-share-links {
+        display: flex;
+        justify-content: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+      }
+
+      .foot-share-btn {
+        background: var(--card-bg);
+        color: var(--text-main);
+        padding: 0.45rem 0.9rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        border: 1px solid var(--card-border);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        transition: transform 0.15s ease, border-color 0.15s ease;
+      }
+
+      .foot-share-btn:hover {
+        transform: translateY(-2px);
+        border-color: var(--primary-blue);
+        color: var(--primary-blue);
+      }
+
+      .footer-contact {
+        margin-bottom: 2rem;
+        font-size: 0.95rem;
+        color: var(--text-muted);
+      }
+
+      .footer-email {
+        color: var(--primary-blue);
+        text-decoration: none;
+        font-weight: 700;
+      }
+
+      .footer-bottom {
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--card-border);
         font-size: 0.85rem;
         color: var(--text-muted);
-        margin-top: 4rem;
       }
-
-      .footer-share-section { margin-bottom: 1.25rem; }
-      .share-site-label { font-size: 0.9rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.6rem; }
-      .footer-share-links { display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem; }
-      .foot-share-btn {
-        background: rgba(150, 150, 150, 0.12);
-        color: var(--text-main);
-        padding: 0.35rem 0.75rem;
-        border-radius: 6px;
-        text-decoration: none;
-        font-size: 0.82rem;
-        font-weight: 600;
-        border: 1px solid var(--border-color);
-      }
-      .foot-share-btn:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
-
-      .footer-contact { margin-bottom: 1rem; font-size: 0.9rem; }
-      .footer-email { color: var(--primary-blue); text-decoration: none; font-weight: 600; }
-      .footer-email:hover { text-decoration: underline; }
-      .copyright { margin: 0; }
 
       @media (max-width: 768px) {
-        .main-content table { display: block; overflow-x: auto; white-space: nowrap; }
+        .main-content h1 {
+          font-size: 1.95rem;
+        }
+        .main-content table {
+          display: block;
+          overflow-x: auto;
+          white-space: nowrap;
+        }
       }
     </style>
 
