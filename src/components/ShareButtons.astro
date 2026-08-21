@@ -1,0 +1,187 @@
+---
+export interface Props {
+  title: string;
+  url: string;
+  description?: string;
+}
+
+const { title, url, description = '' } = Astro.props;
+
+const encodedUrl = encodeURIComponent(url);
+const encodedTitle = encodeURIComponent(title);
+const encodedDesc = encodeURIComponent(description);
+---
+
+<div class="share-widget">
+  <div class="share-header">
+    <span class="share-icon">📢</span>
+    <span class="share-title">Found this helpful? Share with other students:</span>
+  </div>
+
+  <div class="share-buttons">
+    <!-- Native Mobile Web Share (Appears on mobile browsers) -->
+    <button class="share-btn native-share-btn" id="nativeShareBtn" data-title={title} data-url={url} data-desc={description} aria-label="Share via Apps">
+      <span>📲 Share via Apps</span>
+    </button>
+
+    <!-- WhatsApp -->
+    <a 
+      href={`https://api.whatsapp.com/send?text=${encodedTitle}%20-%20${encodedUrl}`} 
+      target="_blank" 
+      rel="noopener noreferrer" 
+      class="share-btn whatsapp"
+      aria-label="Share on WhatsApp"
+    >
+      <span class="btn-icon">💬</span> WhatsApp
+    </a>
+
+    <!-- Facebook -->
+    <a 
+      href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`} 
+      target="_blank" 
+      rel="noopener noreferrer" 
+      class="share-btn facebook"
+      aria-label="Share on Facebook"
+    >
+      <span class="btn-icon">📘</span> Facebook
+    </a>
+
+    <!-- X / Twitter -->
+    <a 
+      href={`https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`} 
+      target="_blank" 
+      rel="noopener noreferrer" 
+      class="share-btn twitter"
+      aria-label="Share on X"
+    >
+      <span class="btn-icon">𝕏</span> X
+    </a>
+
+    <!-- LinkedIn -->
+    <a 
+      href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`} 
+      target="_blank" 
+      rel="noopener noreferrer" 
+      class="share-btn linkedin"
+      aria-label="Share on LinkedIn"
+    >
+      <span class="btn-icon">💼</span> LinkedIn
+    </a>
+
+    <!-- Copy Link Button -->
+    <button class="share-btn copy-link-btn" id="copyShareUrlBtn" data-url={url} aria-label="Copy page link">
+      <span class="btn-icon">🔗</span> <span class="copy-text">Copy Link</span>
+    </button>
+  </div>
+</div>
+
+<style>
+  .share-widget {
+    background: rgba(37, 99, 235, 0.05);
+    border: 1px solid var(--border-color, rgba(150, 150, 150, 0.2));
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin: 2.5rem 0 1.5rem;
+  }
+
+  html.dark .share-widget {
+    background: rgba(30, 41, 59, 0.6);
+  }
+
+  .share-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  .share-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    align-items: center;
+  }
+
+  .share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.85rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid rgba(150, 150, 150, 0.2);
+    background: var(--card-bg, #ffffff);
+    color: var(--text-main, #0f172a);
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  }
+
+  .share-btn:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary-blue, #38bdf8);
+  }
+
+  .native-share-btn {
+    display: none;
+    background: #2563eb;
+    color: #ffffff;
+    border: none;
+  }
+
+  .native-share-btn:hover {
+    background: #1d4ed8;
+  }
+
+  .whatsapp:hover { background: rgba(37, 211, 102, 0.15); color: #25d366; }
+  .facebook:hover { background: rgba(24, 119, 242, 0.15); color: #1877f2; }
+  .twitter:hover { background: rgba(255, 255, 255, 0.15); }
+  .linkedin:hover { background: rgba(10, 102, 194, 0.15); color: #0a66c2; }
+  .copy-link-btn:hover { background: rgba(150, 150, 150, 0.2); }
+
+  @media (max-width: 640px) {
+    .native-share-btn {
+      display: inline-flex;
+    }
+  }
+</style>
+
+<script is:inline>
+  // Web Share API for Mobile
+  const nativeBtn = document.getElementById('nativeShareBtn');
+  if (nativeBtn && navigator.share) {
+    nativeBtn.style.display = 'inline-flex';
+    nativeBtn.addEventListener('click', async () => {
+      try {
+        await navigator.share({
+          title: nativeBtn.dataset.title || document.title,
+          text: nativeBtn.dataset.desc || '',
+          url: nativeBtn.dataset.url || window.location.href,
+        });
+      } catch (err) {
+        // Dismissed or unsupported
+      }
+    });
+  }
+
+  // Copy Link with Feedback
+  const copyBtn = document.getElementById('copyShareUrlBtn');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      const targetUrl = copyBtn.dataset.url || window.location.href;
+      navigator.clipboard.writeText(targetUrl);
+      const textSpan = copyBtn.querySelector('.copy-text');
+      if (textSpan) {
+        const originalText = textSpan.innerText;
+        textSpan.innerText = 'Copied!';
+        setTimeout(() => {
+          textSpan.innerText = originalText;
+        }, 2000);
+      }
+    });
+  }
+</script>
