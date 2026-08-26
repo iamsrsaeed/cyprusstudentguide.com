@@ -1,0 +1,104 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const title = 'Terms of Service | Cyprus Student Guide';
+const description = 'Standard terms and conditions governing the use of CyprusStudentGuide.com informational guides and resources.';
+const permalink = 'https://cyprusstudentguide.com/terms/';
+---
+
+<BaseLayout title={title} description={description} permalink={permalink} current="terms">
+  <div class="legal-container">
+    <header class="legal-header">
+      <span class="badge">TERMS & CONDITIONS</span>
+      <h1>Terms of Service</h1>
+      <p class="last-updated">Last Updated: August 2026</p>
+    </header>
+
+    <div class="legal-body">
+      <section class="legal-section">
+        <h2>1. Acceptance of Terms</h2>
+        <p>By accessing and utilizing <strong>CyprusStudentGuide.com</strong>, you agree to comply with and be bound by these Terms of Service. If you disagree with any part of these terms, please do not use our website.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2>2. Intellectual Property & Fair Use</h2>
+        <p>All original editorial articles, calculations, structural guides, and synthesized checklists published on this portal are the intellectual property of CyprusStudentGuide.com, unless explicitly credited otherwise. You may share short excerpts or links with appropriate attribution for non-commercial educational purposes. Bulk scraping or automated republication without prior written consent is strictly prohibited.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2>3. External Links & Affiliates</h2>
+        <p>Our website contains external hyperlinks to third-party services (such as government portals, transit routes, or remittance platforms). We have no control over the privacy policies, availability, or operational accuracy of external third-party sites.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2>4. Inquiries & Contact</h2>
+        <p>For questions regarding these Terms of Service, please reach out to our team at: <a href="mailto:contact@cyprusstudentguide.com">contact@cyprusstudentguide.com</a>.</p>
+      </section>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .legal-container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 4rem;
+  }
+
+  .legal-header {
+    text-align: center;
+    margin-bottom: 2.75rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  .badge {
+    background: rgba(37, 99, 235, 0.12);
+    color: var(--primary-blue);
+    padding: 0.35rem 0.85rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    display: inline-block;
+    margin-bottom: 0.85rem;
+  }
+
+  .legal-header h1 {
+    font-size: 2.3rem;
+    margin: 0 0 0.5rem;
+    line-height: 1.25;
+  }
+
+  .last-updated {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .legal-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .legal-section h2 {
+    font-size: 1.45rem;
+    color: var(--primary-blue);
+    margin-bottom: 0.85rem;
+  }
+
+  .legal-section p {
+    font-size: 1.02rem;
+    line-height: 1.75;
+    margin-bottom: 1rem;
+  }
+
+  .legal-section a {
+    color: var(--primary-blue);
+    font-weight: 600;
+  }
+
+  @media (max-width: 640px) {
+    .legal-header h1 {
+      font-size: 1.8rem;
+    }
+  }
+</style>
