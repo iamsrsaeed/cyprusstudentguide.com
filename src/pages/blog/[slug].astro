@@ -13,7 +13,6 @@ export async function getStaticPaths() {
   });
 
   return allPosts.map(({ post, slug, frontmatter }) => {
-    // রিলেটেড পোস্ট ফিল্টার (বর্তমান পোস্ট ছাড়া যেকোনো ৩টি গাইড)
     const relatedPosts = allPosts
       .filter(p => p.slug !== slug)
       .slice(0, 3)
@@ -46,7 +45,6 @@ const formattedDate = new Date(publishDate).toLocaleDateString('en-GB', {
 
 const isoDate = new Date(publishDate).toISOString();
 
-// ১. Article Schema (Clean & Warning-Free)
 const articleSchema = {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
@@ -75,7 +73,6 @@ const articleSchema = {
   "keywords": (frontmatter.tags || []).join(", ")
 };
 
-// ২. Breadcrumb Schema
 const breadcrumbSchema = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
@@ -107,7 +104,7 @@ const breadcrumbSchema = {
   <script type="application/ld+json" is:inline set:html={JSON.stringify(articleSchema)} />
   <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbSchema)} />
 
-  <!-- Reading Progress Bar -->
+  <!-- Reading Progress Bar (Ultra High Z-Index) -->
   <div id="reading-progress-bar" class="reading-progress-bar"></div>
 
   <article class="post-single">
@@ -167,50 +164,75 @@ const breadcrumbSchema = {
     )}
   </article>
 
-  <!-- Mobile Sticky Floating Share Bar -->
+  <!-- Compact Mobile Floating Share Bar -->
   <aside class="mobile-floating-bar notranslate">
     <div class="floating-inner">
       <span class="float-label">Share:</span>
       <a href={`https://api.whatsapp.com/send?text=${encodeURIComponent(frontmatter.title + ' - ' + permalink)}`} target="_blank" rel="noopener noreferrer" class="float-btn wa-btn">
-        💬 WhatsApp
+        WhatsApp
       </a>
       <a href={`https://t.me/share/url?url=${encodeURIComponent(permalink)}&text=${encodeURIComponent(frontmatter.title)}`} target="_blank" rel="noopener noreferrer" class="float-btn tg-btn">
-        ✈️ Telegram
+        Telegram
       </a>
-      <button id="copy-link-btn" class="float-btn copy-btn" data-url={permalink}>
+      <button type="button" id="copy-link-btn" class="float-btn copy-btn">
         🔗 Copy
       </button>
     </div>
   </aside>
 
-  <!-- Toast Notification -->
-  <div id="toast-msg" class="toast-msg">Link copied to clipboard!</div>
+  <!-- Global Toast Notification -->
+  <div id="toast-msg" class="toast-msg">✅ Link Copied!</div>
 </BaseLayout>
 
 <script is:inline>
-  // রিডিং প্রোগ্রেস বার লজিক
-  window.addEventListener('scroll', () => {
-    const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
-    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-    const scrolled = (winScroll / height) * 100;
+  document.addEventListener('DOMContentLoaded', () => {
+    // ১. প্রোগ্রেস বার হ্যান্ডলার
     const progressBar = document.getElementById('reading-progress-bar');
-    if (progressBar) {
-      progressBar.style.width = scrolled + '%';
+    const updateProgress = () => {
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (totalHeight > 0 && progressBar) {
+        const progress = (window.scrollY / totalHeight) * 100;
+        progressBar.style.width = Math.min(100, Math.max(0, progress)) + '%';
+      }
+    };
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+
+    // ২. কপি লিংক হ্যান্ডলার (উইথ ফলব্যাক)
+    const copyBtn = document.getElementById('copy-link-btn');
+    const toast = document.getElementById('toast-msg');
+
+    if (copyBtn) {
+      copyBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const currentUrl = window.location.href;
+
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(currentUrl);
+          } else {
+            const tempInput = document.createElement('input');
+            tempInput.value = currentUrl;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+          }
+
+          copyBtn.innerText = 'Copied!';
+          if (toast) {
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2200);
+          }
+          setTimeout(() => {
+            copyBtn.innerText = '🔗 Copy';
+          }, 2000);
+        } catch (err) {
+          console.error('Copy failed: ', err);
+        }
+      });
     }
   });
-
-  // কপি বাটন টোস্ট নোটিফিকেশন লজিক
-  const copyBtn = document.getElementById('copy-link-btn');
-  const toast = document.getElementById('toast-msg');
-  if (copyBtn && toast) {
-    copyBtn.addEventListener('click', () => {
-      const url = copyBtn.getAttribute('data-url') || window.location.href;
-      navigator.clipboard.writeText(url).then(() => {
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 2500);
-      });
-    });
-  }
 </script>
 
 <style>
@@ -222,8 +244,9 @@ const breadcrumbSchema = {
     height: 4px;
     background: linear-gradient(90deg, #2563eb, #38bdf8, #facc15);
     width: 0%;
-    z-index: 100;
-    transition: width 0.1s ease-out;
+    z-index: 99999;
+    box-shadow: 0 1px 4px rgba(37, 99, 235, 0.4);
+    transition: width 0.08s ease-out;
   }
 
   .post-single {
@@ -231,7 +254,7 @@ const breadcrumbSchema = {
     margin: 0 auto;
   }
 
-  /* Visual Hero Card Styling */
+  /* Visual Hero Card */
   .post-hero-card {
     background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(56, 189, 248, 0.03) 100%);
     border: 1px solid var(--card-border);
@@ -413,78 +436,78 @@ const breadcrumbSchema = {
     color: var(--primary-blue);
   }
 
-  /* Mobile Floating Share Bar */
+  /* Compact Mobile Floating Bar */
   .mobile-floating-bar {
     display: none;
     position: fixed;
     bottom: 12px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 90;
-    width: calc(100% - 24px);
-    max-width: 420px;
-    background: rgba(15, 23, 42, 0.92);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    padding: 0.5rem 0.75rem;
-    border-radius: 50px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+    z-index: 9999;
+    width: calc(100% - 32px);
+    max-width: 380px;
+    background: rgba(15, 23, 42, 0.94);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 0.45rem 0.75rem;
+    border-radius: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
   }
 
   .floating-inner {
     display: flex;
     align-items: center;
-    justify-content: space-around;
-    gap: 0.4rem;
+    justify-content: space-between;
+    gap: 0.35rem;
   }
 
   .float-label {
-    color: #ffffff;
-    font-size: 0.75rem;
+    color: #94a3b8;
+    font-size: 0.72rem;
     font-weight: 700;
-    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding-left: 0.25rem;
   }
 
   .float-btn {
     text-decoration: none;
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     font-weight: 700;
-    padding: 0.35rem 0.65rem;
-    border-radius: 50px;
+    padding: 0.35rem 0.7rem;
+    border-radius: 30px;
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
     border: none;
     cursor: pointer;
-    transition: transform 0.15s ease;
+    line-height: 1;
+    transition: transform 0.15s ease, opacity 0.15s ease;
   }
 
   .float-btn:active { transform: scale(0.95); }
   .wa-btn { background: #22c55e; color: #ffffff; }
   .tg-btn { background: #0284c7; color: #ffffff; }
-  .copy-btn { background: #334155; color: #ffffff; }
+  .copy-btn { background: #334155; color: #f8fafc; }
 
-  /* Toast Notification */
+  /* Minimal Toast */
   .toast-msg {
     visibility: hidden;
-    min-width: 220px;
-    background-color: #0f172a;
-    color: #facc15;
-    text-align: center;
-    border-radius: 8px;
-    padding: 10px 16px;
     position: fixed;
-    z-index: 120;
+    bottom: 70px;
     left: 50%;
-    bottom: 75px;
     transform: translateX(-50%);
-    font-size: 0.88rem;
+    background: #0f172a;
+    color: #38bdf8;
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 0.82rem;
     font-weight: 700;
-    border: 1px solid #facc15;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    z-index: 100000;
     opacity: 0;
-    transition: opacity 0.3s, visibility 0.3s;
+    transition: opacity 0.25s, visibility 0.25s;
   }
 
   .toast-msg.show {
