@@ -104,9 +104,6 @@ const breadcrumbSchema = {
   <script type="application/ld+json" is:inline set:html={JSON.stringify(articleSchema)} />
   <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbSchema)} />
 
-  <!-- Reading Progress Bar -->
-  <div id="reading-progress-bar" class="reading-progress-bar"></div>
-
   <article class="post-single">
     <!-- Visual Hero Section Header -->
     <header class="post-hero-card">
@@ -185,29 +182,18 @@ const breadcrumbSchema = {
 </BaseLayout>
 
 <script is:inline>
-  function initPageScripts() {
-    // ১. প্রোগ্রেস বার ট্র্যাকার
-    const progressBar = document.getElementById('reading-progress-bar');
-    const article = document.querySelector('.article-body');
-
+  function handleBlogPageInteractions() {
+    // ১. রিডিং প্রোগ্রেস বার (হেডারের সাথে সিঙ্ক)
+    const progressBar = document.getElementById('site-reading-progress');
+    
     function updateProgress() {
-      if (!progressBar || !article) return;
-      const articleRect = article.getBoundingClientRect();
-      const articleTop = articleRect.top + window.scrollY;
-      const articleHeight = article.offsetHeight;
-      const windowHeight = window.innerHeight;
-      const scrollPos = window.scrollY;
-
-      const start = articleTop - (windowHeight / 3);
-      const end = articleTop + articleHeight - (windowHeight / 1.5);
-
-      if (scrollPos <= start) {
-        progressBar.style.width = '0%';
-      } else if (scrollPos >= end) {
-        progressBar.style.width = '100%';
-      } else {
-        const percentage = ((scrollPos - start) / (end - start)) * 100;
-        progressBar.style.width = `${Math.min(100, Math.max(0, percentage))}%`;
+      if (!progressBar) return;
+      const totalScroll = document.documentElement.scrollTop || document.body.scrollTop;
+      const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      
+      if (windowHeight > 0) {
+        const scrollPercent = (totalScroll / windowHeight) * 100;
+        progressBar.style.width = Math.min(100, Math.max(0, scrollPercent)) + '%';
       }
     }
 
@@ -252,32 +238,13 @@ const breadcrumbSchema = {
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initPageScripts);
+    document.addEventListener('DOMContentLoaded', handleBlogPageInteractions);
   } else {
-    initPageScripts();
+    handleBlogPageInteractions();
   }
 </script>
 
 <style>
-  /* Reading Progress Bar */
-  .reading-progress-bar {
-    position: fixed;
-    top: 52px;
-    left: 0;
-    height: 3.5px;
-    background: linear-gradient(90deg, #2563eb 0%, #38bdf8 50%, #facc15 100%);
-    width: 0%;
-    z-index: 999999;
-    pointer-events: none;
-    transition: width 0.05s ease-out;
-  }
-
-  @media (max-width: 768px) {
-    .reading-progress-bar {
-      top: 50px;
-    }
-  }
-
   .post-single {
     max-width: 840px;
     margin: 0 auto;
