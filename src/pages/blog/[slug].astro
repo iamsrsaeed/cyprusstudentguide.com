@@ -104,7 +104,7 @@ const breadcrumbSchema = {
   <script type="application/ld+json" is:inline set:html={JSON.stringify(articleSchema)} />
   <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbSchema)} />
 
-  <!-- Reading Progress Bar (Ultra High Z-Index) -->
+  <!-- Reading Progress Bar -->
   <div id="reading-progress-bar" class="reading-progress-bar"></div>
 
   <article class="post-single">
@@ -185,20 +185,37 @@ const breadcrumbSchema = {
 </BaseLayout>
 
 <script is:inline>
-  document.addEventListener('DOMContentLoaded', () => {
-    // ১. প্রোগ্রেস বার হ্যান্ডলার
+  function initPageScripts() {
+    // ১. প্রোগ্রেস বার ট্র্যাকার
     const progressBar = document.getElementById('reading-progress-bar');
-    const updateProgress = () => {
-      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
-      if (totalHeight > 0 && progressBar) {
-        const progress = (window.scrollY / totalHeight) * 100;
-        progressBar.style.width = Math.min(100, Math.max(0, progress)) + '%';
+    const article = document.querySelector('.article-body');
+
+    function updateProgress() {
+      if (!progressBar || !article) return;
+      const articleRect = article.getBoundingClientRect();
+      const articleTop = articleRect.top + window.scrollY;
+      const articleHeight = article.offsetHeight;
+      const windowHeight = window.innerHeight;
+      const scrollPos = window.scrollY;
+
+      const start = articleTop - (windowHeight / 3);
+      const end = articleTop + articleHeight - (windowHeight / 1.5);
+
+      if (scrollPos <= start) {
+        progressBar.style.width = '0%';
+      } else if (scrollPos >= end) {
+        progressBar.style.width = '100%';
+      } else {
+        const percentage = ((scrollPos - start) / (end - start)) * 100;
+        progressBar.style.width = `${Math.min(100, Math.max(0, percentage))}%`;
       }
-    };
+    }
+
     window.addEventListener('scroll', updateProgress, { passive: true });
+    window.addEventListener('resize', updateProgress, { passive: true });
     updateProgress();
 
-    // ২. কপি লিংক হ্যান্ডলার (উইথ ফলব্যাক)
+    // ২. কপি লিংক হ্যান্ডলার
     const copyBtn = document.getElementById('copy-link-btn');
     const toast = document.getElementById('toast-msg');
 
@@ -232,21 +249,33 @@ const breadcrumbSchema = {
         }
       });
     }
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPageScripts);
+  } else {
+    initPageScripts();
+  }
 </script>
 
 <style>
   /* Reading Progress Bar */
   .reading-progress-bar {
     position: fixed;
-    top: 0;
+    top: 52px;
     left: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #2563eb, #38bdf8, #facc15);
+    height: 3.5px;
+    background: linear-gradient(90deg, #2563eb 0%, #38bdf8 50%, #facc15 100%);
     width: 0%;
-    z-index: 99999;
-    box-shadow: 0 1px 4px rgba(37, 99, 235, 0.4);
-    transition: width 0.08s ease-out;
+    z-index: 999999;
+    pointer-events: none;
+    transition: width 0.05s ease-out;
+  }
+
+  @media (max-width: 768px) {
+    .reading-progress-bar {
+      top: 50px;
+    }
   }
 
   .post-single {
