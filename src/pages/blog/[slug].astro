@@ -30,7 +30,10 @@ const formattedDate = new Date(publishDate).toLocaleDateString('en-GB', {
   year: 'numeric'
 });
 
-// ১. Article Schema (Rich Snippets-এর জন্য)
+// ISO 8601 টাইম ফরম্যাট (Schema Warnings দূর করার জন্য)
+const isoDate = new Date(publishDate).toISOString();
+
+// ১. Article Schema (Clean & Warning-Free)
 const articleSchema = {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
@@ -40,8 +43,9 @@ const articleSchema = {
   },
   "headline": frontmatter.title,
   "description": description,
-  "datePublished": publishDate,
-  "dateModified": publishDate,
+  "image": "https://cyprusstudentguide.com/favicon.svg",
+  "datePublished": isoDate,
+  "dateModified": isoDate,
   "author": {
     "@type": "Person",
     "name": frontmatter.author || "Saidur Rahman",
@@ -58,7 +62,7 @@ const articleSchema = {
   "keywords": (frontmatter.tags || []).join(", ")
 };
 
-// ২. Breadcrumb Schema (সার্চ রেজাল্টে URL কাঠামোর জন্য)
+// ২. Breadcrumb Schema
 const breadcrumbSchema = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
