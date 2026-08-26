@@ -1,0 +1,162 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const title = 'Disclaimer & Editorial Disclosure | Cyprus Student Guide';
+const description = 'Official legal disclaimer, information gathering sources, editorial guidelines, and correction/takedown policy for CyprusStudentGuide.com.';
+const permalink = 'https://cyprusstudentguide.com/disclaimer/';
+---
+
+<BaseLayout title={title} description={description} permalink={permalink} current="disclaimer">
+  <div class="legal-container">
+    <header class="legal-header">
+      <span class="badge">LEGAL & EDITORIAL NOTICE</span>
+      <h1>Disclaimer & Information Disclosure</h1>
+      <p class="last-updated">Last Updated & Reviewed: August 2026</p>
+    </header>
+
+    <div class="legal-body">
+      <section class="legal-section">
+        <h2>1. General Information & Non-Legal Advice</h2>
+        <p>The content published on <strong>CyprusStudentGuide.com</strong> is intended strictly for general informational and educational purposes. While our mission is to empower international students navigating education, immigration, housing, transport, and daily living in the Republic of Cyprus, nothing on this website constitutes formal legal, immigration, financial, or tax counsel.</p>
+        <p>Official policies, immigration decrees, and fees set by the Civil Registry and Migration Department (CRMD), the Ministry of Labour, and the Department of Road Transport (TOM) are subject to periodic governmental updates. Readers are advised to verify statutory requirements directly with official institutions or certified legal representatives.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2>2. Data Collection & Community Sourcing</h2>
+        <p>To provide practical, hype-free guidance that reflects real student conditions rather than theoretical summaries, our articles synthesize information gathered from multiple authentic sources:</p>
+        <ul>
+          <li><strong>Official Public Portals:</strong> Cypriot ministries, transport authorities, municipal departments, and licensed banking documentation.</li>
+          <li><strong>Expat & Student Communities:</strong> Unfiltered feedback, recent price indices, and procedural timelines shared across international student forums and social media networks.</li>
+          <li><strong>Direct Field Interviews:</strong> Real-world experiences contributed by enrolled international students, alumni, and local service professionals living across Nicosia, Limassol, Larnaca, and Paphos.</li>
+        </ul>
+      </section>
+
+      <section class="legal-section">
+        <h2>3. Accuracy, Good Faith & Procedural Changes</h2>
+        <p>All guides are prepared in good faith with rigorous multi-point verification at the time of publication. However, because administrative procedures, university tuition fees, rental prices, and bus fares can change without prior public notice, CyprusStudentGuide.com makes no warranties regarding the absolute completeness or real-time precision of third-party schedules or institutional policies.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2>4. Notice, Resolution & Content Correction Protocol</h2>
+        <p>We take intellectual property rights, factual precision, and community compliance seriously. If any content, image, guide instruction, or data point on this platform is deemed:</p>
+        <ul>
+          <li>Inaccurate, outdated, or misleading due to recent regulatory shifts;</li>
+          <li>Infringing upon any third-party copyright, trademark, or intellectual property rights;</li>
+          <li>In violation of any local statutory regulations or institutional codes;</li>
+        </ul>
+        <p>Please contact our editorial team immediately through our designated official resolution channel:</p>
+        
+        <div class="contact-box">
+          <p><strong>Designated Resolution Officer:</strong> Editorial & Compliance Desk</p>
+          <p><strong>Direct Email:</strong> <a href="mailto:contact@cyprusstudentguide.com">contact@cyprusstudentguide.com</a></p>
+          <p class="resolution-note">Please include the specific article URL, the exact section or text in question, and any supporting documentation. Our team investigates and resolves valid requests within <strong>24 to 48 business hours</strong> by rectifying, updating, or removing the specified content.</p>
+        </div>
+      </section>
+
+      <section class="legal-section">
+        <h2>5. Affiliate & Monetization Transparency</h2>
+        <p>In accordance with standard digital publishing ethics, CyprusStudentGuide.com may occasionally include referral codes, cashback links (such as Taptap Send promotional benefits), or display advertising (Google AdSense). These partnerships help fund our continuous server maintenance and field investigation without imposing any subscription costs on students. We only recommend platforms and tools that offer genuine utility to the international student community.</p>
+      </section>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .legal-container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 4rem;
+  }
+
+  .legal-header {
+    text-align: center;
+    margin-bottom: 2.75rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  .badge {
+    background: rgba(37, 99, 235, 0.12);
+    color: var(--primary-blue);
+    padding: 0.35rem 0.85rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    display: inline-block;
+    margin-bottom: 0.85rem;
+  }
+
+  .legal-header h1 {
+    font-size: 2.3rem;
+    margin: 0 0 0.5rem;
+    line-height: 1.25;
+  }
+
+  .last-updated {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .legal-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .legal-section h2 {
+    font-size: 1.45rem;
+    color: var(--primary-blue);
+    margin-bottom: 0.85rem;
+  }
+
+  .legal-section p {
+    font-size: 1.02rem;
+    line-height: 1.75;
+    margin-bottom: 1rem;
+  }
+
+  .legal-section ul {
+    margin-bottom: 1.25rem;
+    padding-left: 1.5rem;
+  }
+
+  .legal-section li {
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .contact-box {
+    background: rgba(37, 99, 235, 0.06);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1.25rem;
+  }
+
+  .contact-box p {
+    margin-bottom: 0.5rem;
+  }
+
+  .contact-box a {
+    color: var(--primary-blue);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .contact-box a:hover {
+    text-decoration: underline;
+  }
+
+  .resolution-note {
+    font-size: 0.9rem !important;
+    color: var(--text-muted);
+    margin-top: 0.75rem !important;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 640px) {
+    .legal-header h1 {
+      font-size: 1.8rem;
+    }
+  }
+</style>
