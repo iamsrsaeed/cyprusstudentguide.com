@@ -35,7 +35,7 @@ const { title, description, permalink, current = '' } = Astro.props;
     </script>
   </head>
   <body>
-    <!-- Top Glowing Highlight Banner for Taptap Send Referral -->
+    <!-- Top Highlight Banner for Taptap Send Referral -->
     <div class="promo-top-bar notranslate">
       <div class="promo-inner">
         <span class="promo-tag">🎁 BONUS</span>
@@ -114,8 +114,12 @@ const { title, description, permalink, current = '' } = Astro.props;
           </div>
         </div>
 
-        <div class="footer-contact notranslate">
-          <p>Official Contact: <a href="mailto:contact@cyprusstudentguide.com" class="footer-email">contact@cyprusstudentguide.com</a></p>
+        <div class="footer-links-row notranslate">
+          <a href="/about/">About Us</a>
+          <span class="sep">•</span>
+          <a href="/disclaimer/">Disclaimer & Disclosure</a>
+          <span class="sep">•</span>
+          <a href="mailto:contact@cyprusstudentguide.com">Contact Support</a>
         </div>
 
         <div class="footer-bottom notranslate">
@@ -185,7 +189,6 @@ const { title, description, permalink, current = '' } = Astro.props;
         z-index: 0;
       }
 
-      /* Sticky Top Promo Bar */
       .promo-top-bar {
         background: linear-gradient(90deg, #1d4ed8, #2563eb, #0284c7);
         color: #ffffff;
@@ -242,7 +245,6 @@ const { title, description, permalink, current = '' } = Astro.props;
 
       .promo-link:hover { color: #facc15; }
 
-      /* Site Header */
       .site-header {
         position: sticky;
         top: 0;
@@ -349,7 +351,6 @@ const { title, description, permalink, current = '' } = Astro.props;
       html:not(.dark) .sun-icon { display: none; }
       html:not(.dark) .moon-icon { display: inline; }
 
-      /* Main Body Content */
       .main-content {
         max-width: 860px;
         margin: 0 auto;
@@ -400,7 +401,6 @@ const { title, description, permalink, current = '' } = Astro.props;
         font-size: 1rem;
       }
 
-      /* Footer */
       .site-footer {
         border-top: 1px solid var(--card-border);
         background: rgba(150, 150, 150, 0.03);
@@ -415,7 +415,7 @@ const { title, description, permalink, current = '' } = Astro.props;
       .footer-tagline { color: var(--text-muted); font-size: 0.92rem; max-width: 500px; margin: 0 auto; }
       .footer-share-section { margin-bottom: 1.75rem; }
       .share-site-label { font-size: 0.88rem; font-weight: 700; margin-bottom: 0.65rem; }
-      .footer-share-links { display: flex; justify-content: center; gap: 0.6rem; flex-wrap: wrap; }
+      .footer-share-links { display: flex; justify-content: center; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
       .foot-share-btn {
         background: var(--card-bg);
         color: var(--text-main);
@@ -427,11 +427,33 @@ const { title, description, permalink, current = '' } = Astro.props;
         border: 1px solid var(--card-border);
       }
       .foot-share-btn:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
-      .footer-contact { margin-bottom: 1.75rem; font-size: 0.9rem; color: var(--text-muted); }
-      .footer-email { color: var(--primary-blue); text-decoration: none; font-weight: 700; }
+
+      .footer-links-row {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.85rem;
+        font-size: 0.88rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+      }
+
+      .footer-links-row a {
+        color: var(--primary-blue);
+        text-decoration: none;
+      }
+
+      .footer-links-row a:hover {
+        text-decoration: underline;
+      }
+
+      .sep {
+        color: var(--text-muted);
+        opacity: 0.6;
+      }
+
       .footer-bottom { padding-top: 1.25rem; border-top: 1px solid var(--card-border); font-size: 0.82rem; color: var(--text-muted); }
 
-      /* Mobile Specific Responsive Tweaks */
       @media (max-width: 768px) {
         .header-container {
           flex-direction: column;
@@ -489,7 +511,6 @@ const { title, description, permalink, current = '' } = Astro.props;
 
     <!-- Scripts for theme, promo code, and language -->
     <script is:inline>
-      // Theme Toggle Logic
       const themeBtn = document.getElementById('theme-toggle');
       if (themeBtn) {
         themeBtn.addEventListener('click', () => {
@@ -498,7 +519,6 @@ const { title, description, permalink, current = '' } = Astro.props;
         });
       }
 
-      // Promo Code Copy
       const promoBtn = document.getElementById('promo-code-btn');
       if (promoBtn) {
         promoBtn.addEventListener('click', () => {
@@ -511,7 +531,6 @@ const { title, description, permalink, current = '' } = Astro.props;
         });
       }
 
-      // Language Switcher Trigger
       const langSelect = document.getElementById('custom-language-select');
       
       function setLanguage(lang) {
