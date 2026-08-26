@@ -18,7 +18,11 @@ const { title, description, permalink, current = '' } = Astro.props;
     <meta name="description" content={description} />
     <link rel="canonical" href={permalink} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <!-- Open Graph / Facebook / WhatsApp -->
+
+    <!-- Google AdSense Verification & Auto Ads Script -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4089174887676363" crossorigin="anonymous"></script>
+
+    <!-- Open Graph / Social Meta Tags -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Cyprus Student Guide" />
     <meta property="og:title" content={title} />
@@ -31,9 +35,6 @@ const { title, description, permalink, current = '' } = Astro.props;
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content="https://cyprusstudentguide.com/favicon.svg" />
-
-    <!-- Google AdSense Verification & Auto Ads Script -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4089174887676363" crossorigin="anonymous"></script>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -54,9 +55,9 @@ const { title, description, permalink, current = '' } = Astro.props;
     <!-- Top Highlight Banner for Taptap Send Referral -->
     <div class="promo-top-bar notranslate">
       <div class="promo-inner">
-        <span class="promo-tag">🎁 BONUS</span>
-        <span class="promo-text">Send money with <strong>0% fee</strong>! Code: <span class="promo-code" id="promo-code-btn" title="Click to copy">MDSAIDUR240</span></span>
-        <a href="/blog/how-to-send-money-from-cyprus-taptap-send-bonus-guide/" class="promo-link">Claim Bonus ➔</a>
+        <span class="promo-tag">🎁 TAPTAP SEND BONUS</span>
+        <span class="promo-text">Send money from Cyprus with <strong>0% fee</strong>! Code: <span class="promo-code" id="promo-code-btn" title="Click to copy">MDSAIDUR240</span></span>
+        <a href="/blog/how-to-send-money-from-cyprus-taptap-send-bonus-guide/" class="promo-link">Claim €5 Bonus ➔</a>
       </div>
     </div>
 
@@ -533,7 +534,6 @@ const { title, description, permalink, current = '' } = Astro.props;
 
     <!-- Scripts for theme, promo code, and language -->
     <script is:inline>
-      // Theme Toggle Logic
       const themeBtn = document.getElementById('theme-toggle');
       if (themeBtn) {
         themeBtn.addEventListener('click', () => {
@@ -542,7 +542,6 @@ const { title, description, permalink, current = '' } = Astro.props;
         });
       }
 
-      // Promo Code Copy
       const promoBtn = document.getElementById('promo-code-btn');
       if (promoBtn) {
         promoBtn.addEventListener('click', () => {
@@ -555,9 +554,7 @@ const { title, description, permalink, current = '' } = Astro.props;
         });
       }
 
-      // Language Switcher Trigger
       const langSelect = document.getElementById('custom-language-select');
-      
       function setLanguage(lang) {
         const domain = window.location.hostname;
         document.cookie = `googtrans=/en/${lang}; path=/; domain=${domain}`;
