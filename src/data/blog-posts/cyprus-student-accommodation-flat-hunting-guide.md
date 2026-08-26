@@ -45,4 +45,40 @@ Rental dynamics vary significantly across districts in the Republic of Cyprus. L
 
 ## 3. The Mukhtar Certification & 2-Witness Legal Protocol
 
-To satisfy migration compliance, a simple lease signed between you and the landlord is **not legally sufficient**. The tenancy contract must undergo official certification by a local **Community Leader (Mukhtar / Κοινοτάρχης)**.
+To satisfy migration compliance, a simple lease signed between you and the landlord is **not legally sufficient**. The tenancy contract must undergo official certification by a local **Community Leader (Mukhtar / Κοινοτάρχης)**.Landlord & Student Draft Lease ──> 2 Cypriot Witnesses Sign ──> Visit Local Mukhtar Office ──> Pay €2–€5 Duty Stamps ──> Official Stamped Migration-Ready Lease
+
+
+### The Exact Requirements for Mukhtar Stamping:
+1. **Original Tenancy Agreement:** Prepared in duplicate (one copy for the landlord, one for the tenant). It must clearly state the exact property address, monthly rent, deposit amount, lease duration (minimum 12 months for migration), and full tenant passport details.
+2. **Two Witnesses (Cypriot Citizens / Permanent Residents):** The Mukhtar requires two witnesses who personally know the landlord or the property to co-sign the contract in their presence or provide verified copies of their Cypriot IDs.
+3. **Landlord's Title Deed / Utility Bill:** Proof that the landlord legally owns the property or holds statutory Power of Attorney.
+4. **Revenue Stamps (*Hartosima*):** The Mukhtar will attach fiscal revenue stamps (typically costing **€2.00 to €5.00** per document) and stamp their official embossed seal across the signatures.
+
+---
+
+## 4. Setting Up Utilities & Electricity (EAC) Deposit
+
+If the tenancy agreement requires you to transfer electricity bills into your name, you must visit the local **Electricity Authority of Cyprus (EAC / ΑΗΚ)** customer service center:
+
+* **Non-EU Resident Security Deposit:** International students must pay a refundable security deposit to EAC (typically **€200 to €350** for residential meters).
+* **Required Paperwork:** Your stamped Mukhtar tenancy agreement, original passport, previous meter reading photograph, and a completed EAC change-of-name form signed by the landlord.
+* **Pro-Tip:** If possible, negotiate with the landlord to keep the utility meter in their name and pay your consumption share monthly upon presentation of the physical EAC bill to avoid tying up your cash in security deposits.
+
+---
+
+## 5. Strategic Step-by-Step Flat Hunting Checklist
+
+- [ ] **Book 3–5 Days Temporary Stay:** Secure affordable temporary lodging or an Airbnb before arrival so you can view properties physically.
+- [ ] **Inspect Water Pressure & Solar Boiler:** Cyprus relies on rooftop solar thermal panels. Check that the immersion heater (*thermosifonas*) works for cloudy winter months.
+- [ ] **Check Air Conditioning (A/C) Energy Ratings:** A/C units drive summer electricity bills. Inverter-type units save up to 40% on power costs.
+- [ ] **Sign Only in Front of the Mukhtar:** Do not hand over more than 1 month rent + 1 month security deposit before the Mukhtar seals the deal.
+- [ ] **Collect Payment Receipts:** Insist on written, signed receipts or bank transfer trails for every single euro paid.
+
+---
+
+## 6. Next Steps for Your Migration File
+
+Once you have your stamped Mukhtar tenancy contract in hand:
+1. Take it immediately to the bank to finalize your [Student Bank Account](/blog/how-to-open-bank-account-cyprus-student-immigration-guide/).
+2. Combine it with your [Pink Slip Medical Tests](/blog/cyprus-student-medical-test-health-insurance-guide/) and Plan A health insurance.
+3. Submit the unified package to your university's visa coordinator to book your biometrics appointment at CRMD.
