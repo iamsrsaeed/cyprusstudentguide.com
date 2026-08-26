@@ -30,7 +30,11 @@
     <priority>0.9</priority>
   </url>
 
-  <!-- High-Value Guides & Articles (14 Articles) -->
+  <!-- High-Value Guides & Articles (15 Complete Articles) -->
+  <url>
+    <loc>https://cyprusstudentguide.com/blog/cyprus-student-cost-of-living-monthly-budget-guide/</loc>
+    <priority>1.0</priority>
+  </url>
   <url>
     <loc>https://cyprusstudentguide.com/blog/cyprus-student-tax-tic-social-insurance-guide/</loc>
     <priority>1.0</priority>
