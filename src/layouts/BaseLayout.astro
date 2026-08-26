@@ -102,6 +102,8 @@ const { title, description, permalink, current = '' } = Astro.props;
           </div>
         </div>
       </div>
+      <!-- Global Sticky Reading Progress Bar -->
+      <div id="site-reading-progress" class="site-reading-progress"></div>
     </header>
 
     <!-- Hidden native translation container -->
@@ -269,15 +271,27 @@ const { title, description, permalink, current = '' } = Astro.props;
       .site-header {
         position: sticky;
         top: 0;
-        z-index: 50;
-        background: rgba(255, 255, 255, 0.9);
+        z-index: 100;
+        background: rgba(255, 255, 255, 0.92);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         border-bottom: 1px solid var(--card-border);
       }
 
       html.dark .site-header {
-        background: rgba(8, 13, 26, 0.88);
+        background: rgba(8, 13, 26, 0.9);
+      }
+
+      /* Fixed Progress Bar on Header bottom edge */
+      .site-reading-progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 3.5px;
+        width: 0%;
+        background: linear-gradient(90deg, #2563eb 0%, #38bdf8 50%, #facc15 100%);
+        pointer-events: none;
+        transition: width 0.05s ease-out;
       }
 
       .header-container {
