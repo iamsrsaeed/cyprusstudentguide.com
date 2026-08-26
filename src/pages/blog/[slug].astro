@@ -5,19 +5,33 @@ import ShareButtons from '../../components/ShareButtons.astro';
 export async function getStaticPaths() {
   const postFiles = import.meta.glob('../../data/blog-posts/*.md', { eager: true });
   
-  return Object.entries(postFiles).map(([filePath, post]: [string, any]) => {
+  const allPosts = Object.entries(postFiles).map(([filePath, post]: [string, any]) => {
     const frontmatter = post.frontmatter || {};
     const fileSlug = filePath.split('/').pop()?.replace('.md', '') || '';
     const slug = frontmatter.slug || fileSlug;
-    
+    return { post, slug, frontmatter };
+  });
+
+  return allPosts.map(({ post, slug, frontmatter }) => {
+    // রিলেটেড পোস্ট ফিল্টার (বর্তমান পোস্ট ছাড়া যেকোনো ৩টি গাইড)
+    const relatedPosts = allPosts
+      .filter(p => p.slug !== slug)
+      .slice(0, 3)
+      .map(p => ({
+        title: p.frontmatter.title,
+        slug: p.slug,
+        description: p.frontmatter.description,
+        category: p.frontmatter.category || 'Guide'
+      }));
+
     return {
       params: { slug },
-      props: { post, slug },
+      props: { post, slug, relatedPosts },
     };
   });
 }
 
-const { post, slug } = Astro.props;
+const { post, slug, relatedPosts } = Astro.props;
 const { Content, frontmatter } = post;
 
 const title = `${frontmatter.title} | Cyprus Student Guide`;
@@ -30,7 +44,6 @@ const formattedDate = new Date(publishDate).toLocaleDateString('en-GB', {
   year: 'numeric'
 });
 
-// ISO 8601 টাইম ফরম্যাট (Schema Warnings দূর করার জন্য)
 const isoDate = new Date(publishDate).toISOString();
 
 // ১. Article Schema (Clean & Warning-Free)
@@ -94,6 +107,9 @@ const breadcrumbSchema = {
   <script type="application/ld+json" is:inline set:html={JSON.stringify(articleSchema)} />
   <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbSchema)} />
 
+  <!-- Reading Progress Bar -->
+  <div id="reading-progress-bar" class="reading-progress-bar"></div>
+
   <article class="post-single">
     <!-- Visual Hero Section Header -->
     <header class="post-hero-card">
@@ -129,10 +145,87 @@ const breadcrumbSchema = {
       url={permalink} 
       description={frontmatter.description} 
     />
+
+    <!-- Recommended / Related Guides Grid -->
+    {relatedPosts && relatedPosts.length > 0 && (
+      <section class="related-guides-section notranslate">
+        <div class="related-header">
+          <h3 class="related-title">📚 Recommended Next Guides</h3>
+          <p class="related-sub">Essential guides every international student in Cyprus should read:</p>
+        </div>
+        <div class="related-grid">
+          {relatedPosts.map((guide) => (
+            <a href={`/blog/${guide.slug}/`} class="related-card">
+              <span class="related-badge">{guide.category}</span>
+              <h4 class="related-card-title">{guide.title}</h4>
+              <p class="related-card-desc">{guide.description}</p>
+              <span class="read-more-link">Read Guide ➔</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
   </article>
+
+  <!-- Mobile Sticky Floating Share Bar -->
+  <aside class="mobile-floating-bar notranslate">
+    <div class="floating-inner">
+      <span class="float-label">Share:</span>
+      <a href={`https://api.whatsapp.com/send?text=${encodeURIComponent(frontmatter.title + ' - ' + permalink)}`} target="_blank" rel="noopener noreferrer" class="float-btn wa-btn">
+        💬 WhatsApp
+      </a>
+      <a href={`https://t.me/share/url?url=${encodeURIComponent(permalink)}&text=${encodeURIComponent(frontmatter.title)}`} target="_blank" rel="noopener noreferrer" class="float-btn tg-btn">
+        ✈️ Telegram
+      </a>
+      <button id="copy-link-btn" class="float-btn copy-btn" data-url={permalink}>
+        🔗 Copy
+      </button>
+    </div>
+  </aside>
+
+  <!-- Toast Notification -->
+  <div id="toast-msg" class="toast-msg">Link copied to clipboard!</div>
 </BaseLayout>
 
+<script is:inline>
+  // রিডিং প্রোগ্রেস বার লজিক
+  window.addEventListener('scroll', () => {
+    const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const scrolled = (winScroll / height) * 100;
+    const progressBar = document.getElementById('reading-progress-bar');
+    if (progressBar) {
+      progressBar.style.width = scrolled + '%';
+    }
+  });
+
+  // কপি বাটন টোস্ট নোটিফিকেশন লজিক
+  const copyBtn = document.getElementById('copy-link-btn');
+  const toast = document.getElementById('toast-msg');
+  if (copyBtn && toast) {
+    copyBtn.addEventListener('click', () => {
+      const url = copyBtn.getAttribute('data-url') || window.location.href;
+      navigator.clipboard.writeText(url).then(() => {
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+      });
+    });
+  }
+</script>
+
 <style>
+  /* Reading Progress Bar */
+  .reading-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #2563eb, #38bdf8, #facc15);
+    width: 0%;
+    z-index: 100;
+    transition: width 0.1s ease-out;
+  }
+
   .post-single {
     max-width: 840px;
     margin: 0 auto;
@@ -234,6 +327,175 @@ const breadcrumbSchema = {
   .author-title {
     font-size: 0.78rem;
     color: var(--text-muted);
+  }
+
+  /* Related Guides Section */
+  .related-guides-section {
+    margin-top: 4rem;
+    padding-top: 2.5rem;
+    border-top: 2px dashed var(--card-border);
+  }
+
+  .related-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .related-title {
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: var(--primary-blue);
+    margin: 0 0 0.4rem;
+  }
+
+  .related-sub {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .related-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .related-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--primary-blue);
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.12);
+  }
+
+  .related-badge {
+    align-self: flex-start;
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary-blue);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    margin-bottom: 0.6rem;
+  }
+
+  .related-card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.4;
+    margin: 0 0 0.5rem;
+  }
+
+  .related-card-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin: 0 0 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .read-more-link {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+  }
+
+  /* Mobile Floating Share Bar */
+  .mobile-floating-bar {
+    display: none;
+    position: fixed;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 90;
+    width: calc(100% - 24px);
+    max-width: 420px;
+    background: rgba(15, 23, 42, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 0.5rem 0.75rem;
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+  }
+
+  .floating-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    gap: 0.4rem;
+  }
+
+  .float-label {
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    opacity: 0.8;
+  }
+
+  .float-btn {
+    text-decoration: none;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.35rem 0.65rem;
+    border-radius: 50px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+
+  .float-btn:active { transform: scale(0.95); }
+  .wa-btn { background: #22c55e; color: #ffffff; }
+  .tg-btn { background: #0284c7; color: #ffffff; }
+  .copy-btn { background: #334155; color: #ffffff; }
+
+  /* Toast Notification */
+  .toast-msg {
+    visibility: hidden;
+    min-width: 220px;
+    background-color: #0f172a;
+    color: #facc15;
+    text-align: center;
+    border-radius: 8px;
+    padding: 10px 16px;
+    position: fixed;
+    z-index: 120;
+    left: 50%;
+    bottom: 75px;
+    transform: translateX(-50%);
+    font-size: 0.88rem;
+    font-weight: 700;
+    border: 1px solid #facc15;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    opacity: 0;
+    transition: opacity 0.3s, visibility 0.3s;
+  }
+
+  .toast-msg.show {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  @media (max-width: 768px) {
+    .mobile-floating-bar {
+      display: block;
+    }
   }
 
   @media (max-width: 640px) {
