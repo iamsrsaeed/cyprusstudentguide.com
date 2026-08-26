@@ -18,6 +18,19 @@ const { title, description, permalink, current = '' } = Astro.props;
     <meta name="description" content={description} />
     <link rel="canonical" href={permalink} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Cyprus Student Guide" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={permalink} />
+    <meta property="og:image" content="https://cyprusstudentguide.com/favicon.svg" />
+
+    <!-- Twitter / X Cards -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content="https://cyprusstudentguide.com/favicon.svg" />
 
     <!-- Google AdSense Verification & Auto Ads Script -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4089174887676363" crossorigin="anonymous"></script>
