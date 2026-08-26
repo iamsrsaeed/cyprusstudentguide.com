@@ -29,9 +29,67 @@ const formattedDate = new Date(publishDate).toLocaleDateString('en-GB', {
   month: 'short',
   year: 'numeric'
 });
+
+// ১. Article Schema (Rich Snippets-এর জন্য)
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": permalink
+  },
+  "headline": frontmatter.title,
+  "description": description,
+  "datePublished": publishDate,
+  "dateModified": publishDate,
+  "author": {
+    "@type": "Person",
+    "name": frontmatter.author || "Saidur Rahman",
+    "url": "https://cyprusstudentguide.com/about/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Cyprus Student Guide",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cyprusstudentguide.com/favicon.svg"
+    }
+  },
+  "keywords": (frontmatter.tags || []).join(", ")
+};
+
+// ২. Breadcrumb Schema (সার্চ রেজাল্টে URL কাঠামোর জন্য)
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://cyprusstudentguide.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Blog",
+      "item": "https://cyprusstudentguide.com/blog/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": frontmatter.title,
+      "item": permalink
+    }
+  ]
+};
 ---
 
 <BaseLayout title={title} description={description} permalink={permalink} current="blog">
+  <!-- Google Structured Data (JSON-LD) -->
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(articleSchema)} />
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbSchema)} />
+
   <article class="post-single">
     <!-- Visual Hero Section Header -->
     <header class="post-hero-card">
