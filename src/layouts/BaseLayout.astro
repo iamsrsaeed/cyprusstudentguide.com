@@ -96,11 +96,12 @@ const { title, description, permalink, current = '' } = Astro.props;
           </div>
         </div>
         
-        <!-- Nav Links (Compact & Grid on Mobile to prevent horizontal scroll) -->
+        <!-- Nav Links (Optimized Grid for desktop & mobile) -->
         <nav class="site-nav">
           <a href="/" class={current === 'home' ? 'active' : ''}>Home</a>
-          <a href="/blog/" class={current === 'blog' ? 'active' : ''}>All Guides</a>
-          <a href="/calculator/" class={current === 'calculator' ? 'active nav-highlight' : 'nav-highlight'}>🧮 Calculator</a>
+          <a href="/blog/" class={current === 'blog' ? 'active' : ''}>Guides</a>
+          <a href="/calculator/" class={current === 'calculator' ? 'active nav-highlight' : 'nav-highlight'}>🧮 Budget</a>
+          <a href="/shift-tracker/" class={current === 'tracker' ? 'active nav-special' : 'nav-special'}>⏱️ Work Tracker</a>
           <a href="/about/" class={current === 'about' ? 'active' : ''}>About</a>
         </nav>
       </div>
@@ -140,6 +141,8 @@ const { title, description, permalink, current = '' } = Astro.props;
           <a href="/about/">About Us</a>
           <span class="sep">•</span>
           <a href="/calculator/">Cost Calculator</a>
+          <span class="sep">•</span>
+          <a href="/shift-tracker/">Shift Tracker</a>
           <span class="sep">•</span>
           <a href="/privacy/">Privacy Policy</a>
           <span class="sep">•</span>
@@ -340,15 +343,15 @@ const { title, description, permalink, current = '' } = Astro.props;
       .site-nav {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
+        gap: 0.6rem;
       }
 
       .site-nav a {
         text-decoration: none;
         color: var(--text-muted);
-        font-size: 0.88rem;
+        font-size: 0.86rem;
         font-weight: 600;
-        padding: 0.3rem 0.55rem;
+        padding: 0.3rem 0.5rem;
         border-radius: 6px;
         transition: all 0.15s ease;
         white-space: nowrap;
@@ -363,6 +366,14 @@ const { title, description, permalink, current = '' } = Astro.props;
       .nav-highlight {
         color: var(--primary-blue) !important;
         font-weight: 700 !important;
+      }
+
+      .nav-special {
+        color: #10b981 !important;
+        font-weight: 700 !important;
+      }
+      html.dark .nav-special {
+        color: #34d399 !important;
       }
 
       .header-controls {
@@ -401,7 +412,7 @@ const { title, description, permalink, current = '' } = Astro.props;
       html:not(.dark) .moon-icon { display: inline; }
 
       .main-content {
-        max-width: 960px;
+        max-width: 980px;
         margin: 0 auto;
         padding: 2rem 1rem 4rem;
         position: relative;
@@ -485,15 +496,15 @@ const { title, description, permalink, current = '' } = Astro.props;
 
         .site-nav {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 0.35rem;
+          grid-template-columns: repeat(5, 1fr);
+          gap: 0.25rem;
           width: 100%;
           text-align: center;
         }
 
         .site-nav a {
-          font-size: 0.78rem;
-          padding: 0.35rem 0.2rem;
+          font-size: 0.74rem;
+          padding: 0.35rem 0.15rem;
           background: rgba(150, 150, 150, 0.06);
           border-radius: 6px;
         }
