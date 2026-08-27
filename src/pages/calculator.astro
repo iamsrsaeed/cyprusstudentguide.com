@@ -1,14 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-const title = "Interactive Cyprus Student Monthly Living Cost & Budget Calculator 2026";
-const description = "Custom interactive budget calculator for international students in Cyprus. Enter custom expenses or select real-time city averages for rent, food, AC electricity, and transport.";
+const title = "Interactive Cyprus Student Monthly Budget & Income Calculator 2026";
+const description = "Comprehensive interactive budget & income calculator for international students in Cyprus. Calculate monthly living costs, part-time wages (20h/week limit), and net monthly savings balance across Limassol, Nicosia, Larnaca, and Paphos.";
 const permalink = "https://cyprusstudentguide.com/calculator/";
 
 const calcSchema = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "Cyprus Student Living Cost Calculator",
+  "name": "Cyprus Student Living Cost & Income Calculator",
   "url": permalink,
   "applicationCategory": "EducationalApplication",
   "operatingSystem": "All",
@@ -21,201 +21,341 @@ const calcSchema = {
   <script type="application/ld+json" is:inline set:html={JSON.stringify(calcSchema)} />
 
   <section class="calc-hero">
-    <span class="calc-badge">⚡ Fully Customizable Student Tool</span>
-    <h1 class="calc-title">Cyprus Student Living Cost Calculator</h1>
-    <p class="calc-desc">Enter your exact monthly amounts or click our verified city-rate suggestions below each field to calculate your authentic monthly budget in Cyprus.</p>
+    <span class="calc-badge">⚡ Full Income & Expense Analysis Tool</span>
+    <h1 class="calc-title">Cyprus Student Budget & Income Calculator</h1>
+    <p class="calc-desc">Calculate your real-time expenses, part-time earnings, and net monthly savings balance in Cyprus. Customize living costs and wages or use verified city benchmarks.</p>
   </section>
 
   <div class="calc-container notranslate">
-    <div class="calc-inputs-card">
-      <div class="form-group">
-        <label for="city-select"><strong>📍 Step 1: Select Your Study City</strong></label>
-        <select id="city-select" class="calc-select">
-          <option value="limassol" selected>Limassol (High Job Density / Higher Rent)</option>
-          <option value="nicosia">Nicosia (University Capital / Balanced Cost)</option>
-          <option value="larnaca">Larnaca (Moderate Rent / Coastal City)</option>
-          <option value="paphos">Paphos (Affordable Rent / Hospitality Hub)</option>
-        </select>
-        <span class="field-hint">City changes will auto-adjust average rent suggestions.</span>
-      </div>
+    <div class="calc-inputs-column">
+      
+      <div class="calc-card income-card-wrap">
+        <div class="section-title-row">
+          <span class="sec-icon">💶</span>
+          <div>
+            <h2 class="sec-heading">Part-Time Income & Earnings</h2>
+            <p class="sec-sub">Calculate potential monthly legal wages (Non-EU 20 hrs/week law)</p>
+          </div>
+        </div>
 
-      <div class="form-group">
-        <div class="label-row">
-          <label for="input-rent"><strong>🏠 Monthly Rent (€):</strong></label>
-          <span class="hint-badge">Customizable</span>
+        <div class="form-group">
+          <div class="label-row">
+            <label for="input-hourly"><strong>⏱️ Hourly Pay Rate (€/hr):</strong></label>
+            <span class="hint-badge">Legal Min ~€5.50</span>
+          </div>
+          <div class="input-wrapper">
+            <span class="input-prefix">€</span>
+            <input type="number" id="input-hourly" class="calc-input income-field" value="6.50" min="0" step="0.5" placeholder="e.g. 6.50" />
+          </div>
+          <div class="suggestion-chips">
+            <span class="chip-label">Presets:</span>
+            <button type="button" class="chip-btn" data-target="input-hourly" data-val="5.50">Hospitality (€5.50)</button>
+            <button type="button" class="chip-btn active" data-target="input-hourly" data-val="6.50">Average Standard (€6.50)</button>
+            <button type="button" class="chip-btn" data-target="input-hourly" data-val="8.00">Delivery/Skilled (€8.00)</button>
+          </div>
         </div>
-        <div class="input-wrapper">
-          <span class="input-prefix">€</span>
-          <input type="number" id="input-rent" class="calc-input" value="350" min="0" step="10" placeholder="Enter rent" />
-        </div>
-        <div class="suggestion-chips" id="rent-chips">
-          <span class="chip-label">Suggestions:</span>
-          <button type="button" class="chip-btn" data-target="input-rent" data-val="300">Shared Bed (€300)</button>
-          <button type="button" class="chip-btn active" data-target="input-rent" data-val="450">Private Room (€450)</button>
-          <button type="button" class="chip-btn" data-target="input-rent" data-val="750">Studio Flat (€750)</button>
-        </div>
-      </div>
 
-      <div class="form-group">
-        <div class="label-row">
-          <label for="input-food"><strong>🛒 Monthly Grocery & Food (€):</strong></label>
-          <span class="hint-badge">Customizable</span>
+        <div class="form-group">
+          <div class="label-row">
+            <label for="input-hours"><strong>📅 Weekly Working Hours:</strong></label>
+            <span class="hint-badge">Legal Limit: 20h</span>
+          </div>
+          <div class="input-wrapper">
+            <span class="input-prefix">⌛</span>
+            <input type="number" id="input-hours" class="calc-input income-field" value="20" min="0" max="48" step="1" placeholder="e.g. 20" />
+          </div>
+          <div class="suggestion-chips">
+            <span class="chip-label">Presets:</span>
+            <button type="button" class="chip-btn" data-target="input-hours" data-val="10">Light (10 hrs/wk)</button>
+            <button type="button" class="chip-btn active" data-target="input-hours" data-val="20">Legal Max (20 hrs/wk)</button>
+            <button type="button" class="chip-btn" data-target="input-hours" data-val="0">No Job / Studies Only</button>
+          </div>
         </div>
-        <div class="input-wrapper">
-          <span class="input-prefix">€</span>
-          <input type="number" id="input-food" class="calc-input" value="160" min="0" step="10" placeholder="Enter food expense" />
-        </div>
-        <div class="suggestion-chips">
-          <span class="chip-label">Suggestions:</span>
-          <button type="button" class="chip-btn" data-target="input-food" data-val="130">Self-Cooking (€130)</button>
-          <button type="button" class="chip-btn active" data-target="input-food" data-val="180">Balanced Diet (€180)</button>
-          <button type="button" class="chip-btn" data-target="input-food" data-val="280">Takeouts / Wolt (€280)</button>
-        </div>
-      </div>
 
-      <div class="form-group">
-        <div class="label-row">
-          <label for="input-elec"><strong>⚡ Electricity, AC & Water Share (€):</strong></label>
-          <span class="hint-badge">Customizable</span>
-        </div>
-        <div class="input-wrapper">
-          <span class="input-prefix">€</span>
-          <input type="number" id="input-elec" class="calc-input" value="70" min="0" step="5" placeholder="Enter utility cost" />
-        </div>
-        <div class="suggestion-chips">
-          <span class="chip-label">Suggestions:</span>
-          <button type="button" class="chip-btn" data-target="input-elec" data-val="40">Low / Fan Only (€40)</button>
-          <button type="button" class="chip-btn active" data-target="input-elec" data-val="75">AC 4-6 hrs/day (€75)</button>
-          <button type="button" class="chip-btn" data-target="input-elec" data-val="120">Heavy AC (€120)</button>
+        <div class="form-group">
+          <div class="label-row">
+            <label for="input-other-inc"><strong>🎁 Other Support / Freelance (€/mo):</strong></label>
+            <span class="hint-badge">Optional</span>
+          </div>
+          <div class="input-wrapper">
+            <span class="input-prefix">€</span>
+            <input type="number" id="input-other-inc" class="calc-input income-field" value="0" min="0" step="20" placeholder="Family support / freelance" />
+          </div>
         </div>
       </div>
 
-      <div class="form-group">
-        <div class="label-row">
-          <label for="input-trans"><strong>🚌 Public Bus & Commute (€):</strong></label>
-          <span class="hint-badge">Customizable</span>
+      <div class="calc-card">
+        <div class="section-title-row">
+          <span class="sec-icon">🏠</span>
+          <div>
+            <h2 class="sec-heading">Monthly Living Expenses</h2>
+            <p class="sec-sub">Estimated room rent, electricity, groceries, and travel</p>
+          </div>
         </div>
-        <div class="input-wrapper">
-          <span class="input-prefix">€</span>
-          <input type="number" id="input-trans" class="calc-input" value="20" min="0" step="5" placeholder="Enter transit cost" />
-        </div>
-        <div class="suggestion-chips">
-          <span class="chip-label">Suggestions:</span>
-          <button type="button" class="chip-btn" data-target="input-trans" data-val="5">E-Scooter / Walk (€5)</button>
-          <button type="button" class="chip-btn active" data-target="input-trans" data-val="20">City Bus Card (€20)</button>
-          <button type="button" class="chip-btn" data-target="input-trans" data-val="40">Intercity Travel (€40)</button>
-        </div>
-      </div>
 
-      <div class="form-group">
-        <div class="label-row">
-          <label for="input-misc"><strong>📱 SIM, Wi-Fi & Personal Misc (€):</strong></label>
-          <span class="hint-badge">Customizable</span>
+        <div class="form-group">
+          <label for="city-select"><strong>📍 Study City:</strong></label>
+          <select id="city-select" class="calc-select">
+            <option value="limassol" selected>Limassol (High Job Density / Higher Rent)</option>
+            <option value="nicosia">Nicosia (University Capital / Balanced Cost)</option>
+            <option value="larnaca">Larnaca (Moderate Rent / Coastal City)</option>
+            <option value="paphos">Paphos (Affordable Rent / Hospitality Hub)</option>
+          </select>
         </div>
-        <div class="input-wrapper">
-          <span class="input-prefix">€</span>
-          <input type="number" id="input-misc" class="calc-input" value="45" min="0" step="5" placeholder="Enter personal misc" />
+
+        <div class="form-group">
+          <div class="label-row">
+            <label for="input-rent"><strong>🏠 Monthly Rent (€):</strong></label>
+            <span class="hint-badge">Customizable</span>
+          </div>
+          <div class="input-wrapper">
+            <span class="input-prefix">€</span>
+            <input type="number" id="input-rent" class="calc-input exp-field" value="350" min="0" step="10" placeholder="Enter rent" />
+          </div>
+          <div class="suggestion-chips" id="rent-chips">
+            <span class="chip-label">Suggestions:</span>
+            <button type="button" class="chip-btn" data-target="input-rent" data-val="300">Shared Bed (€300)</button>
+            <button type="button" class="chip-btn active" data-target="input-rent" data-val="450">Private Room (€450)</button>
+            <button type="button" class="chip-btn" data-target="input-rent" data-val="750">Studio Flat (€750)</button>
+          </div>
         </div>
-        <div class="suggestion-chips">
-          <span class="chip-label">Suggestions:</span>
-          <button type="button" class="chip-btn active" data-target="input-misc" data-val="40">SIM + Wi-Fi (€40)</button>
-          <button type="button" class="chip-btn" data-target="input-misc" data-val="80">Standard Student (€80)</button>
-          <button type="button" class="chip-btn" data-target="input-misc" data-val="140">Active Lifestyle (€140)</button>
+
+        <div class="form-group">
+          <div class="label-row">
+            <label for="input-food"><strong>🛒 Grocery & Food (€):</strong></label>
+            <span class="hint-badge">Customizable</span>
+          </div>
+          <div class="input-wrapper">
+            <span class="input-prefix">€</span>
+            <input type="number" id="input-food" class="calc-input exp-field" value="160" min="0" step="10" placeholder="Enter food expense" />
+          </div>
+          <div class="suggestion-chips">
+            <span class="chip-label">Suggestions:</span>
+            <button type="button" class="chip-btn" data-target="input-food" data-val="130">Self-Cooking (€130)</button>
+            <button type="button" class="chip-btn active" data-target="input-food" data-val="180">Balanced Diet (€180)</button>
+            <button type="button" class="chip-btn" data-target="input-food" data-val="280">Takeouts / Wolt (€280)</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="label-row">
+            <label for="input-elec"><strong>⚡ Power, AC & Water Share (€):</strong></label>
+            <span class="hint-badge">Customizable</span>
+          </div>
+          <div class="input-wrapper">
+            <span class="input-prefix">€</span>
+            <input type="number" id="input-elec" class="calc-input exp-field" value="70" min="0" step="5" placeholder="Enter utility cost" />
+          </div>
+          <div class="suggestion-chips">
+            <span class="chip-label">Suggestions:</span>
+            <button type="button" class="chip-btn" data-target="input-elec" data-val="40">Low / Fan Only (€40)</button>
+            <button type="button" class="chip-btn active" data-target="input-elec" data-val="75">AC 4-6 hrs/day (€75)</button>
+            <button type="button" class="chip-btn" data-target="input-elec" data-val="120">Heavy AC (€120)</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="label-row">
+            <label for="input-trans"><strong>🚌 Public Bus & Commute (€):</strong></label>
+            <span class="hint-badge">Customizable</span>
+          </div>
+          <div class="input-wrapper">
+            <span class="input-prefix">€</span>
+            <input type="number" id="input-trans" class="calc-input exp-field" value="20" min="0" step="5" placeholder="Enter transit cost" />
+          </div>
+          <div class="suggestion-chips">
+            <span class="chip-label">Suggestions:</span>
+            <button type="button" class="chip-btn" data-target="input-trans" data-val="5">E-Scooter / Walk (€5)</button>
+            <button type="button" class="chip-btn active" data-target="input-trans" data-val="20">City Bus Card (€20)</button>
+            <button type="button" class="chip-btn" data-target="input-trans" data-val="40">Intercity Travel (€40)</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="label-row">
+            <label for="input-misc"><strong>📱 SIM, Wi-Fi & Misc (€):</strong></label>
+            <span class="hint-badge">Customizable</span>
+          </div>
+          <div class="input-wrapper">
+            <span class="input-prefix">€</span>
+            <input type="number" id="input-misc" class="calc-input exp-field" value="45" min="0" step="5" placeholder="Enter personal misc" />
+          </div>
+          <div class="suggestion-chips">
+            <span class="chip-label">Suggestions:</span>
+            <button type="button" class="chip-btn active" data-target="input-misc" data-val="40">SIM + Wi-Fi (€40)</button>
+            <button type="button" class="chip-btn" data-target="input-misc" data-val="80">Standard Student (€80)</button>
+            <button type="button" class="chip-btn" data-target="input-misc" data-val="140">Active Lifestyle (€140)</button>
+          </div>
+        </div>
+
+        <div class="custom-expense-section">
+          <div class="custom-header">
+            <label><strong>➕ Other Personal Expenses:</strong></label>
+            <span class="field-hint">e.g. Gym, Books, Netflix, Coffee</span>
+          </div>
+
+          <div id="custom-expense-list" class="custom-expense-list"></div>
+
+          <button type="button" id="btn-add-expense" class="btn-add-expense">
+            + Add Another Expense Field
+          </button>
         </div>
       </div>
     </div>
 
-    <div class="calc-results-card">
-      <div class="result-box">
-        <span class="result-label">Total Estimated Monthly Expense</span>
-        <div class="result-amount">
-          <span class="currency">€</span><span id="total-cost">645</span><span class="period">/month</span>
+    <div class="calc-results-column">
+      
+      <div class="net-balance-card" id="balance-card">
+        <span class="balance-label">Net Monthly Balance (Savings / Deficit)</span>
+        <div class="balance-amount" id="balance-val-container">
+          <span class="currency">€</span><span id="net-balance-amount">-85</span>
         </div>
-        <div id="cost-category-pill" class="cost-pill moderate">Standard Moderate Student Budget</div>
+        <div id="balance-status-pill" class="status-pill status-neutral">Calculating...</div>
       </div>
 
-      <div class="breakdown-list">
-        <div class="breakdown-item">
-          <span>🏠 Accommodation:</span>
-          <strong id="b-rent">€350</strong>
+      <div class="calc-card summary-card">
+        <h3 class="summary-heading">📊 Monthly Financial Overview</h3>
+        
+        <div class="financial-row green-row">
+          <span>💚 Total Monthly Income:</span>
+          <strong id="total-income-display">€560</strong>
         </div>
-        <div class="breakdown-item">
-          <span>🛒 Grocery & Nutrition:</span>
-          <strong id="b-food">€160</strong>
+        <div class="financial-row red-row">
+          <span>🔻 Total Monthly Expenses:</span>
+          <strong id="total-expense-display">€645</strong>
         </div>
-        <div class="breakdown-item">
-          <span>⚡ Power, AC & Water:</span>
-          <strong id="b-elec">€70</strong>
+
+        <div class="breakdown-list" id="breakdown-container">
+          <div class="breakdown-divider">Detailed Cost Breakdown</div>
+          <div class="breakdown-item">
+            <span>🏠 Rent:</span>
+            <strong id="b-rent">€350</strong>
+          </div>
+          <div class="breakdown-item">
+            <span>🛒 Food & Grocery:</span>
+            <strong id="b-food">€160</strong>
+          </div>
+          <div class="breakdown-item">
+            <span>⚡ Utilities (AC/Power/Water):</span>
+            <strong id="b-elec">€70</strong>
+          </div>
+          <div class="breakdown-item">
+            <span>🚌 Bus / Commute:</span>
+            <strong id="b-trans">€20</strong>
+          </div>
+          <div class="breakdown-item">
+            <span>📱 Internet & SIM:</span>
+            <strong id="b-misc">€45</strong>
+          </div>
+          <div id="custom-breakdown-items"></div>
         </div>
-        <div class="breakdown-item">
-          <span>🚌 Local Bus / Transit:</span>
-          <strong id="b-trans">€20</strong>
+
+        <div class="analysis-box">
+          <h4 class="analysis-title">💡 Real Student Field Analysis</h4>
+          <p class="analysis-txt" id="analysis-text">Loading verified city analysis...</p>
         </div>
-        <div class="breakdown-item">
-          <span>📱 Internet, SIM & Misc:</span>
-          <strong id="b-misc">€45</strong>
+
+        <div class="taptap-calc-box">
+          <div class="taptap-badge">🎁 Remittance & Tuition Fee Tip</div>
+          <p class="taptap-txt">Sending money from Cyprus or receiving funds from abroad? Use Taptap Send with <strong>0% fee</strong> + get <strong>€10 bonus</strong> on your first transfer.</p>
+          <div class="taptap-action">
+            <span class="promo-code-calc">CODE: MDSAIDUR240</span>
+            <a href="/blog/how-to-send-money-from-cyprus-taptap-send-bonus-guide/" class="btn-claim-bonus">Claim €10 ➔</a>
+          </div>
         </div>
       </div>
 
-      <div class="analysis-box">
-        <h4 class="analysis-title">💡 Field Insight for Students</h4>
-        <p class="analysis-txt" id="analysis-text">In Limassol, room sharing cuts accommodation costs by over 50%. A legal 20-hour part-time job (€850 - €1,000/mo) comfortably offsets this living cost with surplus savings.</p>
-      </div>
-
-      <div class="taptap-calc-box">
-        <div class="taptap-badge">🎁 Remittance & Tuition Fee Tip</div>
-        <p class="taptap-txt">Sending money from Cyprus or receiving study funds? Use Taptap Send with <strong>0% fee</strong> + get <strong>€10 bonus</strong> on your first transfer.</p>
-        <div class="taptap-action">
-          <span class="promo-code-calc">CODE: MDSAIDUR240</span>
-          <a href="/blog/how-to-send-money-from-cyprus-taptap-send-bonus-guide/" class="btn-claim-bonus">Claim €10 ➔</a>
-        </div>
-      </div>
     </div>
   </div>
 </BaseLayout>
 
 <script is:inline>
   function runCalculation() {
+    // 1. Income Calculation (Hourly * Weekly Hours * 4.33 weeks/mo + Other)
+    const hourlyRate = parseFloat(document.getElementById('input-hourly').value) || 0;
+    const weeklyHours = parseFloat(document.getElementById('input-hours').value) || 0;
+    const otherIncome = parseFloat(document.getElementById('input-other-inc').value) || 0;
+
+    const wageIncome = Math.round(hourlyRate * weeklyHours * 4.33);
+    const totalIncome = wageIncome + otherIncome;
+
+    // 2. Standard Expenses
     const rentVal = parseFloat(document.getElementById('input-rent').value) || 0;
     const foodVal = parseFloat(document.getElementById('input-food').value) || 0;
     const elecVal = parseFloat(document.getElementById('input-elec').value) || 0;
     const transVal = parseFloat(document.getElementById('input-trans').value) || 0;
     const miscVal = parseFloat(document.getElementById('input-misc').value) || 0;
 
-    const total = Math.round(rentVal + foodVal + elecVal + transVal + miscVal);
+    // 3. Custom Expenses
+    let customTotal = 0;
+    const customRows = document.querySelectorAll('.custom-expense-row');
+    const customBreakdownContainer = document.getElementById('custom-breakdown-items');
+    
+    if (customBreakdownContainer) {
+      customBreakdownContainer.innerHTML = '';
+    }
 
-    // Update Summary Elements
-    document.getElementById('total-cost').innerText = total;
+    customRows.forEach((row) => {
+      const titleInput = row.querySelector('.custom-name-input');
+      const amountInput = row.querySelector('.custom-amount-input');
+      
+      const title = titleInput && titleInput.value.trim() !== '' ? titleInput.value.trim() : 'Custom Expense';
+      const amount = parseFloat(amountInput.value) || 0;
+      
+      if (amount > 0) {
+        customTotal += amount;
+        if (customBreakdownContainer) {
+          const itemDiv = document.createElement('div');
+          itemDiv.className = 'breakdown-item custom-item';
+          itemDiv.innerHTML = `<span>📌 ${title}:</span><strong>€${amount}</strong>`;
+          customBreakdownContainer.appendChild(itemDiv);
+        }
+      }
+    });
+
+    const totalExpense = Math.round(rentVal + foodVal + elecVal + transVal + miscVal + customTotal);
+    const netBalance = totalIncome - totalExpense;
+
+    // 4. Update Displays
+    document.getElementById('total-income-display').innerText = '€' + totalIncome;
+    document.getElementById('total-expense-display').innerText = '€' + totalExpense;
+
     document.getElementById('b-rent').innerText = '€' + rentVal;
     document.getElementById('b-food').innerText = '€' + foodVal;
     document.getElementById('b-elec').innerText = '€' + elecVal;
     document.getElementById('b-trans').innerText = '€' + transVal;
     document.getElementById('b-misc').innerText = '€' + miscVal;
 
-    // Status Pill
-    const pill = document.getElementById('cost-category-pill');
-    if (total <= 520) {
-      pill.innerText = "Budget-Optimized / Highly Economical";
-      pill.className = "cost-pill budget-friendly";
-    } else if (total <= 800) {
-      pill.innerText = "Standard Moderate Student Budget";
-      pill.className = "cost-pill moderate";
+    // Net Balance Banner Logic
+    const netEl = document.getElementById('net-balance-amount');
+    const pill = document.getElementById('balance-status-pill');
+    const balanceCard = document.getElementById('balance-card');
+
+    if (netBalance >= 0) {
+      netEl.innerText = '+' + netBalance;
+      netEl.style.color = '#22c55e';
+      pill.innerText = `✅ Monthly Surplus: Saving €${netBalance}/month`;
+      pill.className = "status-pill status-surplus";
+      balanceCard.style.borderColor = 'rgba(34, 197, 94, 0.4)';
     } else {
-      pill.innerText = "Higher Comfort / Solo Studio Living";
-      pill.className = "cost-pill high-cost";
+      netEl.innerText = netBalance;
+      netEl.style.color = '#ef4444';
+      pill.innerText = `⚠️ Deficit: Need €${Math.abs(netBalance)} from savings or family`;
+      pill.className = "status-pill status-deficit";
+      balanceCard.style.borderColor = 'rgba(239, 68, 68, 0.4)';
     }
 
-    // Dynamic Field Insight
+    // 5. Dynamic Field Insight
     const city = document.getElementById('city-select').value;
     const analysis = document.getElementById('analysis-text');
     if (city === 'limassol') {
-      analysis.innerText = "In Limassol, accommodation is the biggest factor. A student working 20 hours/week earns ~€850-€1,000, which balances standard living costs nicely.";
+      analysis.innerText = `In Limassol, housing is the primary expense. Working legal 20 hrs/week earns ~€${wageIncome}/mo. Sharing a flat helps secure an immediate surplus.`;
     } else if (city === 'nicosia') {
-      analysis.innerText = "Nicosia offers lower rent and higher student flat availability near Engomi and Aglantzia. Average total expenses stay tightly around €500 - €650.";
+      analysis.innerText = `In Nicosia, lower rent around Engomi/Aglantzia combined with ~€${wageIncome}/mo wages allows students to achieve a comfortable break-even point.`;
     } else if (city === 'larnaca') {
-      analysis.innerText = "Larnaca is one of the most budget-friendly coastal cities for international students with affordable studio rentals and easy bicycle/scooter routes.";
+      analysis.innerText = `In Larnaca, moderate living costs make ~€${wageIncome}/mo wages highly efficient, often leaving €100+ monthly net savings.`;
     } else {
-      analysis.innerText = "Paphos provides high seasonal hospitality employment opportunities with relatively moderate housing costs throughout the academic year.";
+      analysis.innerText = `In Paphos, hospitality positions offer steady wages with lower accommodation costs throughout the academic term.`;
     }
   }
 
@@ -271,7 +411,6 @@ const calcSchema = {
         const input = document.getElementById(targetId);
         if (input) {
           input.value = targetVal;
-          // Toggle active class inside same group
           const parent = this.parentElement;
           parent.querySelectorAll('.chip-btn').forEach(btn => btn.classList.remove('active'));
           this.classList.add('active');
@@ -281,15 +420,47 @@ const calcSchema = {
     });
   }
 
+  function addCustomExpenseRow(defaultTitle = '', defaultAmount = '') {
+    const list = document.getElementById('custom-expense-list');
+    if (!list) return;
+
+    const row = document.createElement('div');
+    row.className = 'custom-expense-row';
+    row.innerHTML = `
+      <input type="text" class="calc-input custom-name-input" placeholder="Expense name (e.g. Gym, Netflix)" value="${defaultTitle}" />
+      <div class="input-wrapper custom-amt-wrap">
+        <span class="input-prefix">€</span>
+        <input type="number" class="calc-input custom-amount-input" placeholder="0" min="0" step="5" value="${defaultAmount}" />
+      </div>
+      <button type="button" class="btn-remove-row" title="Remove this expense">✕</button>
+    `;
+
+    row.querySelector('.custom-name-input').addEventListener('input', runCalculation);
+    row.querySelector('.custom-amount-input').addEventListener('input', runCalculation);
+    row.querySelector('.btn-remove-row').addEventListener('click', () => {
+      row.remove();
+      runCalculation();
+    });
+
+    list.appendChild(row);
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
-    const inputs = document.querySelectorAll('.calc-input');
-    inputs.forEach(input => {
+    const allInputs = document.querySelectorAll('.calc-input');
+    allInputs.forEach(input => {
       input.addEventListener('input', runCalculation);
     });
 
     const citySelect = document.getElementById('city-select');
     if (citySelect) {
       citySelect.addEventListener('change', handleCityChange);
+    }
+
+    const addBtn = document.getElementById('btn-add-expense');
+    if (addBtn) {
+      addBtn.addEventListener('click', () => {
+        addCustomExpenseRow('', '');
+      });
     }
 
     bindChipEvents();
@@ -322,7 +493,7 @@ const calcSchema = {
   .calc-desc {
     color: var(--text-muted);
     font-size: 1.05rem;
-    max-width: 680px;
+    max-width: 720px;
     margin: 0 auto;
   }
 
@@ -333,16 +504,56 @@ const calcSchema = {
     align-items: start;
   }
 
-  .calc-inputs-card, .calc-results-card {
+  .calc-inputs-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .calc-results-column {
+    position: sticky;
+    top: 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .calc-card {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
     border-radius: 16px;
-    padding: 2rem;
+    padding: 1.75rem;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
   }
 
+  .income-card-wrap {
+    border-color: rgba(34, 197, 94, 0.3);
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.03) 0%, rgba(56, 189, 248, 0.02) 100%);
+  }
+
+  .section-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.35rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--card-border);
+  }
+  .sec-icon { font-size: 1.6rem; }
+  .sec-heading {
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin: 0;
+    color: var(--text-main);
+  }
+  .sec-sub {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin: 0.15rem 0 0;
+  }
+
   .form-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.35rem;
   }
   .form-group:last-child {
     margin-bottom: 0;
@@ -352,10 +563,10 @@ const calcSchema = {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.45rem;
+    margin-bottom: 0.4rem;
   }
   .label-row label {
-    font-size: 0.92rem;
+    font-size: 0.9rem;
     color: var(--text-main);
   }
   .hint-badge {
@@ -365,18 +576,241 @@ const calcSchema = {
     color: var(--text-muted);
     padding: 0.1rem 0.4rem;
     border-radius: 4px;
-    text-transform: uppercase;
-  }
-
-  .field-hint {
-    font-size: 0.78rem;
-    color: var(--text-muted);
-    display: block;
-    margin-top: 0.35rem;
   }
 
   .calc-select {
     width: 100%;
     background: var(--bg-color);
     color: var(--text-main);
-    border: 1px solid var(--
+    border: 1px solid var(--card-border);
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .input-prefix {
+    position: absolute;
+    left: 14px;
+    font-weight: 800;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    pointer-events: none;
+  }
+  .calc-input {
+    width: 100%;
+    background: var(--bg-color);
+    color: var(--text-main);
+    border: 1px solid var(--card-border);
+    padding: 0.7rem 1rem 0.7rem 2.2rem;
+    border-radius: 10px;
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    font-weight: 700;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .calc-input:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px var(--primary-glow);
+  }
+
+  .suggestion-chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.45rem;
+  }
+  .chip-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+  .chip-btn {
+    background: rgba(150, 150, 150, 0.08);
+    border: 1px solid var(--card-border);
+    color: var(--text-main);
+    font-size: 0.74rem;
+    font-weight: 600;
+    padding: 0.2rem 0.55rem;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .chip-btn:hover {
+    border-color: var(--primary-blue);
+    color: var(--primary-blue);
+  }
+  .chip-btn.active {
+    background: var(--primary-blue);
+    color: #ffffff;
+    border-color: var(--primary-blue);
+    font-weight: 700;
+  }
+
+  /* Custom Expenses Section */
+  .custom-expense-section {
+    margin-top: 1.75rem;
+    padding-top: 1.25rem;
+    border-top: 2px dashed var(--card-border);
+  }
+  .custom-header { margin-bottom: 0.85rem; }
+  .custom-header label { font-size: 0.92rem; color: var(--text-main); }
+  .field-hint { font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.2rem; }
+  .custom-expense-list { display: flex; flex-direction: column; gap: 0.65rem; margin-bottom: 0.85rem; }
+  .custom-expense-row { display: flex; gap: 0.5rem; align-items: center; }
+  .custom-name-input { flex: 1.4; padding: 0.6rem 0.8rem !important; font-family: inherit !important; font-size: 0.9rem !important; }
+  .custom-amt-wrap { flex: 1; }
+  .custom-amount-input { padding: 0.6rem 0.75rem 0.6rem 2rem !important; font-size: 0.95rem !important; }
+  .btn-remove-row {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 8px;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.85rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .btn-remove-row:hover { background: #ef4444; color: #ffffff; }
+  .btn-add-expense {
+    width: 100%;
+    background: rgba(37, 99, 235, 0.08);
+    color: var(--primary-blue);
+    border: 1px dashed var(--primary-blue);
+    border-radius: 10px;
+    padding: 0.7rem;
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+  }
+  .btn-add-expense:hover { background: var(--primary-blue); color: #ffffff; }
+
+  /* Net Balance Banner */
+  .net-balance-card {
+    text-align: center;
+    background: var(--card-bg);
+    border: 2px solid var(--card-border);
+    border-radius: 16px;
+    padding: 1.5rem 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    transition: border-color 0.3s ease;
+  }
+  .balance-label {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .balance-amount {
+    font-size: 3.2rem;
+    font-weight: 900;
+    line-height: 1.1;
+    margin: 0.25rem 0 0.5rem;
+  }
+  .balance-amount .currency { font-size: 2rem; vertical-align: super; }
+  
+  .status-pill {
+    display: inline-block;
+    padding: 0.35rem 0.9rem;
+    border-radius: 30px;
+    font-size: 0.82rem;
+    font-weight: 800;
+  }
+  .status-surplus { background: #dcfce7; color: #15803d; }
+  .status-deficit { background: #fee2e2; color: #b91c1c; }
+  .status-neutral { background: #f1f5f9; color: #475569; }
+
+  /* Summary Card */
+  .summary-heading {
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin: 0 0 1.2rem;
+    color: var(--text-main);
+  }
+  .financial-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0.85rem;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+  }
+  .green-row { background: rgba(34, 197, 94, 0.1); color: #15803d; }
+  html.dark .green-row { color: #4ade80; }
+  .red-row { background: rgba(239, 68, 68, 0.1); color: #b91c1c; }
+  html.dark .red-row { color: #f87171; }
+
+  .breakdown-list {
+    margin-top: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+  .breakdown-divider {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px dashed var(--card-border);
+  }
+  .breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.88rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid var(--card-border);
+    color: var(--text-main);
+  }
+  .breakdown-item.custom-item {
+    color: var(--primary-blue);
+    background: rgba(37, 99, 235, 0.04);
+    padding: 0.25rem 0.4rem;
+    border-radius: 4px;
+  }
+
+  /* Analysis Box */
+  .analysis-box {
+    background: rgba(37, 99, 235, 0.06);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 0.9rem;
+    margin-top: 1.25rem;
+  }
+  .analysis-title { font-size: 0.85rem; font-weight: 800; color: var(--primary-blue); margin: 0 0 0.3rem; }
+  .analysis-txt { font-size: 0.82rem; color: var(--text-muted); line-height: 1.45; margin: 0; }
+
+  /* Taptap Send Box */
+  .taptap-calc-box {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 1.15rem;
+    color: #f8fafc;
+    margin-top: 1.25rem;
+  }
+  .taptap-badge { color: #facc15; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.35rem; }
+  .taptap-txt { font-size: 0.82rem; color: #cbd5e1; line-height: 1.45; margin: 0 0 0.85rem; }
+  .taptap-action { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+  .promo-code-calc { font-family: var(--font-mono); background: #1e293b; border: 1px dashed #facc15; color: #facc15; font-size: 0.78rem; font-weight: 800; padding: 0.3rem 0.55rem; border-radius: 6px; }
+  .btn-claim-bonus { background: #2563eb; color: #ffffff; text-decoration: none; font-size: 0.78rem; font-weight: 800; padding: 0.35rem 0.75rem; border-radius: 6px; }
+
+  @media (max-width: 900px) {
+    .calc-container { grid-template-columns: 1fr; }
+    .calc-results-column { position: static; }
+  }
+</style>
