@@ -1,14 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-const title = "Student Work Shift, Daily Money Tracker & Delivery Splitter 2026";
-const description = "Track daily student earnings, calculate food delivery splits with ID & scooter rent, log work hours, and export everything to Excel. 100% private offline storage.";
+const title = "Cyprus Student Work Shift, Daily Ledger & Delivery Split Tracker 2026";
+const description = "Track daily income & expenses, hourly jobs, and shared food delivery shifts (Wolt, Foody) with exact time slots, ID commission, vehicle rent, and fuel deductions. 100% offline auto-save with Excel export.";
 const permalink = "https://cyprusstudentguide.com/shift-tracker/";
 
 const trackerSchema = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "Cyprus Student Work & Shift Tracker",
+  "name": "Cyprus Student Daily Money & Delivery Shift Tracker",
   "url": permalink,
   "applicationCategory": "FinanceApplication",
   "operatingSystem": "All",
@@ -21,11 +21,11 @@ const trackerSchema = {
   <script type="application/ld+json" is:inline set:html={JSON.stringify(trackerSchema)} />
 
   <div class="st-wrapper notranslate">
-    <!-- Header Title -->
+    <!-- Header Hero -->
     <div class="st-hero">
-      <span class="st-badge">🔒 100% Private • Auto-Save in Browser • Excel Export</span>
-      <h1 class="st-title">Student Daily Money & Shift Tracker</h1>
-      <p class="st-desc">Easily log daily income & expenses, track hourly shifts, or split food delivery earnings with ID & vehicle rent. Your data stays securely stored on your device.</p>
+      <span class="st-badge">🔒 100% Private • Local Browser Storage • Excel Export</span>
+      <h1 class="st-title">Student Daily Money & Delivery Shift Tracker</h1>
+      <p class="st-desc">Log your personal daily finances, record hourly work shifts, or split shared food delivery earnings with exact shift time slots, ID commissions, and custom expenses.</p>
     </div>
 
     <!-- Control Center: Currency, Auto-save status, and Export Tools -->
@@ -61,7 +61,7 @@ const trackerSchema = {
     <!-- Navigation Tabs -->
     <div class="st-tabs">
       <button type="button" class="st-tab-btn active" data-target="view-delivery-split">
-        🛵 Food Delivery Splitter
+        🛵 Food Delivery Shift Splitter
       </button>
       <button type="button" class="st-tab-btn" data-target="view-money-ledger">
         💰 Daily Income & Expenses
@@ -71,102 +71,106 @@ const trackerSchema = {
       </button>
     </div>
 
-    <!-- ================= TAB 1: DELIVERY SPLITTER ================= -->
+    <!-- ================= TAB 1: REAL-WORLD DELIVERY SPLITTER ================= -->
     <div id="view-delivery-split" class="st-tab-content active">
       <div class="st-card">
         <div class="st-card-head">
-          <h2 class="st-card-title">🛵 Delivery Earnings & Expense Splitter</h2>
-          <p class="st-card-sub">Accurately calculate net payouts after deducting Fleet/ID rent commission, bike/scooter rent, and fuel costs.</p>
+          <h2 class="st-card-title">🛵 Shared Delivery Account & Shift Splitter</h2>
+          <p class="st-card-sub">Record exact shift working times, specific app earnings per rider, Fleet/ID commission cuts, and custom shared expenses (Scooter rent, fuel, data, maintenance).</p>
         </div>
 
+        <!-- Global Deductions Configuration -->
         <div class="st-grid-3">
           <div class="st-field">
-            <label>Total App Gross (<span class="curr-sym">€</span>):</label>
-            <input type="number" id="split-gross-app" class="st-input calc-split-input" value="165" step="1" min="0" />
-            <span class="st-hint">Total shown on Wolt / Foody / Bolt app</span>
-          </div>
-
-          <div class="st-field">
-            <label>Calculation Basis:</label>
-            <select id="split-split-basis" class="st-select calc-split-input">
-              <option value="orders" selected>By Orders Done (Recommended)</option>
-              <option value="hours">By Hours on Road</option>
-            </select>
-          </div>
-
-          <div class="st-field">
-            <label>Fleet / ID Rent Cut:</label>
+            <label>Fleet / ID Account Cut:</label>
             <div class="st-input-combo">
               <select id="split-fleet-type" class="st-select calc-split-input" style="max-width: 110px;">
                 <option value="percent" selected>% Cut</option>
                 <option value="fixed">Fixed</option>
               </select>
-              <input type="number" id="split-fleet-val" class="st-input calc-split-input" value="18" step="0.5" min="0" />
+              <input type="number" id="split-fleet-val" class="st-input calc-split-input" value="18" step="0.5" min="0" placeholder="18" />
             </div>
-            <span class="st-hint">e.g. 18% or fixed daily fee</span>
+            <span class="st-hint">e.g. 18% or fixed daily rental fee</span>
           </div>
 
           <div class="st-field">
-            <label>Vehicle / Scooter Rent (<span class="curr-sym">€</span>):</label>
-            <input type="number" id="split-vehicle-rent" class="st-input calc-split-input" value="15" step="1" min="0" />
-            <span class="st-hint">0 if you own the vehicle</span>
-          </div>
-
-          <div class="st-field">
-            <label>Petrol / Charging (<span class="curr-sym">€</span>):</label>
-            <input type="number" id="split-fuel-cost" class="st-input calc-split-input" value="12" step="1" min="0" />
-            <span class="st-hint">Total fuel/power spent today</span>
-          </div>
-
-          <div class="st-field">
-            <label>Expense Sharing Mode:</label>
+            <label>Shared Expense Split Mode:</label>
             <select id="split-expense-split-mode" class="st-select calc-split-input">
-              <option value="proportional" selected>Proportional (By Work Done)</option>
+              <option value="proportional" selected>Proportional (Based on Earnings)</option>
               <option value="equal">Equal 50/50 Split</option>
             </select>
+            <span class="st-hint">How shared rent/petrol is divided</span>
+          </div>
+
+          <div class="st-field">
+            <label>Shift Date:</label>
+            <input type="date" id="split-shift-date" class="st-input" />
+            <span class="st-hint">Date of this delivery shift</span>
           </div>
         </div>
 
-        <!-- Riders List -->
+        <!-- Section: Dynamic Riders List with Start/End Time & Earnings -->
         <div class="st-sub-box">
           <div class="st-sub-head">
-            <h3>👥 Delivery Partners on Shift</h3>
-            <span class="st-tag" id="split-basis-indicator">Basis: Orders Completed</span>
+            <h3>👥 Riders on Shift (Time Slots & App Gross)</h3>
+            <span class="st-tag">Multi-Rider Shift Log</span>
           </div>
           
-          <div id="delivery-riders-container" class="st-riders-list"></div>
+          <div id="delivery-riders-container" class="st-riders-list">
+            <!-- Dynamically populated rider cards -->
+          </div>
 
-          <button type="button" id="btn-add-delivery-rider" class="st-btn-outline">+ Add Another Rider</button>
+          <button type="button" id="btn-add-delivery-rider" class="st-btn-outline">
+            + Add Another Rider / Time Slot
+          </button>
         </div>
 
-        <!-- Split Result Calculation Summary -->
+        <!-- Section: Dynamic Custom Shared Expenses (Rent, Fuel, Data, Repairs) -->
+        <div class="st-sub-box">
+          <div class="st-sub-head">
+            <h3>⛽ Shared Shift Expenses (Vehicle Rent, Fuel, Misc)</h3>
+            <span class="st-tag">Custom Deductions</span>
+          </div>
+          
+          <div id="delivery-expenses-container" class="st-expenses-list">
+            <!-- Dynamically populated custom expense rows -->
+          </div>
+
+          <button type="button" id="btn-add-delivery-expense" class="st-btn-outline">
+            + Add Another Custom Shared Expense
+          </button>
+        </div>
+
+        <!-- Summary & Payout Distribution Output -->
         <div class="st-result-box">
           <div class="st-result-grid">
             <div class="st-res-col">
-              <span>App Gross</span>
-              <strong><span class="curr-sym">€</span><span id="res-d-gross">165.00</span></strong>
+              <span>Total App Gross</span>
+              <strong><span class="curr-sym">€</span><span id="res-d-gross">0.00</span></strong>
             </div>
             <div class="st-res-col st-red">
-              <span>Fleet Cut</span>
-              <strong>-<span class="curr-sym">€</span><span id="res-d-fleet">29.70</span></strong>
+              <span>Total Fleet Cut</span>
+              <strong>-<span class="curr-sym">€</span><span id="res-d-fleet">0.00</span></strong>
             </div>
             <div class="st-res-col st-red">
-              <span>Rent + Fuel</span>
-              <strong>-<span class="curr-sym">€</span><span id="res-d-expenses">27.00</span></strong>
+              <span>Shared Expenses</span>
+              <strong>-<span class="curr-sym">€</span><span id="res-d-expenses">0.00</span></strong>
             </div>
             <div class="st-res-col st-green">
               <span>Net Distributable</span>
-              <strong><span class="curr-sym">€</span><span id="res-d-net">108.30</span></strong>
+              <strong><span class="curr-sym">€</span><span id="res-d-net">0.00</span></strong>
             </div>
           </div>
 
-          <h4 class="st-payout-heading">💵 Net Payout Breakdown per Rider:</h4>
-          <div id="delivery-payouts-list" class="st-payout-cards"></div>
+          <h4 class="st-payout-heading">💵 Final Individual Payout Distribution:</h4>
+          <div id="delivery-payouts-list" class="st-payout-cards">
+            <!-- Calculated individual payouts -->
+          </div>
         </div>
 
         <div class="st-foot-actions">
           <button type="button" id="btn-copy-delivery-summary" class="st-btn st-btn-primary">
-            📋 Copy Shift Summary for WhatsApp
+            📋 Copy Shift Breakdown for WhatsApp
           </button>
           <span id="delivery-copy-feedback" class="st-feedback-msg" style="display: none;">✅ Copied to clipboard!</span>
         </div>
@@ -211,8 +215,8 @@ const trackerSchema = {
           <h3 class="st-box-title">➕ Add Daily Entry</h3>
           
           <div class="st-toggle-row">
-            <button type="button" class="st-toggle-btn active-exp" id="btn-type-expense">🔻 Expense (খরচ)</button>
-            <button type="button" class="st-toggle-btn" id="btn-type-income">💚 Income (আয়)</button>
+            <button type="button" class="st-toggle-btn active-exp" id="btn-type-expense">🔻 Expense Entry</button>
+            <button type="button" class="st-toggle-btn" id="btn-type-income">💚 Income Entry</button>
           </div>
 
           <div class="st-grid-4">
@@ -243,8 +247,8 @@ const trackerSchema = {
             </div>
 
             <div class="st-field">
-              <label>Description / Note:</label>
-              <input type="text" id="trans-desc" class="st-input" placeholder="e.g. Lidl grocery, rent" />
+              <label>Description / Custom Item:</label>
+              <input type="text" id="trans-desc" class="st-input" placeholder="e.g. Sklavenitis groceries, studio rent" />
             </div>
 
             <div class="st-field">
@@ -254,11 +258,10 @@ const trackerSchema = {
           </div>
 
           <button type="button" id="btn-save-transaction" class="st-btn st-btn-primary" style="margin-top: 1rem;">
-            + Save to Ledger
+            + Save Entry to Ledger
           </button>
         </div>
 
-        <!-- Table -->
         <div class="st-table-wrapper">
           <table class="st-table">
             <thead>
@@ -266,7 +269,7 @@ const trackerSchema = {
                 <th>Date</th>
                 <th>Type</th>
                 <th>Category</th>
-                <th>Note</th>
+                <th>Description</th>
                 <th>Amount</th>
                 <th>Action</th>
               </tr>
@@ -305,19 +308,19 @@ const trackerSchema = {
         </div>
 
         <div class="st-entry-box">
-          <h3 class="st-box-title">➕ Add Work Shift</h3>
+          <h3 class="st-box-title">➕ Add Hourly Work Shift</h3>
           <div class="st-grid-5">
             <div class="st-field">
               <label>Date:</label>
               <input type="date" id="shift-date" class="st-input" />
             </div>
             <div class="st-field">
-              <label>Workplace / Job:</label>
-              <input type="text" id="shift-job" class="st-input" placeholder="e.g. Hotel, Restaurant" />
+              <label>Workplace / Role:</label>
+              <input type="text" id="shift-job" class="st-input" placeholder="e.g. Hotel, Restaurant, Warehouse" />
             </div>
             <div class="st-field">
               <label>Hours Worked:</label>
-              <input type="number" id="shift-hours" class="st-input" step="0.5" min="0" placeholder="e.g. 5" />
+              <input type="number" id="shift-hours" class="st-input" step="0.5" min="0" placeholder="e.g. 5.5" />
             </div>
             <div class="st-field">
               <label>Hourly Rate (<span class="curr-sym">€</span>/hr):</label>
@@ -358,8 +361,8 @@ const trackerSchema = {
     <div class="st-taptap-card">
       <div class="st-taptap-left">
         <span class="st-taptap-badge">💡 Smart Money Transfer Tip</span>
-        <h3>Sending Wages to Home Country or Receiving Funds?</h3>
-        <p>Use Taptap Send with <strong>0% fee</strong> and receive an extra <strong>€10 bonus</strong> on your first transfer.</p>
+        <h3>Sending Wages to Home Country or Receiving Study Funds?</h3>
+        <p>Use Taptap Send with <strong>0% fee</strong> and receive an extra <strong>€10 bonus</strong> on your first transfer using the verified promo code.</p>
       </div>
       <div class="st-taptap-right">
         <span class="st-taptap-code">CODE: MDSAIDUR240</span>
@@ -374,20 +377,27 @@ const trackerSchema = {
   const STORAGE_KEY_CURRENCY = 'csg_user_currency';
   const STORAGE_KEY_LEDGER = 'csg_daily_ledger_data';
   const STORAGE_KEY_SHIFTS = 'csg_student_shifts_data';
-  const STORAGE_KEY_DELIVERY = 'csg_delivery_fleet_data';
+  const STORAGE_KEY_DELIVERY_RIDERS = 'csg_delivery_riders_data';
+  const STORAGE_KEY_DELIVERY_EXPENSES = 'csg_delivery_expenses_data';
 
   // App State
   let currentCurrency = '€';
   let currentTransType = 'expense';
   let ledgerRecords = [];
   let shiftRecords = [];
+  
+  // Dynamic Delivery State
   let deliveryRiders = [
-    { name: 'Rider 1 (Morning)', units: 14, cashTips: 5 },
-    { name: 'Rider 2 (Evening)', units: 11, cashTips: 8 }
+    { name: 'Rider 1 (Morning)', startTime: '11:00', endTime: '16:30', appGross: 75, cashTips: 6 },
+    { name: 'Rider 2 (Evening)', startTime: '17:00', endTime: '23:30', appGross: 95, cashTips: 10 }
+  ];
+
+  let deliveryExpenses = [
+    { name: 'Scooter / Bike Rent', amount: 15 },
+    { name: 'Petrol / Fuel', amount: 10 }
   ];
 
   document.addEventListener('DOMContentLoaded', () => {
-    // Set default dates
     const today = new Date().toISOString().split('T')[0];
     const currentMonth = today.substring(0, 7);
 
@@ -396,6 +406,9 @@ const trackerSchema = {
 
     const sDate = document.getElementById('shift-date');
     if (sDate) sDate.value = today;
+
+    const splitDate = document.getElementById('split-shift-date');
+    if (splitDate) splitDate.value = today;
 
     const mFilter = document.getElementById('ledger-month-filter');
     if (mFilter) mFilter.value = currentMonth;
@@ -421,8 +434,11 @@ const trackerSchema = {
       const s = localStorage.getItem(STORAGE_KEY_SHIFTS);
       if (s) shiftRecords = JSON.parse(s);
 
-      const d = localStorage.getItem(STORAGE_KEY_DELIVERY);
-      if (d) deliveryRiders = JSON.parse(d);
+      const dr = localStorage.getItem(STORAGE_KEY_DELIVERY_RIDERS);
+      if (dr) deliveryRiders = JSON.parse(dr);
+
+      const de = localStorage.getItem(STORAGE_KEY_DELIVERY_EXPENSES);
+      if (de) deliveryExpenses = JSON.parse(de);
     } catch (e) {
       console.warn('Storage read error:', e);
     }
@@ -432,7 +448,8 @@ const trackerSchema = {
     localStorage.setItem(STORAGE_KEY_CURRENCY, currentCurrency);
     localStorage.setItem(STORAGE_KEY_LEDGER, JSON.stringify(ledgerRecords));
     localStorage.setItem(STORAGE_KEY_SHIFTS, JSON.stringify(shiftRecords));
-    localStorage.setItem(STORAGE_KEY_DELIVERY, JSON.stringify(deliveryRiders));
+    localStorage.setItem(STORAGE_KEY_DELIVERY_RIDERS, JSON.stringify(deliveryRiders));
+    localStorage.setItem(STORAGE_KEY_DELIVERY_EXPENSES, JSON.stringify(deliveryExpenses));
     
     const txt = document.getElementById('save-status-text');
     if (txt) {
@@ -485,21 +502,27 @@ const trackerSchema = {
 
   // 3. Delivery Splitter Engine
   function initDeliveryEngine() {
-    const basisSelect = document.getElementById('split-split-basis');
-    if (basisSelect) {
-      basisSelect.addEventListener('change', (e) => {
-        const ind = document.getElementById('split-basis-indicator');
-        ind.innerText = e.target.value === 'orders' ? 'Basis: Orders Completed' : 'Basis: Hours Worked';
+    const addRiderBtn = document.getElementById('btn-add-delivery-rider');
+    if (addRiderBtn) {
+      addRiderBtn.addEventListener('click', () => {
+        deliveryRiders.push({
+          name: `Rider ${deliveryRiders.length + 1}`,
+          startTime: '12:00',
+          endTime: '18:00',
+          appGross: 50,
+          cashTips: 0
+        });
         renderDeliveryRiders();
         calculateDelivery();
+        saveData();
       });
     }
 
-    const addBtn = document.getElementById('btn-add-delivery-rider');
-    if (addBtn) {
-      addBtn.addEventListener('click', () => {
-        deliveryRiders.push({ name: `Rider ${deliveryRiders.length + 1}`, units: 8, cashTips: 0 });
-        renderDeliveryRiders();
+    const addExpBtn = document.getElementById('btn-add-delivery-expense');
+    if (addExpBtn) {
+      addExpBtn.addEventListener('click', () => {
+        deliveryExpenses.push({ name: 'Custom Expense', amount: 5 });
+        renderDeliveryExpenses();
         calculateDelivery();
         saveData();
       });
@@ -518,31 +541,35 @@ const trackerSchema = {
   function renderDeliveryRiders() {
     const container = document.getElementById('delivery-riders-container');
     if (!container) return;
-    const basis = document.getElementById('split-split-basis').value;
-    const unitLbl = basis === 'orders' ? 'orders' : 'hrs';
-
     container.innerHTML = '';
 
     deliveryRiders.forEach((rider, idx) => {
       const row = document.createElement('div');
-      row.className = 'st-rider-row';
+      row.className = 'st-rider-card';
       row.innerHTML = `
-        <div class="st-field-flex">
-          <label>Rider Name:</label>
-          <input type="text" class="st-input d-r-name" value="${rider.name}" placeholder="Rider ${idx + 1}" />
-        </div>
-        <div class="st-field-flex">
-          <label>${basis === 'orders' ? 'Orders Done:' : 'Hours on Road:'}</label>
-          <div class="st-input-unit">
-            <input type="number" class="st-input d-r-units" value="${rider.units}" min="0" step="${basis === 'orders' ? '1' : '0.5'}" />
-            <span class="st-unit-lbl">${unitLbl}</span>
+        <div class="st-grid-rider">
+          <div class="st-field">
+            <label>Rider Name:</label>
+            <input type="text" class="st-input d-r-name" value="${rider.name}" placeholder="e.g. Rider ${idx + 1}" />
           </div>
+          <div class="st-field">
+            <label>Shift Time (From - To):</label>
+            <div class="st-time-combo">
+              <input type="time" class="st-input d-r-start" value="${rider.startTime || '11:00'}" />
+              <span class="st-time-sep">to</span>
+              <input type="time" class="st-input d-r-end" value="${rider.endTime || '17:00'}" />
+            </div>
+          </div>
+          <div class="st-field">
+            <label>App Earnings (${currentCurrency}):</label>
+            <input type="number" class="st-input d-r-gross" value="${rider.appGross}" min="0" step="1" placeholder="0.00" />
+          </div>
+          <div class="st-field">
+            <label>Cash Tips (${currentCurrency}):</label>
+            <input type="number" class="st-input d-r-tips" value="${rider.cashTips || 0}" min="0" step="1" placeholder="0.00" />
+          </div>
+          ${deliveryRiders.length > 1 ? `<div class="st-del-col"><button type="button" class="st-btn-del" title="Remove Rider">✕</button></div>` : ''}
         </div>
-        <div class="st-field-flex">
-          <label>Cash Tips Kept (${currentCurrency}):</label>
-          <input type="number" class="st-input d-r-tips" value="${rider.cashTips || 0}" min="0" step="1" />
-        </div>
-        ${deliveryRiders.length > 1 ? `<button type="button" class="st-btn-del" title="Remove">✕</button>` : ''}
       `;
 
       row.querySelector('.d-r-name').addEventListener('input', (e) => {
@@ -551,8 +578,20 @@ const trackerSchema = {
         saveData();
       });
 
-      row.querySelector('.d-r-units').addEventListener('input', (e) => {
-        deliveryRiders[idx].units = parseFloat(e.target.value) || 0;
+      row.querySelector('.d-r-start').addEventListener('input', (e) => {
+        deliveryRiders[idx].startTime = e.target.value;
+        calculateDelivery();
+        saveData();
+      });
+
+      row.querySelector('.d-r-end').addEventListener('input', (e) => {
+        deliveryRiders[idx].endTime = e.target.value;
+        calculateDelivery();
+        saveData();
+      });
+
+      row.querySelector('.d-r-gross').addEventListener('input', (e) => {
+        deliveryRiders[idx].appGross = parseFloat(e.target.value) || 0;
         calculateDelivery();
         saveData();
       });
@@ -577,38 +616,83 @@ const trackerSchema = {
     });
   }
 
+  function renderDeliveryExpenses() {
+    const container = document.getElementById('delivery-expenses-container');
+    if (!container) return;
+    container.innerHTML = '';
+
+    deliveryExpenses.forEach((exp, idx) => {
+      const row = document.createElement('div');
+      row.className = 'st-expense-row';
+      row.innerHTML = `
+        <div class="st-exp-name">
+          <input type="text" class="st-input d-e-name" value="${exp.name}" placeholder="Expense name (e.g. Scooter Rent, Petrol)" />
+        </div>
+        <div class="st-exp-amt">
+          <span class="st-curr-tag">${currentCurrency}</span>
+          <input type="number" class="st-input d-e-amt" value="${exp.amount}" min="0" step="1" placeholder="0.00" />
+        </div>
+        <button type="button" class="st-btn-del" title="Remove Expense">✕</button>
+      `;
+
+      row.querySelector('.d-e-name').addEventListener('input', (e) => {
+        deliveryExpenses[idx].name = e.target.value;
+        calculateDelivery();
+        saveData();
+      });
+
+      row.querySelector('.d-e-amt').addEventListener('input', (e) => {
+        deliveryExpenses[idx].amount = parseFloat(e.target.value) || 0;
+        calculateDelivery();
+        saveData();
+      });
+
+      row.querySelector('.st-btn-del').addEventListener('click', () => {
+        deliveryExpenses.splice(idx, 1);
+        renderDeliveryExpenses();
+        calculateDelivery();
+        saveData();
+      });
+
+      container.appendChild(row);
+    });
+  }
+
   function calculateDelivery() {
-    const grossApp = parseFloat(document.getElementById('split-gross-app').value) || 0;
     const fleetType = document.getElementById('split-fleet-type').value;
     const fleetVal = parseFloat(document.getElementById('split-fleet-val').value) || 0;
-    const vehicleRent = parseFloat(document.getElementById('split-vehicle-rent').value) || 0;
-    const fuelCost = parseFloat(document.getElementById('split-fuel-cost').value) || 0;
     const expenseMode = document.getElementById('split-expense-split-mode').value;
-    const basis = document.getElementById('split-split-basis').value;
 
-    let fleetCut = fleetType === 'percent' ? (grossApp * fleetVal) / 100 : fleetVal;
-    const operationalExpenses = vehicleRent + fuelCost;
-    const netDistributable = Math.max(0, grossApp - fleetCut - operationalExpenses);
+    // Total App Gross is sum of individual rider earnings
+    let totalAppGross = 0;
+    deliveryRiders.forEach(r => totalAppGross += (r.appGross || 0));
 
-    document.getElementById('res-d-gross').innerText = grossApp.toFixed(2);
-    document.getElementById('res-d-fleet').innerText = fleetCut.toFixed(2);
-    document.getElementById('res-d-expenses').innerText = operationalExpenses.toFixed(2);
+    // Fleet deduction
+    let totalFleetCut = fleetType === 'percent' ? ((totalAppGross * fleetVal) / 100) : fleetVal;
+
+    // Total Custom Shared Expenses
+    let totalSharedExpenses = 0;
+    deliveryExpenses.forEach(e => totalSharedExpenses += (e.amount || 0));
+
+    const netDistributable = Math.max(0, totalAppGross - totalFleetCut - totalSharedExpenses);
+
+    // Update Header Indicators
+    document.getElementById('res-d-gross').innerText = totalAppGross.toFixed(2);
+    document.getElementById('res-d-fleet').innerText = totalFleetCut.toFixed(2);
+    document.getElementById('res-d-expenses').innerText = totalSharedExpenses.toFixed(2);
     document.getElementById('res-d-net').innerText = netDistributable.toFixed(2);
-
-    let totalUnits = 0;
-    deliveryRiders.forEach(r => totalUnits += (r.units || 0));
 
     const payoutList = document.getElementById('delivery-payouts-list');
     if (!payoutList) return;
     payoutList.innerHTML = '';
 
     deliveryRiders.forEach(rider => {
-      const ratio = totalUnits > 0 ? ((rider.units || 0) / totalUnits) : (1 / deliveryRiders.length);
-      let riderGross = grossApp * ratio;
-      let riderFleet = fleetCut * ratio;
-      let riderExpenses = expenseMode === 'proportional' ? (operationalExpenses * ratio) : (operationalExpenses / deliveryRiders.length);
+      const ratio = totalAppGross > 0 ? ((rider.appGross || 0) / totalAppGross) : (1 / deliveryRiders.length);
+      
+      let riderFleetShare = fleetType === 'percent' ? (((rider.appGross || 0) * fleetVal) / 100) : (totalFleetCut * ratio);
+      let riderExpenseShare = expenseMode === 'proportional' ? (totalSharedExpenses * ratio) : (totalSharedExpenses / deliveryRiders.length);
 
-      const riderNetApp = Math.max(0, riderGross - riderFleet - riderExpenses);
+      const riderNetApp = Math.max(0, (rider.appGross || 0) - riderFleetShare - riderExpenseShare);
       const totalTakeHome = riderNetApp + (rider.cashTips || 0);
 
       const card = document.createElement('div');
@@ -617,7 +701,7 @@ const trackerSchema = {
         <div class="st-p-top">
           <div>
             <h5 class="st-p-name">👤 ${rider.name || 'Rider'}</h5>
-            <span class="st-p-meta">${rider.units || 0} ${basis === 'orders' ? 'orders' : 'hrs'} (${(ratio * 100).toFixed(0)}%)</span>
+            <span class="st-p-meta">⏰ ${rider.startTime || '--:--'} - ${rider.endTime || '--:--'} • App: ${currentCurrency}${(rider.appGross || 0).toFixed(2)} (${(ratio * 100).toFixed(0)}%)</span>
           </div>
           <div class="st-p-val">
             ${currentCurrency}${totalTakeHome.toFixed(2)}
@@ -625,10 +709,10 @@ const trackerSchema = {
           </div>
         </div>
         <div class="st-p-breakdown">
-          <span>App: <strong>${currentCurrency}${riderGross.toFixed(2)}</strong></span>
-          <span>Fleet: <strong class="st-red-txt">-${currentCurrency}${riderFleet.toFixed(2)}</strong></span>
-          <span>Rent+Fuel: <strong class="st-red-txt">-${currentCurrency}${riderExpenses.toFixed(2)}</strong></span>
-          <span>Tips: <strong class="st-green-txt">+${currentCurrency}${(rider.cashTips || 0).toFixed(2)}</strong></span>
+          <span>Gross: <strong>${currentCurrency}${(rider.appGross || 0).toFixed(2)}</strong></span>
+          <span>Fleet Cut: <strong class="st-red-txt">-${currentCurrency}${riderFleetShare.toFixed(2)}</strong></span>
+          <span>Shared Expenses: <strong class="st-red-txt">-${currentCurrency}${riderExpenseShare.toFixed(2)}</strong></span>
+          <span>Cash Tips: <strong class="st-green-txt">+${currentCurrency}${(rider.cashTips || 0).toFixed(2)}</strong></span>
         </div>
       `;
       payoutList.appendChild(card);
@@ -636,38 +720,50 @@ const trackerSchema = {
   }
 
   function copyDeliveryText() {
-    const grossApp = parseFloat(document.getElementById('split-gross-app').value) || 0;
     const fleetType = document.getElementById('split-fleet-type').value;
     const fleetVal = parseFloat(document.getElementById('split-fleet-val').value) || 0;
-    const vehicleRent = parseFloat(document.getElementById('split-vehicle-rent').value) || 0;
-    const fuelCost = parseFloat(document.getElementById('split-fuel-cost').value) || 0;
-    const basis = document.getElementById('split-split-basis').value;
     const expenseMode = document.getElementById('split-expense-split-mode').value;
+    const shiftDate = document.getElementById('split-shift-date').value || new Date().toISOString().split('T')[0];
 
-    let fleetCut = fleetType === 'percent' ? (grossApp * fleetVal) / 100 : fleetVal;
-    const operationalExpenses = vehicleRent + fuelCost;
-    const netDistributable = Math.max(0, grossApp - fleetCut - operationalExpenses);
+    let totalAppGross = 0;
+    deliveryRiders.forEach(r => totalAppGross += (r.appGross || 0));
 
-    let totalUnits = 0;
-    deliveryRiders.forEach(r => totalUnits += (r.units || 0));
+    let totalFleetCut = fleetType === 'percent' ? ((totalAppGross * fleetVal) / 100) : fleetVal;
 
-    let text = `🛵 *Cyprus Food Delivery Shift Split*\n`;
-    text += `📅 Date: ${new Date().toLocaleDateString()}\n`;
-    text += `📱 App Gross: ${currentCurrency}${grossApp.toFixed(2)}\n`;
-    text += `📑 Fleet Cut: -${currentCurrency}${fleetCut.toFixed(2)}\n`;
-    text += `🛵 Vehicle + Fuel: -${currentCurrency}${operationalExpenses.toFixed(2)}\n`;
-    text += `💵 Net Pool: ${currentCurrency}${netDistributable.toFixed(2)}\n`;
+    let totalSharedExpenses = 0;
+    let expDetails = [];
+    deliveryExpenses.forEach(e => {
+      if (e.amount > 0) {
+        totalSharedExpenses += e.amount;
+        expDetails.push(`${e.name}: ${currentCurrency}${e.amount.toFixed(2)}`);
+      }
+    });
+
+    const netDistributable = Math.max(0, totalAppGross - totalFleetCut - totalSharedExpenses);
+
+    let text = `🛵 *Cyprus Food Delivery Shift Split Summary*\n`;
+    text += `📅 Date: ${shiftDate}\n`;
+    text += `📱 App Total Gross: ${currentCurrency}${totalAppGross.toFixed(2)}\n`;
+    text += `📑 Fleet Cut: -${currentCurrency}${totalFleetCut.toFixed(2)} (${fleetType === 'percent' ? fleetVal + '%' : 'Fixed'})\n`;
+    if (expDetails.length > 0) {
+      text += `⛽ Expenses Deducted: -${currentCurrency}${totalSharedExpenses.toFixed(2)} (${expDetails.join(', ')})\n`;
+    }
+    text += `💵 Net Distributable Pool: ${currentCurrency}${netDistributable.toFixed(2)}\n`;
     text += `------------------------------------\n`;
 
     deliveryRiders.forEach(rider => {
-      const ratio = totalUnits > 0 ? ((rider.units || 0) / totalUnits) : (1 / deliveryRiders.length);
-      let riderGross = grossApp * ratio;
-      let riderFleet = fleetCut * ratio;
-      let riderExpenses = expenseMode === 'proportional' ? (operationalExpenses * ratio) : (operationalExpenses / deliveryRiders.length);
-      const riderNetApp = Math.max(0, riderGross - riderFleet - riderExpenses);
+      const ratio = totalAppGross > 0 ? ((rider.appGross || 0) / totalAppGross) : (1 / deliveryRiders.length);
+      let riderFleetShare = fleetType === 'percent' ? (((rider.appGross || 0) * fleetVal) / 100) : (totalFleetCut * ratio);
+      let riderExpenseShare = expenseMode === 'proportional' ? (totalSharedExpenses * ratio) : (totalSharedExpenses / deliveryRiders.length);
+      const riderNetApp = Math.max(0, (rider.appGross || 0) - riderFleetShare - riderExpenseShare);
       const totalTakeHome = riderNetApp + (rider.cashTips || 0);
 
-      text += `👤 *${rider.name}*: ${currentCurrency}${totalTakeHome.toFixed(2)} (${rider.units} ${basis === 'orders' ? 'orders' : 'hrs'})\n`;
+      text += `👤 *${rider.name}*:\n`;
+      text += `   • Time: ${rider.startTime || '--'} - ${rider.endTime || '--'}\n`;
+      text += `   • App Gross: ${currentCurrency}${(rider.appGross || 0).toFixed(2)}\n`;
+      text += `   • Net App Payout: ${currentCurrency}${riderNetApp.toFixed(2)}\n`;
+      if (rider.cashTips > 0) text += `   • Cash Tips Kept: +${currentCurrency}${rider.cashTips.toFixed(2)}\n`;
+      text += `   👉 *Total Take-Home: ${currentCurrency}${totalTakeHome.toFixed(2)}*\n\n`;
     });
 
     text += `------------------------------------\nCalculated via CyprusStudentGuide.com`;
@@ -922,11 +1018,12 @@ const trackerSchema = {
 
     document.getElementById('btn-export-json').addEventListener('click', () => {
       const backup = {
-        version: "3.0",
+        version: "3.5",
         currency: currentCurrency,
         ledger: ledgerRecords,
         shifts: shiftRecords,
-        delivery: deliveryRiders
+        deliveryRiders: deliveryRiders,
+        deliveryExpenses: deliveryExpenses
       };
 
       const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
@@ -946,11 +1043,12 @@ const trackerSchema = {
       reader.onload = function(evt) {
         try {
           const parsed = JSON.parse(evt.target.result);
-          if (parsed.ledger || parsed.shifts || parsed.delivery) {
+          if (parsed.ledger || parsed.shifts || parsed.deliveryRiders) {
             if (parsed.currency) currentCurrency = parsed.currency;
             if (parsed.ledger) ledgerRecords = parsed.ledger;
             if (parsed.shifts) shiftRecords = parsed.shifts;
-            if (parsed.delivery) deliveryRiders = parsed.delivery;
+            if (parsed.deliveryRiders) deliveryRiders = parsed.deliveryRiders;
+            if (parsed.deliveryExpenses) deliveryExpenses = parsed.deliveryExpenses;
 
             saveData();
             initCurrency();
@@ -969,8 +1067,12 @@ const trackerSchema = {
         ledgerRecords = [];
         shiftRecords = [];
         deliveryRiders = [
-          { name: 'Rider 1 (Morning)', units: 14, cashTips: 5 },
-          { name: 'Rider 2 (Evening)', units: 11, cashTips: 8 }
+          { name: 'Rider 1 (Morning)', startTime: '11:00', endTime: '16:30', appGross: 75, cashTips: 6 },
+          { name: 'Rider 2 (Evening)', startTime: '17:00', endTime: '23:30', appGross: 95, cashTips: 10 }
+        ];
+        deliveryExpenses = [
+          { name: 'Scooter / Bike Rent', amount: 15 },
+          { name: 'Petrol / Fuel', amount: 10 }
         ];
         saveData();
         renderAll();
@@ -980,6 +1082,7 @@ const trackerSchema = {
 
   function renderAll() {
     renderDeliveryRiders();
+    renderDeliveryExpenses();
     calculateDelivery();
     renderLedger();
     renderShifts();
@@ -1185,7 +1288,7 @@ const trackerSchema = {
   .st-input-combo { display: flex; gap: 0.4rem; }
   .st-hint { font-size: 0.72rem; color: var(--text-muted); display: block; margin-top: 0.25rem; }
 
-  /* Sub Box & Riders List */
+  /* Sub Box & Dynamic Riders */
   .st-sub-box {
     background: rgba(150, 150, 150, 0.04);
     border: 1px solid var(--card-border);
@@ -1197,22 +1300,36 @@ const trackerSchema = {
   .st-sub-head h3 { font-size: 1rem; font-weight: 800; margin: 0; color: var(--text-main); }
   .st-tag { font-size: 0.75rem; font-weight: 800; background: rgba(37, 99, 235, 0.1); color: var(--primary-blue); padding: 0.2rem 0.6rem; border-radius: 20px; }
 
-  .st-riders-list { display: flex; flex-direction: column; gap: 0.65rem; }
-  .st-rider-row {
+  .st-riders-list { display: flex; flex-direction: column; gap: 0.75rem; }
+  .st-rider-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+  }
+  .st-grid-rider {
     display: grid;
-    grid-template-columns: 1.8fr 1.2fr 1.2fr auto;
+    grid-template-columns: 1.4fr 1.6fr 1fr 1fr auto;
     gap: 0.75rem;
     align-items: flex-end;
-    background: var(--card-bg);
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    border: 1px solid var(--card-border);
   }
-  .st-field-flex label { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.25rem; }
-  .st-input-unit { position: relative; display: flex; align-items: center; }
-  .st-unit-lbl { position: absolute; right: 10px; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); pointer-events: none; }
+  .st-time-combo { display: flex; align-items: center; gap: 0.35rem; }
+  .st-time-sep { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); }
+  .st-del-col { padding-bottom: 2px; }
   .st-btn-del { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 6px; padding: 0.6rem 0.8rem; cursor: pointer; }
   .st-btn-del:hover { background: #ef4444; color: #fff; }
+
+  /* Custom Expenses Rows */
+  .st-expenses-list { display: flex; flex-direction: column; gap: 0.65rem; }
+  .st-expense-row {
+    display: flex;
+    gap: 0.65rem;
+    align-items: center;
+  }
+  .st-exp-name { flex: 2; }
+  .st-exp-amt { flex: 1; display: flex; align-items: center; position: relative; }
+  .st-curr-tag { position: absolute; left: 10px; font-weight: 800; color: var(--text-muted); font-size: 0.9rem; pointer-events: none; }
+  .st-exp-amt input { padding-left: 1.8rem !important; }
 
   /* Result Box */
   .st-result-box {
@@ -1312,10 +1429,10 @@ const trackerSchema = {
   /* Responsive Fixes */
   @media (max-width: 860px) {
     .st-grid-3, .st-grid-4, .st-grid-5 { grid-template-columns: 1fr; }
+    .st-grid-rider { grid-template-columns: 1fr; }
     .st-tabs { grid-template-columns: 1fr; }
     .st-stats-grid { grid-template-columns: repeat(2, 1fr); }
     .st-result-grid { grid-template-columns: repeat(2, 1fr); }
-    .st-rider-row { grid-template-columns: 1fr; }
     .st-taptap-card { flex-direction: column; align-items: flex-start; }
     .st-title { font-size: 1.85rem; }
   }
