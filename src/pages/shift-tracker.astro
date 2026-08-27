@@ -1,14 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-const title = "Cyprus Student Daily Money Ledger, Shift Tracker & Delivery Fleet Splitter 2026";
-const description = "Track daily student income and expenses, log hourly shifts, or split shared food delivery earnings (Wolt/Foody) with ID rent, vehicle rental, and fuel deductions. 100% offline auto-save with Excel export.";
+const title = "Student Work Shift, Daily Money Tracker & Delivery Splitter 2026";
+const description = "Track daily student earnings, calculate food delivery splits with ID & scooter rent, log work hours, and export everything to Excel. 100% private offline storage.";
 const permalink = "https://cyprusstudentguide.com/shift-tracker/";
 
 const trackerSchema = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "Cyprus Student Daily Money & Delivery Shift Tracker",
+  "name": "Cyprus Student Work & Shift Tracker",
   "url": permalink,
   "applicationCategory": "FinanceApplication",
   "operatingSystem": "All",
@@ -20,357 +20,322 @@ const trackerSchema = {
 <BaseLayout title={title} description={description} permalink={permalink} current="tracker">
   <script type="application/ld+json" is:inline set:html={JSON.stringify(trackerSchema)} />
 
-  <section class="tracker-hero">
-    <span class="tracker-badge">🔒 100% Private • Local Storage Auto-Save • Excel Backup</span>
-    <h1 class="tracker-title">Student Daily Money & Delivery Shift Tracker</h1>
-    <p class="tracker-desc">Log your personal income & expenses, track hourly work shifts, or split shared food delivery earnings with ID rent, vehicle hire, and fuel deductions. Everything auto-saves in your browser.</p>
-  </section>
-
-  <!-- Top Toolbar: Currency Selector & Backup Control Center -->
-  <div class="top-control-bar notranslate">
-    <div class="currency-picker-wrap">
-      <label for="global-currency-select"><strong>💱 Currency:</strong></label>
-      <select id="global-currency-select" class="currency-select">
-        <option value="€" selected>Euro (€)</option>
-        <option value="৳">BDT (৳)</option>
-        <option value="₹">INR (₹)</option>
-        <option value="$">USD ($)</option>
-        <option value="£">GBP (£)</option>
-        <option value="₨">PKR / NPR (₨)</option>
-      </select>
+  <div class="st-wrapper notranslate">
+    <!-- Header Title -->
+    <div class="st-hero">
+      <span class="st-badge">🔒 100% Private • Auto-Save in Browser • Excel Export</span>
+      <h1 class="st-title">Student Daily Money & Shift Tracker</h1>
+      <p class="st-desc">Easily log daily income & expenses, track hourly shifts, or split food delivery earnings with ID & vehicle rent. Your data stays securely stored on your device.</p>
     </div>
 
-    <div class="backup-status">
-      <span class="status-indicator"></span>
-      <span id="save-status-text">Auto-saved to browser</span>
+    <!-- Control Center: Currency, Auto-save status, and Export Tools -->
+    <div class="st-toolbar">
+      <div class="st-tool-group">
+        <label for="global-currency-select" class="st-tool-label">Currency:</label>
+        <select id="global-currency-select" class="st-select-mini">
+          <option value="€" selected>EUR (€)</option>
+          <option value="৳">BDT (৳)</option>
+          <option value="₹">INR (₹)</option>
+          <option value="$">USD ($)</option>
+          <option value="£">GBP (£)</option>
+          <option value="₨">PKR / NPR (₨)</option>
+        </select>
+      </div>
+
+      <div class="st-save-status">
+        <span class="st-dot"></span>
+        <span id="save-status-text">Auto-saved to browser</span>
+      </div>
+
+      <div class="st-actions-group">
+        <button type="button" id="btn-export-csv" class="st-btn st-btn-green">📊 Excel (.CSV)</button>
+        <button type="button" id="btn-export-json" class="st-btn st-btn-gray">💾 Save Backup</button>
+        <label class="st-btn st-btn-gray st-btn-file">
+          📂 Restore
+          <input type="file" id="file-restore-input" accept=".json,.csv" style="display: none;" />
+        </label>
+        <button type="button" id="btn-clear-all" class="st-btn st-btn-red" title="Clear all local data">🗑️ Reset</button>
+      </div>
     </div>
 
-    <div class="backup-buttons">
-      <button type="button" id="btn-export-csv" class="tool-btn btn-excel">
-        📊 Export Excel (.CSV)
+    <!-- Navigation Tabs -->
+    <div class="st-tabs">
+      <button type="button" class="st-tab-btn active" data-target="view-delivery-split">
+        🛵 Food Delivery Splitter
       </button>
-      <button type="button" id="btn-export-json" class="tool-btn btn-json">
-        💾 Save Backup (.json)
+      <button type="button" class="st-tab-btn" data-target="view-money-ledger">
+        💰 Daily Income & Expenses
       </button>
-      <label class="tool-btn btn-restore">
-        📂 Restore File
-        <input type="file" id="file-restore-input" accept=".json,.csv" style="display: none;" />
-      </label>
-      <button type="button" id="btn-clear-all" class="tool-btn btn-danger" title="Clear all local data">
-        🗑️ Clear Data
+      <button type="button" class="st-tab-btn" data-target="view-daily-log">
+        ⏱️ Hourly Work Shifts Log
       </button>
     </div>
-  </div>
 
-  <!-- 3-Mode Switcher Tabs -->
-  <div class="mode-tabs-container notranslate">
-    <button type="button" class="tab-btn active" id="tab-delivery-split">
-      🛵 Delivery Splitter (ID & Bike Rent)
-    </button>
-    <button type="button" class="tab-btn" id="tab-money-ledger">
-      💰 Daily Income & Expense Ledger
-    </button>
-    <button type="button" class="tab-btn" id="tab-daily-log">
-      ⏱️ Hourly Work Shifts Log
-    </button>
-  </div>
-
-  <div class="tracker-body notranslate">
-
-    <!-- ================= MODE 1: ADVANCED FOOD DELIVERY SPLITTER ================= -->
-    <div id="view-delivery-split" class="tracker-view active-view">
-      <div class="split-calculator-card">
-        <div class="split-header">
-          <h2>🛵 Real-World Food Delivery Earnings & Rent Splitter</h2>
-          <p class="split-sub">Calculate exact net earnings per rider after deducting Fleet/ID rent commission, vehicle rent, and fuel costs. Split fairly by total orders delivered or hours worked.</p>
+    <!-- ================= TAB 1: DELIVERY SPLITTER ================= -->
+    <div id="view-delivery-split" class="st-tab-content active">
+      <div class="st-card">
+        <div class="st-card-head">
+          <h2 class="st-card-title">🛵 Delivery Earnings & Expense Splitter</h2>
+          <p class="st-card-sub">Accurately calculate net payouts after deducting Fleet/ID rent commission, bike/scooter rent, and fuel costs.</p>
         </div>
 
-        <!-- App Gross & Deductions Setup -->
-        <div class="split-grid-top">
-          
-          <div class="form-field">
-            <label for="split-gross-app"><strong>📱 Total Gross App Earnings (<span class="curr-sym">€</span>):</strong></label>
-            <input type="number" id="split-gross-app" class="t-input calc-split-input" placeholder="e.g. 165" value="165" step="1" min="0" />
-            <span class="field-help">Total amount shown on Wolt / Foody / Bolt app</span>
+        <div class="st-grid-3">
+          <div class="st-field">
+            <label>Total App Gross (<span class="curr-sym">€</span>):</label>
+            <input type="number" id="split-gross-app" class="st-input calc-split-input" value="165" step="1" min="0" />
+            <span class="st-hint">Total shown on Wolt / Foody / Bolt app</span>
           </div>
 
-          <div class="form-field">
-            <label for="split-split-basis"><strong>⚖️ Split Calculation Basis:</strong></label>
-            <select id="split-split-basis" class="t-select calc-split-input">
-              <option value="orders" selected>By Orders Completed (Most Accurate)</option>
+          <div class="st-field">
+            <label>Calculation Basis:</label>
+            <select id="split-split-basis" class="st-select calc-split-input">
+              <option value="orders" selected>By Orders Done (Recommended)</option>
               <option value="hours">By Hours on Road</option>
             </select>
           </div>
 
-          <div class="form-field">
-            <label for="split-fleet-type"><strong>📑 Fleet / ID Rent Deduction:</strong></label>
-            <div class="input-with-select">
-              <select id="split-fleet-type" class="t-select calc-split-input" style="flex: 1.2;">
-                <option value="percent" selected>Percentage (%)</option>
-                <option value="fixed">Fixed Flat (<span class="curr-sym">€</span>)</option>
+          <div class="st-field">
+            <label>Fleet / ID Rent Cut:</label>
+            <div class="st-input-combo">
+              <select id="split-fleet-type" class="st-select calc-split-input" style="max-width: 110px;">
+                <option value="percent" selected>% Cut</option>
+                <option value="fixed">Fixed</option>
               </select>
-              <input type="number" id="split-fleet-val" class="t-input calc-split-input" style="flex: 1;" value="18" placeholder="e.g. 18" min="0" step="0.5" />
+              <input type="number" id="split-fleet-val" class="st-input calc-split-input" value="18" step="0.5" min="0" />
             </div>
-            <span class="field-help" id="fleet-help-txt">Fleet cut (e.g. 18% or fixed daily fee)</span>
+            <span class="st-hint">e.g. 18% or fixed daily fee</span>
           </div>
 
-          <div class="form-field">
-            <label for="split-vehicle-rent"><strong>🛵 Vehicle / Scooter / Car Rent (<span class="curr-sym">€</span>):</strong></label>
-            <input type="number" id="split-vehicle-rent" class="t-input calc-split-input" placeholder="Daily rent (0 if owned)" value="15" step="1" min="0" />
-            <span class="field-help">Daily rental fee for bike/scooter/car</span>
+          <div class="st-field">
+            <label>Vehicle / Scooter Rent (<span class="curr-sym">€</span>):</label>
+            <input type="number" id="split-vehicle-rent" class="st-input calc-split-input" value="15" step="1" min="0" />
+            <span class="st-hint">0 if you own the vehicle</span>
           </div>
 
-          <div class="form-field">
-            <label for="split-fuel-cost"><strong>⛽ Petrol / Battery Charging (<span class="curr-sym">€</span>):</strong></label>
-            <input type="number" id="split-fuel-cost" class="t-input calc-split-input" placeholder="Fuel cost" value="12" step="1" min="0" />
-            <span class="field-help">Total fuel/charging expense today</span>
+          <div class="st-field">
+            <label>Petrol / Charging (<span class="curr-sym">€</span>):</label>
+            <input type="number" id="split-fuel-cost" class="st-input calc-split-input" value="12" step="1" min="0" />
+            <span class="st-hint">Total fuel/power spent today</span>
           </div>
 
-          <div class="form-field">
-            <label for="split-expense-split-mode"><strong>⚙️ Expense Sharing Method:</strong></label>
-            <select id="split-expense-split-mode" class="t-select calc-split-input">
-              <option value="proportional" selected>Proportional to Work/Orders (Fair)</option>
+          <div class="st-field">
+            <label>Expense Sharing Mode:</label>
+            <select id="split-expense-split-mode" class="st-select calc-split-input">
+              <option value="proportional" selected>Proportional (By Work Done)</option>
               <option value="equal">Equal 50/50 Split</option>
             </select>
           </div>
-
         </div>
 
-        <!-- Dynamic Riders Working on This Shift -->
-        <div class="riders-section">
-          <div class="riders-header-row">
-            <h4 class="riders-heading">👥 Riders Sharing This Shift / Account</h4>
-            <span class="riders-count-badge" id="split-basis-indicator">Basis: Orders Completed</span>
+        <!-- Riders List -->
+        <div class="st-sub-box">
+          <div class="st-sub-head">
+            <h3>👥 Delivery Partners on Shift</h3>
+            <span class="st-tag" id="split-basis-indicator">Basis: Orders Completed</span>
           </div>
           
-          <div id="delivery-riders-container" class="riders-list">
-            <!-- Dynamically populated rider rows -->
-          </div>
+          <div id="delivery-riders-container" class="st-riders-list"></div>
 
-          <button type="button" id="btn-add-delivery-rider" class="btn-add-sub">
-            + Add Another Delivery Partner
-          </button>
+          <button type="button" id="btn-add-delivery-rider" class="st-btn-outline">+ Add Another Rider</button>
         </div>
 
-        <!-- Master Split Calculation Result -->
-        <div class="split-result-box">
-          <div class="result-summary-grid">
-            <div class="res-item">
-              <span>Gross App Income:</span>
+        <!-- Split Result Calculation Summary -->
+        <div class="st-result-box">
+          <div class="st-result-grid">
+            <div class="st-res-col">
+              <span>App Gross</span>
               <strong><span class="curr-sym">€</span><span id="res-d-gross">165.00</span></strong>
             </div>
-            <div class="res-item">
-              <span>Fleet/ID Commission:</span>
-              <strong style="color: #ef4444;">-<span class="curr-sym">€</span><span id="res-d-fleet">29.70</span></strong>
+            <div class="st-res-col st-red">
+              <span>Fleet Cut</span>
+              <strong>-<span class="curr-sym">€</span><span id="res-d-fleet">29.70</span></strong>
             </div>
-            <div class="res-item">
-              <span>Vehicle + Fuel:</span>
-              <strong style="color: #ef4444;">-<span class="curr-sym">€</span><span id="res-d-expenses">27.00</span></strong>
+            <div class="st-res-col st-red">
+              <span>Rent + Fuel</span>
+              <strong>-<span class="curr-sym">€</span><span id="res-d-expenses">27.00</span></strong>
             </div>
-            <div class="res-item res-net">
-              <span>Total Net Payout:</span>
-              <strong style="color: #10b981;"><span class="curr-sym">€</span><span id="res-d-net">108.30</span></strong>
+            <div class="st-res-col st-green">
+              <span>Net Distributable</span>
+              <strong><span class="curr-sym">€</span><span id="res-d-net">108.30</span></strong>
             </div>
           </div>
 
-          <h4 class="payout-title">💵 Final Individual Payouts:</h4>
-          <div id="delivery-payouts-list" class="payout-list">
-            <!-- Individual payout cards calculated here -->
-          </div>
+          <h4 class="st-payout-heading">💵 Net Payout Breakdown per Rider:</h4>
+          <div id="delivery-payouts-list" class="st-payout-cards"></div>
         </div>
 
-        <!-- Copy / WhatsApp Share Button -->
-        <div class="split-share-actions">
-          <button type="button" id="btn-copy-delivery-summary" class="btn-primary btn-copy-summary">
-            📋 Copy Complete Shift Summary for WhatsApp
+        <div class="st-foot-actions">
+          <button type="button" id="btn-copy-delivery-summary" class="st-btn st-btn-primary">
+            📋 Copy Shift Summary for WhatsApp
           </button>
-          <span id="delivery-copy-feedback" class="copy-hint" style="display: none;">✅ Copied to clipboard!</span>
+          <span id="delivery-copy-feedback" class="st-feedback-msg" style="display: none;">✅ Copied to clipboard!</span>
         </div>
       </div>
     </div>
 
-    <!-- ================= MODE 2: DAILY INCOME & EXPENSE LEDGER ================= -->
-    <div id="view-money-ledger" class="tracker-view">
-      
-      <div class="month-filter-bar">
-        <div class="filter-left">
-          <label for="ledger-month-filter"><strong>📅 Select Month to Review:</strong></label>
-          <input type="month" id="ledger-month-filter" class="month-input" />
-        </div>
-        <div class="filter-right">
-          <span class="month-tag" id="current-month-display">Current Month Report</span>
-        </div>
-      </div>
-
-      <div class="stats-grid">
-        <div class="stat-card stat-green">
-          <span class="stat-label">Total Monthly Income</span>
-          <div class="stat-val"><span class="curr-sym">€</span><span id="stat-ledger-income">0.00</span></div>
-          <span class="stat-sub">Wages, salary, support</span>
-        </div>
-        <div class="stat-card stat-red">
-          <span class="stat-label">Total Monthly Expenses</span>
-          <div class="stat-val"><span class="curr-sym">€</span><span id="stat-ledger-expense">0.00</span></div>
-          <span class="stat-sub">Rent, food, bills, misc</span>
-        </div>
-        <div class="stat-card stat-blue">
-          <span class="stat-label">Month-End Net Balance</span>
-          <div class="stat-val"><span class="curr-sym">€</span><span id="stat-ledger-net">0.00</span></div>
-          <span class="stat-sub" id="stat-ledger-status">Savings / Deficit</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-label">Total Entries Logged</span>
-          <div class="stat-val" id="stat-ledger-count">0</div>
-          <span class="stat-sub">In selected month</span>
-        </div>
-      </div>
-
-      <div class="entry-form-card">
-        <h3 class="form-title">➕ Add Daily Income / Expense Entry</h3>
-        
-        <div class="trans-type-toggle">
-          <button type="button" class="type-btn active type-expense" id="btn-type-expense">🔻 Expense (খরচ)</button>
-          <button type="button" class="type-btn type-income" id="btn-type-income">💚 Income (আয়)</button>
-        </div>
-
-        <div class="form-grid">
-          <div class="form-field">
-            <label for="trans-date"><strong>📅 Date:</strong></label>
-            <input type="date" id="trans-date" class="t-input" />
+    <!-- ================= TAB 2: DAILY INCOME & EXPENSE LEDGER ================= -->
+    <div id="view-money-ledger" class="st-tab-content">
+      <div class="st-card">
+        <div class="st-filter-row">
+          <div class="st-filter-item">
+            <label for="ledger-month-filter"><strong>Select Month:</strong></label>
+            <input type="month" id="ledger-month-filter" class="st-input-mini" />
           </div>
+          <span class="st-tag-blue" id="current-month-display">Monthly Report</span>
+        </div>
+
+        <div class="st-stats-grid">
+          <div class="st-stat-card st-green">
+            <span class="st-stat-lbl">Monthly Income</span>
+            <div class="st-stat-num"><span class="curr-sym">€</span><span id="stat-ledger-income">0.00</span></div>
+            <span class="st-stat-sub">Wages & Support</span>
+          </div>
+          <div class="st-stat-card st-red">
+            <span class="st-stat-lbl">Monthly Expenses</span>
+            <div class="st-stat-num"><span class="curr-sym">€</span><span id="stat-ledger-expense">0.00</span></div>
+            <span class="st-stat-sub">Rent, Food & Bills</span>
+          </div>
+          <div class="st-stat-card st-blue">
+            <span class="st-stat-lbl">Net Balance</span>
+            <div class="st-stat-num"><span class="curr-sym">€</span><span id="stat-ledger-net">0.00</span></div>
+            <span class="st-stat-sub" id="stat-ledger-status">Net Savings</span>
+          </div>
+          <div class="st-stat-card">
+            <span class="st-stat-lbl">Total Entries</span>
+            <div class="st-stat-num" id="stat-ledger-count">0</div>
+            <span class="st-stat-sub">This Month</span>
+          </div>
+        </div>
+
+        <div class="st-entry-box">
+          <h3 class="st-box-title">➕ Add Daily Entry</h3>
           
-          <div class="form-field">
-            <label for="trans-category"><strong>🏷️ Category:</strong></label>
-            <select id="trans-category" class="t-select">
-              <optgroup label="Expenses (খরচ)">
-                <option value="Groceries & Food">🛒 Groceries & Food</option>
-                <option value="Rent & Housing">🏠 Rent & Housing</option>
-                <option value="Electricity & Utilities">⚡ Electricity & Water</option>
-                <option value="Bus & Commute">🚌 Bus / Commute</option>
-                <option value="Phone & Internet">📱 Phone & Internet</option>
-                <option value="Dining Out & Coffee">☕ Dining Out & Coffee</option>
-                <option value="Personal & Misc">🛍️ Personal & Misc</option>
-              </optgroup>
-              <optgroup label="Income (আয়)">
-                <option value="Work Wages / Salary">💼 Work Wages / Salary</option>
-                <option value="Delivery Earnings">🛵 Delivery Earnings</option>
-                <option value="Family Support">🎁 Family Support</option>
-                <option value="Freelancing / Other">💻 Freelancing / Other</option>
-              </optgroup>
-            </select>
+          <div class="st-toggle-row">
+            <button type="button" class="st-toggle-btn active-exp" id="btn-type-expense">🔻 Expense (খরচ)</button>
+            <button type="button" class="st-toggle-btn" id="btn-type-income">💚 Income (আয়)</button>
           </div>
 
-          <div class="form-field">
-            <label for="trans-desc"><strong>📝 Note / Description:</strong></label>
-            <input type="text" id="trans-desc" class="t-input" placeholder="e.g. Lidl grocery, August room rent" />
+          <div class="st-grid-4">
+            <div class="st-field">
+              <label>Date:</label>
+              <input type="date" id="trans-date" class="st-input" />
+            </div>
+            
+            <div class="st-field">
+              <label>Category:</label>
+              <select id="trans-category" class="st-select">
+                <optgroup label="Expenses">
+                  <option value="Groceries & Food">🛒 Groceries & Food</option>
+                  <option value="Rent & Housing">🏠 Rent & Housing</option>
+                  <option value="Electricity & Utilities">⚡ Electricity & Water</option>
+                  <option value="Bus & Commute">🚌 Bus / Commute</option>
+                  <option value="Phone & Internet">📱 Phone & Internet</option>
+                  <option value="Dining Out & Coffee">☕ Dining Out & Coffee</option>
+                  <option value="Personal & Misc">🛍️ Personal & Misc</option>
+                </optgroup>
+                <optgroup label="Income">
+                  <option value="Work Wages / Salary">💼 Work Wages / Salary</option>
+                  <option value="Delivery Earnings">🛵 Delivery Earnings</option>
+                  <option value="Family Support">🎁 Family Support</option>
+                  <option value="Freelancing / Other">💻 Freelancing / Other</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <div class="st-field">
+              <label>Description / Note:</label>
+              <input type="text" id="trans-desc" class="st-input" placeholder="e.g. Lidl grocery, rent" />
+            </div>
+
+            <div class="st-field">
+              <label>Amount (<span class="curr-sym">€</span>):</label>
+              <input type="number" id="trans-amount" class="st-input" step="0.5" min="0" placeholder="0.00" />
+            </div>
           </div>
 
-          <div class="form-field">
-            <label for="trans-amount"><strong>💰 Amount (<span class="curr-sym">€</span>):</strong></label>
-            <input type="number" id="trans-amount" class="t-input" step="0.5" min="0" placeholder="e.g. 25.50" />
-          </div>
-        </div>
-
-        <div class="form-actions">
-          <button type="button" id="btn-save-transaction" class="btn-primary">
-            + Save Entry to Ledger
+          <button type="button" id="btn-save-transaction" class="st-btn st-btn-primary" style="margin-top: 1rem;">
+            + Save to Ledger
           </button>
         </div>
-      </div>
 
-      <div class="table-card">
-        <div class="table-header-row">
-          <h3 class="table-title">📑 Transaction History</h3>
-          <span class="table-count" id="ledger-count-badge">0 Entries</span>
-        </div>
-
-        <div class="table-responsive">
-          <table class="data-table">
+        <!-- Table -->
+        <div class="st-table-wrapper">
+          <table class="st-table">
             <thead>
               <tr>
                 <th>Date</th>
                 <th>Type</th>
                 <th>Category</th>
-                <th>Description</th>
+                <th>Note</th>
                 <th>Amount</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody id="ledger-tbody"></tbody>
           </table>
-        </div>
-        <div id="no-ledger-msg" class="empty-state">
-          <p>No transactions recorded for this month yet. Add your daily income or expense above!</p>
+          <div id="no-ledger-msg" class="st-empty-msg">No transactions recorded for this month yet.</div>
         </div>
       </div>
-
     </div>
 
-    <!-- ================= MODE 3: HOURLY WORK & WAGE LOG ================= -->
-    <div id="view-daily-log" class="tracker-view">
-      <div class="stats-grid">
-        <div class="stat-card">
-          <span class="stat-label">Total Hours Recorded</span>
-          <div class="stat-val"><span id="stat-total-hours">0.0</span> hrs</div>
-          <span class="stat-sub">Tracked shifts</span>
+    <!-- ================= TAB 3: HOURLY WORK SHIFTS ================= -->
+    <div id="view-daily-log" class="st-tab-content">
+      <div class="st-card">
+        <div class="st-stats-grid">
+          <div class="st-stat-card">
+            <span class="st-stat-lbl">Hours Tracked</span>
+            <div class="st-stat-num"><span id="stat-total-hours">0.0</span> hrs</div>
+            <span class="st-stat-sub">Total recorded</span>
+          </div>
+          <div class="st-stat-card st-green">
+            <span class="st-stat-lbl">Earned Wages</span>
+            <div class="st-stat-num"><span class="curr-sym">€</span><span id="stat-total-earned">0.00</span></div>
+            <span class="st-stat-sub">Including tips</span>
+          </div>
+          <div class="st-stat-card st-blue">
+            <span class="st-stat-lbl">Avg Rate</span>
+            <div class="st-stat-num"><span class="curr-sym">€</span><span id="stat-avg-rate">0.00</span>/hr</div>
+            <span class="st-stat-sub">Average per hour</span>
+          </div>
+          <div class="st-stat-card">
+            <span class="st-stat-lbl">Weekly Status</span>
+            <div class="st-stat-num" id="stat-legal-status" style="font-size: 1.15rem;">Limit OK (≤20h)</div>
+            <span class="st-stat-sub">Student Legal Limit</span>
+          </div>
         </div>
-        <div class="stat-card stat-green">
-          <span class="stat-label">Total Earned Wages</span>
-          <div class="stat-val"><span class="curr-sym">€</span><span id="stat-total-earned">0.00</span></div>
-          <span class="stat-sub">Including tips</span>
-        </div>
-        <div class="stat-card stat-blue">
-          <span class="stat-label">Average Hourly Rate</span>
-          <div class="stat-val"><span class="curr-sym">€</span><span id="stat-avg-rate">0.00</span>/hr</div>
-          <span class="stat-sub">Across all entries</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-label">Legal 20h Weekly Status</span>
-          <div class="stat-val" id="stat-legal-status">In Compliance</div>
-          <span class="stat-sub">Non-EU Student Law</span>
-        </div>
-      </div>
 
-      <div class="entry-form-card">
-        <h3 class="form-title">➕ Add Hourly Work Shift Entry</h3>
-        <div class="form-grid">
-          <div class="form-field">
-            <label for="shift-date"><strong>📅 Date:</strong></label>
-            <input type="date" id="shift-date" class="t-input" />
+        <div class="st-entry-box">
+          <h3 class="st-box-title">➕ Add Work Shift</h3>
+          <div class="st-grid-5">
+            <div class="st-field">
+              <label>Date:</label>
+              <input type="date" id="shift-date" class="st-input" />
+            </div>
+            <div class="st-field">
+              <label>Workplace / Job:</label>
+              <input type="text" id="shift-job" class="st-input" placeholder="e.g. Hotel, Restaurant" />
+            </div>
+            <div class="st-field">
+              <label>Hours Worked:</label>
+              <input type="number" id="shift-hours" class="st-input" step="0.5" min="0" placeholder="e.g. 5" />
+            </div>
+            <div class="st-field">
+              <label>Hourly Rate (<span class="curr-sym">€</span>/hr):</label>
+              <input type="number" id="shift-rate" class="st-input" step="0.5" min="0" value="6.50" />
+            </div>
+            <div class="st-field">
+              <label>Tips (<span class="curr-sym">€</span>):</label>
+              <input type="number" id="shift-tips" class="st-input" step="1" min="0" value="0" />
+            </div>
           </div>
-          <div class="form-field">
-            <label for="shift-job"><strong>🏢 Workplace / Role:</strong></label>
-            <input type="text" id="shift-job" class="t-input" placeholder="e.g. Restaurant / Hotel / Construction" />
-          </div>
-          <div class="form-field">
-            <label for="shift-hours"><strong>⌛ Hours Worked:</strong></label>
-            <input type="number" id="shift-hours" class="t-input" step="0.5" min="0" placeholder="e.g. 5.5" />
-          </div>
-          <div class="form-field">
-            <label for="shift-rate"><strong>💶 Hourly Rate (<span class="curr-sym">€</span>/hr):</strong></label>
-            <input type="number" id="shift-rate" class="t-input" step="0.5" min="0" value="6.50" placeholder="e.g. 6.50" />
-          </div>
-          <div class="form-field">
-            <label for="shift-tips"><strong>🎁 Extra Tips (<span class="curr-sym">€</span>):</strong></label>
-            <input type="number" id="shift-tips" class="t-input" step="1" min="0" value="0" placeholder="e.g. 10" />
-          </div>
-        </div>
-        
-        <div class="form-actions">
-          <button type="button" id="btn-save-shift" class="btn-primary">
-            + Save Shift to Log
+          
+          <button type="button" id="btn-save-shift" class="st-btn st-btn-primary" style="margin-top: 1rem;">
+            + Save Shift
           </button>
         </div>
-      </div>
 
-      <div class="table-card">
-        <div class="table-header-row">
-          <h3 class="table-title">📋 Recorded Shift History</h3>
-          <span class="table-count" id="log-count-badge">0 Shifts</span>
-        </div>
-        
-        <div class="table-responsive">
-          <table class="data-table">
+        <div class="st-table-wrapper">
+          <table class="st-table">
             <thead>
               <tr>
                 <th>Date</th>
@@ -384,25 +349,22 @@ const trackerSchema = {
             </thead>
             <tbody id="shifts-tbody"></tbody>
           </table>
-        </div>
-        <div id="no-data-msg" class="empty-state">
-          <p>No work shifts recorded yet. Add your first entry above to start tracking!</p>
+          <div id="no-data-msg" class="st-empty-msg">No work shifts recorded yet. Add your first shift above!</div>
         </div>
       </div>
     </div>
 
-  </div>
-
-  <!-- Safe Remittance / Taptap Send Box -->
-  <div class="taptap-banner-card notranslate">
-    <div class="taptap-left">
-      <span class="taptap-tag">💡 Remittance & Tuition Fee Tip</span>
-      <h3 class="taptap-h">Sending Earned Wages Home or Paying Tuition?</h3>
-      <p class="taptap-p">Use Taptap Send from Cyprus with <strong>0% transfer fee</strong> and receive an extra <strong>€10 bonus</strong> on your first transfer using the student code below.</p>
-    </div>
-    <div class="taptap-right">
-      <span class="promo-box">CODE: MDSAIDUR240</span>
-      <a href="/blog/how-to-send-money-from-cyprus-taptap-send-bonus-guide/" class="btn-claim-taptap">Claim €10 ➔</a>
+    <!-- Monetization Banner -->
+    <div class="st-taptap-card">
+      <div class="st-taptap-left">
+        <span class="st-taptap-badge">💡 Smart Money Transfer Tip</span>
+        <h3>Sending Wages to Home Country or Receiving Funds?</h3>
+        <p>Use Taptap Send with <strong>0% fee</strong> and receive an extra <strong>€10 bonus</strong> on your first transfer.</p>
+      </div>
+      <div class="st-taptap-right">
+        <span class="st-taptap-code">CODE: MDSAIDUR240</span>
+        <a href="/blog/how-to-send-money-from-cyprus-taptap-send-bonus-guide/" class="st-btn st-btn-primary">Claim €10 ➔</a>
+      </div>
     </div>
   </div>
 </BaseLayout>
@@ -414,228 +376,200 @@ const trackerSchema = {
   const STORAGE_KEY_SHIFTS = 'csg_student_shifts_data';
   const STORAGE_KEY_DELIVERY = 'csg_delivery_fleet_data';
 
-  // State
+  // App State
   let currentCurrency = '€';
   let currentTransType = 'expense';
   let ledgerRecords = [];
   let shiftRecords = [];
-  
-  // Real-world Delivery Shift State
   let deliveryRiders = [
     { name: 'Rider 1 (Morning)', units: 14, cashTips: 5 },
     { name: 'Rider 2 (Evening)', units: 11, cashTips: 8 }
   ];
 
   document.addEventListener('DOMContentLoaded', () => {
+    // Set default dates
     const today = new Date().toISOString().split('T')[0];
     const currentMonth = today.substring(0, 7);
 
-    const transDateInput = document.getElementById('trans-date');
-    if (transDateInput) transDateInput.value = today;
+    const tDate = document.getElementById('trans-date');
+    if (tDate) tDate.value = today;
 
-    const shiftDateInput = document.getElementById('shift-date');
-    if (shiftDateInput) shiftDateInput.value = today;
+    const sDate = document.getElementById('shift-date');
+    if (sDate) sDate.value = today;
 
-    const monthFilter = document.getElementById('ledger-month-filter');
-    if (monthFilter) monthFilter.value = currentMonth;
+    const mFilter = document.getElementById('ledger-month-filter');
+    if (mFilter) mFilter.value = currentMonth;
 
-    loadLocalData();
-    initCurrencyPicker();
-    initTabSwitching();
-    initDeliverySplitter();
-    initLedgerEvents();
-    initDailyLogEvents();
-    initBackupEvents();
+    loadData();
+    initCurrency();
+    initTabs();
+    initDeliveryEngine();
+    initLedgerEngine();
+    initShiftsEngine();
+    initBackupEngine();
     renderAll();
   });
 
-  function loadLocalData() {
+  function loadData() {
     try {
-      const savedCurr = localStorage.getItem(STORAGE_KEY_CURRENCY);
-      if (savedCurr) currentCurrency = savedCurr;
+      const c = localStorage.getItem(STORAGE_KEY_CURRENCY);
+      if (c) currentCurrency = c;
 
-      const savedLedger = localStorage.getItem(STORAGE_KEY_LEDGER);
-      if (savedLedger) ledgerRecords = JSON.parse(savedLedger);
+      const l = localStorage.getItem(STORAGE_KEY_LEDGER);
+      if (l) ledgerRecords = JSON.parse(l);
 
-      const savedShifts = localStorage.getItem(STORAGE_KEY_SHIFTS);
-      if (savedShifts) shiftRecords = JSON.parse(savedShifts);
+      const s = localStorage.getItem(STORAGE_KEY_SHIFTS);
+      if (s) shiftRecords = JSON.parse(s);
 
-      const savedDelivery = localStorage.getItem(STORAGE_KEY_DELIVERY);
-      if (savedDelivery) deliveryRiders = JSON.parse(savedDelivery);
+      const d = localStorage.getItem(STORAGE_KEY_DELIVERY);
+      if (d) deliveryRiders = JSON.parse(d);
     } catch (e) {
-      console.warn('Error reading local data:', e);
+      console.warn('Storage read error:', e);
     }
   }
 
-  function saveLocalData() {
+  function saveData() {
     localStorage.setItem(STORAGE_KEY_CURRENCY, currentCurrency);
     localStorage.setItem(STORAGE_KEY_LEDGER, JSON.stringify(ledgerRecords));
     localStorage.setItem(STORAGE_KEY_SHIFTS, JSON.stringify(shiftRecords));
     localStorage.setItem(STORAGE_KEY_DELIVERY, JSON.stringify(deliveryRiders));
-    showSaveStatus();
-  }
-
-  function showSaveStatus() {
-    const el = document.getElementById('save-status-text');
-    if (el) {
-      el.innerText = 'Auto-saved at ' + new Date().toLocaleTimeString();
-      setTimeout(() => {
-        el.innerText = 'Auto-saved to browser';
-      }, 3000);
+    
+    const txt = document.getElementById('save-status-text');
+    if (txt) {
+      txt.innerText = 'Saved ' + new Date().toLocaleTimeString();
+      setTimeout(() => txt.innerText = 'Auto-saved to browser', 2500);
     }
   }
 
-  function initCurrencyPicker() {
-    const currSelect = document.getElementById('global-currency-select');
-    if (currSelect) {
-      currSelect.value = currentCurrency;
-      currSelect.addEventListener('change', (e) => {
+  // 1. Currency Picker
+  function initCurrency() {
+    const sel = document.getElementById('global-currency-select');
+    if (sel) {
+      sel.value = currentCurrency;
+      sel.addEventListener('change', (e) => {
         currentCurrency = e.target.value;
-        saveLocalData();
-        updateCurrencySymbols();
+        saveData();
+        updateSymbols();
         renderAll();
       });
     }
-    updateCurrencySymbols();
+    updateSymbols();
   }
 
-  function updateCurrencySymbols() {
-    document.querySelectorAll('.curr-sym').forEach(el => {
-      el.innerText = currentCurrency;
-    });
+  function updateSymbols() {
+    document.querySelectorAll('.curr-sym').forEach(el => el.innerText = currentCurrency);
   }
 
-  function initTabSwitching() {
-    const tabDelivery = document.getElementById('tab-delivery-split');
-    const tabLedger = document.getElementById('tab-money-ledger');
-    const tabShift = document.getElementById('tab-daily-log');
+  // 2. Tabs Switcher
+  function initTabs() {
+    const tabBtns = document.querySelectorAll('.st-tab-btn');
+    const contents = document.querySelectorAll('.st-tab-content');
 
-    const viewDelivery = document.getElementById('view-delivery-split');
-    const viewLedger = document.getElementById('view-money-ledger');
-    const viewShift = document.getElementById('view-daily-log');
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        
+        tabBtns.forEach(b => b.classList.remove('active'));
+        contents.forEach(c => c.classList.remove('active'));
 
-    tabDelivery.addEventListener('click', () => {
-      tabDelivery.classList.add('active');
-      tabLedger.classList.remove('active');
-      tabShift.classList.remove('active');
-      viewDelivery.classList.add('active-view');
-      viewLedger.classList.remove('active-view');
-      viewShift.classList.remove('active-view');
-      calculateDeliverySplit();
-    });
+        btn.classList.add('active');
+        const targetEl = document.getElementById(targetId);
+        if (targetEl) targetEl.classList.add('active');
 
-    tabLedger.addEventListener('click', () => {
-      tabLedger.classList.add('active');
-      tabDelivery.classList.remove('active');
-      tabShift.classList.remove('active');
-      viewLedger.classList.add('active-view');
-      viewDelivery.classList.remove('active-view');
-      viewShift.classList.remove('active-view');
-      renderLedgerTable();
-    });
-
-    tabShift.addEventListener('click', () => {
-      tabShift.classList.add('active');
-      tabDelivery.classList.remove('active');
-      tabLedger.classList.remove('active');
-      viewShift.classList.add('active-view');
-      viewDelivery.classList.remove('active-view');
-      viewLedger.classList.remove('active-view');
-      renderShiftsTable();
+        if (targetId === 'view-delivery-split') calculateDelivery();
+        if (targetId === 'view-money-ledger') renderLedger();
+        if (targetId === 'view-daily-log') renderShifts();
+      });
     });
   }
 
-  // ================= DELIVERY SPLITTER LOGIC =================
-  function initDeliverySplitter() {
+  // 3. Delivery Splitter Engine
+  function initDeliveryEngine() {
     const basisSelect = document.getElementById('split-split-basis');
     if (basisSelect) {
       basisSelect.addEventListener('change', (e) => {
-        const indicator = document.getElementById('split-basis-indicator');
-        if (e.target.value === 'orders') {
-          indicator.innerText = 'Basis: Orders Completed';
-        } else {
-          indicator.innerText = 'Basis: Hours Worked';
-        }
-        renderDeliveryRidersInputs();
-        calculateDeliverySplit();
+        const ind = document.getElementById('split-basis-indicator');
+        ind.innerText = e.target.value === 'orders' ? 'Basis: Orders Completed' : 'Basis: Hours Worked';
+        renderDeliveryRiders();
+        calculateDelivery();
       });
     }
 
-    const addRiderBtn = document.getElementById('btn-add-delivery-rider');
-    addRiderBtn.addEventListener('click', () => {
-      deliveryRiders.push({
-        name: `Rider ${deliveryRiders.length + 1}`,
-        units: 8,
-        cashTips: 0
+    const addBtn = document.getElementById('btn-add-delivery-rider');
+    if (addBtn) {
+      addBtn.addEventListener('click', () => {
+        deliveryRiders.push({ name: `Rider ${deliveryRiders.length + 1}`, units: 8, cashTips: 0 });
+        renderDeliveryRiders();
+        calculateDelivery();
+        saveData();
       });
-      renderDeliveryRidersInputs();
-      calculateDeliverySplit();
-      saveLocalData();
+    }
+
+    document.querySelectorAll('.calc-split-input').forEach(i => {
+      i.addEventListener('input', calculateDelivery);
     });
 
-    const splitInputs = document.querySelectorAll('.calc-split-input');
-    splitInputs.forEach(i => i.addEventListener('input', calculateDeliverySplit));
-
-    document.getElementById('btn-copy-delivery-summary').addEventListener('click', copyDeliverySummary);
-
-    renderDeliveryRidersInputs();
-    calculateDeliverySplit();
+    const copyBtn = document.getElementById('btn-copy-delivery-summary');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', copyDeliveryText);
+    }
   }
 
-  function renderDeliveryRidersInputs() {
+  function renderDeliveryRiders() {
     const container = document.getElementById('delivery-riders-container');
+    if (!container) return;
     const basis = document.getElementById('split-split-basis').value;
-    const unitLabel = basis === 'orders' ? 'orders' : 'hrs';
+    const unitLbl = basis === 'orders' ? 'orders' : 'hrs';
 
     container.innerHTML = '';
 
     deliveryRiders.forEach((rider, idx) => {
       const row = document.createElement('div');
-      row.className = 'rider-card-row';
+      row.className = 'st-rider-row';
       row.innerHTML = `
-        <div class="rider-name-box">
-          <label>Rider Name / Shift:</label>
-          <input type="text" class="t-input d-rider-name" value="${rider.name}" placeholder="e.g. Rider ${idx + 1}" />
+        <div class="st-field-flex">
+          <label>Rider Name:</label>
+          <input type="text" class="st-input d-r-name" value="${rider.name}" placeholder="Rider ${idx + 1}" />
         </div>
-        <div class="rider-units-box">
+        <div class="st-field-flex">
           <label>${basis === 'orders' ? 'Orders Done:' : 'Hours on Road:'}</label>
-          <div class="input-with-label">
-            <input type="number" class="t-input d-rider-units" value="${rider.units}" min="0" step="${basis === 'orders' ? '1' : '0.5'}" />
-            <span class="unit-tag">${unitLabel}</span>
+          <div class="st-input-unit">
+            <input type="number" class="st-input d-r-units" value="${rider.units}" min="0" step="${basis === 'orders' ? '1' : '0.5'}" />
+            <span class="st-unit-lbl">${unitLbl}</span>
           </div>
         </div>
-        <div class="rider-tips-box">
-          <label>Cash Tips Kept (<span class="curr-sym">${currentCurrency}</span>):</label>
-          <input type="number" class="t-input d-rider-tips" value="${rider.cashTips || 0}" min="0" step="1" placeholder="0" />
+        <div class="st-field-flex">
+          <label>Cash Tips Kept (${currentCurrency}):</label>
+          <input type="number" class="st-input d-r-tips" value="${rider.cashTips || 0}" min="0" step="1" />
         </div>
-        ${deliveryRiders.length > 1 ? `<button type="button" class="btn-del-rider" title="Remove rider">✕</button>` : ''}
+        ${deliveryRiders.length > 1 ? `<button type="button" class="st-btn-del" title="Remove">✕</button>` : ''}
       `;
 
-      row.querySelector('.d-rider-name').addEventListener('input', (e) => {
+      row.querySelector('.d-r-name').addEventListener('input', (e) => {
         deliveryRiders[idx].name = e.target.value;
-        calculateDeliverySplit();
-        saveLocalData();
+        calculateDelivery();
+        saveData();
       });
 
-      row.querySelector('.d-rider-units').addEventListener('input', (e) => {
+      row.querySelector('.d-r-units').addEventListener('input', (e) => {
         deliveryRiders[idx].units = parseFloat(e.target.value) || 0;
-        calculateDeliverySplit();
-        saveLocalData();
+        calculateDelivery();
+        saveData();
       });
 
-      row.querySelector('.d-rider-tips').addEventListener('input', (e) => {
+      row.querySelector('.d-r-tips').addEventListener('input', (e) => {
         deliveryRiders[idx].cashTips = parseFloat(e.target.value) || 0;
-        calculateDeliverySplit();
-        saveLocalData();
+        calculateDelivery();
+        saveData();
       });
 
-      const delBtn = row.querySelector('.btn-del-rider');
+      const delBtn = row.querySelector('.st-btn-del');
       if (delBtn) {
         delBtn.addEventListener('click', () => {
           deliveryRiders.splice(idx, 1);
-          renderDeliveryRidersInputs();
-          calculateDeliverySplit();
-          saveLocalData();
+          renderDeliveryRiders();
+          calculateDelivery();
+          saveData();
         });
       }
 
@@ -643,7 +577,7 @@ const trackerSchema = {
     });
   }
 
-  function calculateDeliverySplit() {
+  function calculateDelivery() {
     const grossApp = parseFloat(document.getElementById('split-gross-app').value) || 0;
     const fleetType = document.getElementById('split-fleet-type').value;
     const fleetVal = parseFloat(document.getElementById('split-fleet-val').value) || 0;
@@ -652,19 +586,10 @@ const trackerSchema = {
     const expenseMode = document.getElementById('split-expense-split-mode').value;
     const basis = document.getElementById('split-split-basis').value;
 
-    // 1. Calculate Fleet / ID cut
-    let fleetCut = 0;
-    if (fleetType === 'percent') {
-      fleetCut = (grossApp * fleetVal) / 100;
-    } else {
-      fleetCut = fleetVal;
-    }
-
-    // 2. Fixed & Variable Operating Expenses
+    let fleetCut = fleetType === 'percent' ? (grossApp * fleetVal) / 100 : fleetVal;
     const operationalExpenses = vehicleRent + fuelCost;
     const netDistributable = Math.max(0, grossApp - fleetCut - operationalExpenses);
 
-    // Update Top Summary Stats
     document.getElementById('res-d-gross').innerText = grossApp.toFixed(2);
     document.getElementById('res-d-fleet').innerText = fleetCut.toFixed(2);
     document.getElementById('res-d-expenses').innerText = operationalExpenses.toFixed(2);
@@ -674,49 +599,43 @@ const trackerSchema = {
     deliveryRiders.forEach(r => totalUnits += (r.units || 0));
 
     const payoutList = document.getElementById('delivery-payouts-list');
+    if (!payoutList) return;
     payoutList.innerHTML = '';
 
     deliveryRiders.forEach(rider => {
       const ratio = totalUnits > 0 ? ((rider.units || 0) / totalUnits) : (1 / deliveryRiders.length);
-      
-      let riderGrossShare = grossApp * ratio;
-      let riderFleetShare = fleetCut * ratio;
-      let riderExpenseShare = 0;
+      let riderGross = grossApp * ratio;
+      let riderFleet = fleetCut * ratio;
+      let riderExpenses = expenseMode === 'proportional' ? (operationalExpenses * ratio) : (operationalExpenses / deliveryRiders.length);
 
-      if (expenseMode === 'proportional') {
-        riderExpenseShare = operationalExpenses * ratio;
-      } else {
-        riderExpenseShare = operationalExpenses / deliveryRiders.length;
-      }
-
-      const riderNetAppPayout = Math.max(0, riderGrossShare - riderFleetShare - riderExpenseShare);
-      const totalPocketEarned = riderNetAppPayout + (rider.cashTips || 0);
+      const riderNetApp = Math.max(0, riderGross - riderFleet - riderExpenses);
+      const totalTakeHome = riderNetApp + (rider.cashTips || 0);
 
       const card = document.createElement('div');
-      card.className = 'rider-payout-card';
+      card.className = 'st-payout-item';
       card.innerHTML = `
-        <div class="rpc-header">
+        <div class="st-p-top">
           <div>
-            <h5 class="rpc-name">👤 ${rider.name || 'Rider'}</h5>
-            <span class="rpc-meta">${rider.units || 0} ${basis === 'orders' ? 'orders' : 'hrs'} (${(ratio * 100).toFixed(1)}% of shift)</span>
+            <h5 class="st-p-name">👤 ${rider.name || 'Rider'}</h5>
+            <span class="st-p-meta">${rider.units || 0} ${basis === 'orders' ? 'orders' : 'hrs'} (${(ratio * 100).toFixed(0)}%)</span>
           </div>
-          <div class="rpc-final-val">
-            <span class="curr-sym">${currentCurrency}</span>${totalPocketEarned.toFixed(2)}
-            <span class="rpc-final-sub">Total Take-Home</span>
+          <div class="st-p-val">
+            ${currentCurrency}${totalTakeHome.toFixed(2)}
+            <small>Total Take-Home</small>
           </div>
         </div>
-        <div class="rpc-breakdown">
-          <span>App Share: <strong>${currentCurrency}${riderGrossShare.toFixed(2)}</strong></span>
-          <span>Fleet Cut: <strong class="red-txt">-${currentCurrency}${riderFleetShare.toFixed(2)}</strong></span>
-          <span>Rent+Fuel: <strong class="red-txt">-${currentCurrency}${riderExpenseShare.toFixed(2)}</strong></span>
-          <span>Cash Tips: <strong class="green-txt">+${currentCurrency}${(rider.cashTips || 0).toFixed(2)}</strong></span>
+        <div class="st-p-breakdown">
+          <span>App: <strong>${currentCurrency}${riderGross.toFixed(2)}</strong></span>
+          <span>Fleet: <strong class="st-red-txt">-${currentCurrency}${riderFleet.toFixed(2)}</strong></span>
+          <span>Rent+Fuel: <strong class="st-red-txt">-${currentCurrency}${riderExpenses.toFixed(2)}</strong></span>
+          <span>Tips: <strong class="st-green-txt">+${currentCurrency}${(rider.cashTips || 0).toFixed(2)}</strong></span>
         </div>
       `;
       payoutList.appendChild(card);
     });
   }
 
-  function copyDeliverySummary() {
+  function copyDeliveryText() {
     const grossApp = parseFloat(document.getElementById('split-gross-app').value) || 0;
     const fleetType = document.getElementById('split-fleet-type').value;
     const fleetVal = parseFloat(document.getElementById('split-fleet-val').value) || 0;
@@ -725,106 +644,103 @@ const trackerSchema = {
     const basis = document.getElementById('split-split-basis').value;
     const expenseMode = document.getElementById('split-expense-split-mode').value;
 
-    let fleetCut = fleetType === 'percent' ? ((grossApp * fleetVal) / 100) : fleetVal;
+    let fleetCut = fleetType === 'percent' ? (grossApp * fleetVal) / 100 : fleetVal;
     const operationalExpenses = vehicleRent + fuelCost;
     const netDistributable = Math.max(0, grossApp - fleetCut - operationalExpenses);
 
     let totalUnits = 0;
     deliveryRiders.forEach(r => totalUnits += (r.units || 0));
 
-    let text = `🛵 *Cyprus Food Delivery Shift Split Summary*\n`;
+    let text = `🛵 *Cyprus Food Delivery Shift Split*\n`;
     text += `📅 Date: ${new Date().toLocaleDateString()}\n`;
-    text += `📱 App Gross Total: ${currentCurrency}${grossApp.toFixed(2)}\n`;
-    text += `📑 Fleet/ID Commission: -${currentCurrency}${fleetCut.toFixed(2)} (${fleetType === 'percent' ? fleetVal + '%' : 'Fixed'})\n`;
-    text += `🛵 Vehicle Rent: -${currentCurrency}${vehicleRent.toFixed(2)}\n`;
-    text += `⛽ Fuel/Charging: -${currentCurrency}${fuelCost.toFixed(2)}\n`;
-    text += `💵 Net Distributable Pool: ${currentCurrency}${netDistributable.toFixed(2)}\n`;
+    text += `📱 App Gross: ${currentCurrency}${grossApp.toFixed(2)}\n`;
+    text += `📑 Fleet Cut: -${currentCurrency}${fleetCut.toFixed(2)}\n`;
+    text += `🛵 Vehicle + Fuel: -${currentCurrency}${operationalExpenses.toFixed(2)}\n`;
+    text += `💵 Net Pool: ${currentCurrency}${netDistributable.toFixed(2)}\n`;
     text += `------------------------------------\n`;
 
     deliveryRiders.forEach(rider => {
       const ratio = totalUnits > 0 ? ((rider.units || 0) / totalUnits) : (1 / deliveryRiders.length);
-      let riderGrossShare = grossApp * ratio;
-      let riderFleetShare = fleetCut * ratio;
-      let riderExpenseShare = expenseMode === 'proportional' ? (operationalExpenses * ratio) : (operationalExpenses / deliveryRiders.length);
-      const riderNetAppPayout = Math.max(0, riderGrossShare - riderFleetShare - riderExpenseShare);
-      const totalPocket = riderNetAppPayout + (rider.cashTips || 0);
+      let riderGross = grossApp * ratio;
+      let riderFleet = fleetCut * ratio;
+      let riderExpenses = expenseMode === 'proportional' ? (operationalExpenses * ratio) : (operationalExpenses / deliveryRiders.length);
+      const riderNetApp = Math.max(0, riderGross - riderFleet - riderExpenses);
+      const totalTakeHome = riderNetApp + (rider.cashTips || 0);
 
-      text += `👤 *${rider.name}*:\n`;
-      text += `   • Shift Done: ${rider.units} ${basis === 'orders' ? 'orders' : 'hours'} (${(ratio * 100).toFixed(0)}%)\n`;
-      text += `   • Net App Payout: ${currentCurrency}${riderNetAppPayout.toFixed(2)}\n`;
-      if (rider.cashTips > 0) text += `   • Cash Tips Kept: +${currentCurrency}${rider.cashTips.toFixed(2)}\n`;
-      text += `   👉 *Total Net: ${currentCurrency}${totalPocket.toFixed(2)}*\n\n`;
+      text += `👤 *${rider.name}*: ${currentCurrency}${totalTakeHome.toFixed(2)} (${rider.units} ${basis === 'orders' ? 'orders' : 'hrs'})\n`;
     });
 
-    text += `Calculated accurately on CyprusStudentGuide.com`;
+    text += `------------------------------------\nCalculated via CyprusStudentGuide.com`;
 
     navigator.clipboard.writeText(text).then(() => {
-      const hint = document.getElementById('delivery-copy-feedback');
-      hint.style.display = 'inline';
-      setTimeout(() => hint.style.display = 'none', 3000);
+      const fb = document.getElementById('delivery-copy-feedback');
+      if (fb) {
+        fb.style.display = 'inline';
+        setTimeout(() => fb.style.display = 'none', 3000);
+      }
     });
   }
 
-  // ================= LEDGER & WORK LOG LOGIC =================
-  function initLedgerEvents() {
+  // 4. Ledger Engine
+  function initLedgerEngine() {
     const btnExp = document.getElementById('btn-type-expense');
     const btnInc = document.getElementById('btn-type-income');
     const catSelect = document.getElementById('trans-category');
 
-    btnExp.addEventListener('click', () => {
-      currentTransType = 'expense';
-      btnExp.classList.add('active');
-      btnInc.classList.remove('active');
-      catSelect.value = 'Groceries & Food';
-    });
+    if (btnExp && btnInc) {
+      btnExp.addEventListener('click', () => {
+        currentTransType = 'expense';
+        btnExp.classList.add('active-exp');
+        btnInc.classList.remove('active-inc');
+        catSelect.value = 'Groceries & Food';
+      });
 
-    btnInc.addEventListener('click', () => {
-      currentTransType = 'income';
-      btnInc.classList.add('active');
-      btnExp.classList.remove('active');
-      catSelect.value = 'Work Wages / Salary';
-    });
-
-    const monthFilter = document.getElementById('ledger-month-filter');
-    if (monthFilter) {
-      monthFilter.addEventListener('change', renderLedgerTable);
+      btnInc.addEventListener('click', () => {
+        currentTransType = 'income';
+        btnInc.classList.add('active-inc');
+        btnExp.classList.remove('active-exp');
+        catSelect.value = 'Work Wages / Salary';
+      });
     }
 
+    const monthFilter = document.getElementById('ledger-month-filter');
+    if (monthFilter) monthFilter.addEventListener('change', renderLedger);
+
     const btnSave = document.getElementById('btn-save-transaction');
-    btnSave.addEventListener('click', () => {
-      const date = document.getElementById('trans-date').value;
-      const category = document.getElementById('trans-category').value;
-      const desc = document.getElementById('trans-desc').value.trim() || category;
-      const amount = parseFloat(document.getElementById('trans-amount').value) || 0;
+    if (btnSave) {
+      btnSave.addEventListener('click', () => {
+        const date = document.getElementById('trans-date').value;
+        const category = document.getElementById('trans-category').value;
+        const desc = document.getElementById('trans-desc').value.trim() || category;
+        const amount = parseFloat(document.getElementById('trans-amount').value) || 0;
 
-      if (amount <= 0) {
-        alert('Please enter a valid amount.');
-        return;
-      }
+        if (amount <= 0) {
+          alert('Please enter a valid amount.');
+          return;
+        }
 
-      const item = {
-        id: 'tx_' + Date.now(),
-        date,
-        type: currentTransType,
-        category,
-        desc,
-        amount,
-        currency: currentCurrency
-      };
+        ledgerRecords.unshift({
+          id: 'tx_' + Date.now(),
+          date,
+          type: currentTransType,
+          category,
+          desc,
+          amount,
+          currency: currentCurrency
+        });
 
-      ledgerRecords.unshift(item);
-      saveLocalData();
-      renderLedgerTable();
+        saveData();
+        renderLedger();
 
-      document.getElementById('trans-desc').value = '';
-      document.getElementById('trans-amount').value = '';
-    });
+        document.getElementById('trans-desc').value = '';
+        document.getElementById('trans-amount').value = '';
+      });
+    }
   }
 
-  function renderLedgerTable() {
+  function renderLedger() {
     const tbody = document.getElementById('ledger-tbody');
     const emptyMsg = document.getElementById('no-ledger-msg');
-    const countBadge = document.getElementById('ledger-count-badge');
     const selectedMonth = document.getElementById('ledger-month-filter').value;
     const monthDisplay = document.getElementById('current-month-display');
 
@@ -834,9 +750,9 @@ const trackerSchema = {
       monthDisplay.innerText = `${monthNames[parseInt(month)-1]} ${year} Report`;
     }
 
+    if (!tbody) return;
     tbody.innerHTML = '';
     const filtered = ledgerRecords.filter(item => item.date.startsWith(selectedMonth));
-    countBadge.innerText = `${filtered.length} Entries`;
 
     let totalIncome = 0;
     let totalExpense = 0;
@@ -849,28 +765,26 @@ const trackerSchema = {
         if (item.type === 'income') totalIncome += item.amount;
         else totalExpense += item.amount;
 
-        const tr = document.createElement('tr');
         const isInc = item.type === 'income';
+        const tr = document.createElement('tr');
         tr.innerHTML = `
           <td><strong>${item.date}</strong></td>
-          <td><span class="badge-${item.type}">${isInc ? '💚 Income' : '🔻 Expense'}</span></td>
+          <td><span class="st-badge-${item.type}">${isInc ? '💚 Income' : '🔻 Expense'}</span></td>
           <td>${item.category}</td>
           <td>${item.desc}</td>
-          <td class="${isInc ? 'amount-income' : 'amount-expense'}">
+          <td class="${isInc ? 'st-amount-inc' : 'st-amount-exp'}">
             ${isInc ? '+' : '-'}${currentCurrency}${item.amount.toFixed(2)}
           </td>
-          <td>
-            <button type="button" class="btn-delete" title="Delete entry">✕</button>
-          </td>
+          <td><button type="button" class="st-btn-del" title="Delete">✕</button></td>
         `;
 
-        tr.querySelector('.btn-delete').addEventListener('click', () => {
-          if (confirm('Delete this transaction?')) {
-            const index = ledgerRecords.findIndex(r => r.id === item.id);
-            if (index !== -1) {
-              ledgerRecords.splice(index, 1);
-              saveLocalData();
-              renderLedgerTable();
+        tr.querySelector('.st-btn-del').addEventListener('click', () => {
+          if (confirm('Delete this entry?')) {
+            const idx = ledgerRecords.findIndex(r => r.id === item.id);
+            if (idx !== -1) {
+              ledgerRecords.splice(idx, 1);
+              saveData();
+              renderLedger();
             }
           }
         });
@@ -889,57 +803,56 @@ const trackerSchema = {
 
     if (netBalance >= 0) {
       netEl.style.color = '#10b981';
-      netStatus.innerText = '✅ Net Savings Surplus';
+      netStatus.innerText = '✅ Monthly Surplus';
     } else {
       netEl.style.color = '#ef4444';
-      netStatus.innerText = '⚠️ Net Monthly Deficit';
+      netStatus.innerText = '⚠️ Monthly Deficit';
     }
 
     document.getElementById('stat-ledger-count').innerText = filtered.length;
   }
 
-  function initDailyLogEvents() {
+  // 5. Work Shifts Engine
+  function initShiftsEngine() {
     const btnSave = document.getElementById('btn-save-shift');
-    btnSave.addEventListener('click', () => {
-      const date = document.getElementById('shift-date').value;
-      const job = document.getElementById('shift-job').value.trim() || 'General Shift';
-      const hours = parseFloat(document.getElementById('shift-hours').value) || 0;
-      const rate = parseFloat(document.getElementById('shift-rate').value) || 0;
-      const tips = parseFloat(document.getElementById('shift-tips').value) || 0;
+    if (btnSave) {
+      btnSave.addEventListener('click', () => {
+        const date = document.getElementById('shift-date').value;
+        const job = document.getElementById('shift-job').value.trim() || 'General Shift';
+        const hours = parseFloat(document.getElementById('shift-hours').value) || 0;
+        const rate = parseFloat(document.getElementById('shift-rate').value) || 0;
+        const tips = parseFloat(document.getElementById('shift-tips').value) || 0;
 
-      if (hours <= 0) {
-        alert('Please enter valid working hours.');
-        return;
-      }
+        if (hours <= 0) {
+          alert('Please enter valid working hours.');
+          return;
+        }
 
-      const totalEarned = (hours * rate) + tips;
-      const entry = {
-        id: 'shift_' + Date.now(),
-        date,
-        job,
-        hours,
-        rate,
-        tips,
-        totalEarned
-      };
+        shiftRecords.unshift({
+          id: 'shift_' + Date.now(),
+          date,
+          job,
+          hours,
+          rate,
+          tips,
+          totalEarned: (hours * rate) + tips
+        });
 
-      shiftRecords.unshift(entry);
-      saveLocalData();
-      renderShiftsTable();
+        saveData();
+        renderShifts();
 
-      document.getElementById('shift-hours').value = '';
-      document.getElementById('shift-tips').value = '0';
-    });
+        document.getElementById('shift-hours').value = '';
+        document.getElementById('shift-tips').value = '0';
+      });
+    }
   }
 
-  function renderShiftsTable() {
+  function renderShifts() {
     const tbody = document.getElementById('shifts-tbody');
     const emptyMsg = document.getElementById('no-data-msg');
-    const countBadge = document.getElementById('log-count-badge');
+    if (!tbody) return;
 
     tbody.innerHTML = '';
-    countBadge.innerText = `${shiftRecords.length} Shifts`;
-
     if (shiftRecords.length === 0) {
       emptyMsg.style.display = 'block';
     } else {
@@ -952,17 +865,15 @@ const trackerSchema = {
           <td>${item.hours} hrs</td>
           <td>${currentCurrency}${item.rate.toFixed(2)}/hr</td>
           <td>${currentCurrency}${item.tips.toFixed(2)}</td>
-          <td class="earned-col">${currentCurrency}${item.totalEarned.toFixed(2)}</td>
-          <td>
-            <button type="button" class="btn-delete" title="Delete shift">✕</button>
-          </td>
+          <td class="st-amount-inc">${currentCurrency}${item.totalEarned.toFixed(2)}</td>
+          <td><button type="button" class="st-btn-del" title="Delete">✕</button></td>
         `;
 
-        tr.querySelector('.btn-delete').addEventListener('click', () => {
-          if (confirm('Delete this shift entry?')) {
+        tr.querySelector('.st-btn-del').addEventListener('click', () => {
+          if (confirm('Delete this shift?')) {
             shiftRecords.splice(index, 1);
-            saveLocalData();
-            renderShiftsTable();
+            saveData();
+            renderShifts();
           }
         });
 
@@ -970,144 +881,123 @@ const trackerSchema = {
       });
     }
 
-    updateShiftStats();
-  }
-
-  function updateShiftStats() {
     let totalHours = 0;
     let totalEarned = 0;
-
     shiftRecords.forEach(s => {
       totalHours += s.hours;
       totalEarned += s.totalEarned;
     });
 
-    const avgRate = totalHours > 0 ? (totalEarned / totalHours) : 0;
-
     document.getElementById('stat-total-hours').innerText = totalHours.toFixed(1);
     document.getElementById('stat-total-earned').innerText = totalEarned.toFixed(2);
-    document.getElementById('stat-avg-rate').innerText = avgRate.toFixed(2);
-
-    const legalStatus = document.getElementById('stat-legal-status');
-    if (totalHours > 20) {
-      legalStatus.innerText = 'Verify Multi-Week Avg';
-      legalStatus.style.color = '#f59e0b';
-    } else {
-      legalStatus.innerText = 'Legal Limit OK (≤20h)';
-      legalStatus.style.color = '#10b981';
-    }
+    document.getElementById('stat-avg-rate').innerText = totalHours > 0 ? (totalEarned / totalHours).toFixed(2) : '0.00';
   }
 
-  function initBackupEvents() {
-    document.getElementById('btn-export-csv').addEventListener('click', exportToCSV);
-    document.getElementById('btn-export-json').addEventListener('click', exportToJSON);
+  // 6. Backup & Restore
+  function initBackupEngine() {
+    document.getElementById('btn-export-csv').addEventListener('click', () => {
+      if (ledgerRecords.length === 0 && shiftRecords.length === 0) {
+        alert('No data to export yet.');
+        return;
+      }
 
-    const fileInput = document.getElementById('file-restore-input');
-    fileInput.addEventListener('change', handleFileRestore);
+      let csv = "=== DAILY INCOME & EXPENSE LEDGER ===\nDate,Type,Category,Description,Amount,Currency\n";
+      ledgerRecords.forEach(i => {
+        csv += `"${i.date}","${i.type}","${i.category}","${i.desc.replace(/"/g, '""')}",${i.amount},"${currentCurrency}"\n`;
+      });
+
+      csv += "\n=== WORK SHIFTS ===\nDate,Workplace,Hours,Rate,Tips,Total,Currency\n";
+      shiftRecords.forEach(s => {
+        csv += `"${s.date}","${s.job.replace(/"/g, '""')}",${s.hours},${s.rate},${s.tips},${s.totalEarned},"${currentCurrency}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Student_Financial_Log_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('btn-export-json').addEventListener('click', () => {
+      const backup = {
+        version: "3.0",
+        currency: currentCurrency,
+        ledger: ledgerRecords,
+        shifts: shiftRecords,
+        delivery: deliveryRiders
+      };
+
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Student_Backup_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('file-restore-input').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const parsed = JSON.parse(evt.target.result);
+          if (parsed.ledger || parsed.shifts || parsed.delivery) {
+            if (parsed.currency) currentCurrency = parsed.currency;
+            if (parsed.ledger) ledgerRecords = parsed.ledger;
+            if (parsed.shifts) shiftRecords = parsed.shifts;
+            if (parsed.delivery) deliveryRiders = parsed.delivery;
+
+            saveData();
+            initCurrency();
+            renderAll();
+            alert('✅ Backup restored successfully!');
+          }
+        } catch (err) {
+          alert('Invalid backup file.');
+        }
+      };
+      reader.readAsText(file);
+    });
 
     document.getElementById('btn-clear-all').addEventListener('click', () => {
-      if (confirm('Are you sure you want to clear all data? Make sure you have exported an Excel or JSON backup first!')) {
+      if (confirm('Are you sure you want to reset all data? Download an Excel or JSON backup first!')) {
         ledgerRecords = [];
         shiftRecords = [];
         deliveryRiders = [
           { name: 'Rider 1 (Morning)', units: 14, cashTips: 5 },
           { name: 'Rider 2 (Evening)', units: 11, cashTips: 8 }
         ];
-        saveLocalData();
+        saveData();
         renderAll();
       }
     });
   }
 
-  function exportToCSV() {
-    if (ledgerRecords.length === 0 && shiftRecords.length === 0) {
-      alert('No records to export yet. Please add entries first!');
-      return;
-    }
-
-    let csv = "=== DAILY INCOME & EXPENSE LEDGER ===\n";
-    csv += "Date,Type,Category,Description,Amount,Currency\n";
-    ledgerRecords.forEach(item => {
-      csv += `"${item.date}","${item.type}","${item.category}","${item.desc.replace(/"/g, '""')}",${item.amount},"${currentCurrency}"\n`;
-    });
-
-    csv += "\n=== WORK SHIFTS LOG ===\n";
-    csv += "Date,Workplace,Hours,Hourly Rate,Tips,Total Earned,Currency\n";
-    shiftRecords.forEach(s => {
-      csv += `"${s.date}","${s.job.replace(/"/g, '""')}",${s.hours},${s.rate},${s.tips},${s.totalEarned},"${currentCurrency}"\n`;
-    });
-
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Cyprus_Student_Financial_Log_${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  function exportToJSON() {
-    const backupData = {
-      version: "3.0",
-      exportDate: new Date().toISOString(),
-      currency: currentCurrency,
-      ledger: ledgerRecords,
-      shifts: shiftRecords,
-      delivery: deliveryRiders
-    };
-
-    const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Cyprus_Student_Backup_${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  function handleFileRestore(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(evt) {
-      try {
-        const content = evt.target.result;
-        if (file.name.endsWith('.json')) {
-          const parsed = JSON.parse(content);
-          if (parsed.currency) currentCurrency = parsed.currency;
-          if (parsed.ledger) ledgerRecords = parsed.ledger;
-          if (parsed.shifts) shiftRecords = parsed.shifts;
-          if (parsed.delivery) deliveryRiders = parsed.delivery;
-          
-          saveLocalData();
-          initCurrencyPicker();
-          renderAll();
-          alert('✅ Backup restored successfully!');
-        } else {
-          alert('Please upload a valid .json backup file for complete restoration.');
-        }
-      } catch (err) {
-        alert('Could not parse file: ' + err.message);
-      }
-    };
-    reader.readAsText(file);
-  }
-
   function renderAll() {
-    renderDeliveryRidersInputs();
-    calculateDeliverySplit();
-    renderLedgerTable();
-    renderShiftsTable();
+    renderDeliveryRiders();
+    calculateDelivery();
+    renderLedger();
+    renderShifts();
   }
 </script>
 
-<style>
-  .tracker-hero {
+<style is:global>
+  /* ================= MODERN SCOPED STYLING ================= */
+  .st-wrapper {
+    max-width: 980px;
+    margin: 0 auto;
+  }
+
+  .st-hero {
     text-align: center;
     margin-bottom: 2rem;
   }
-  .tracker-badge {
+  .st-badge {
     background: rgba(16, 185, 129, 0.12);
     color: #10b981;
     font-weight: 800;
@@ -1117,315 +1007,169 @@ const trackerSchema = {
     display: inline-block;
     margin-bottom: 0.75rem;
   }
-  html.dark .tracker-badge { color: #34d399; }
-  .tracker-title {
-    font-size: 2.3rem;
+  html.dark .st-badge { color: #34d399; }
+  .st-title {
+    font-size: 2.25rem;
     font-weight: 800;
     color: var(--text-main);
-    margin: 0 0 0.75rem;
+    margin: 0 0 0.65rem;
     line-height: 1.25;
   }
-  .tracker-desc {
+  .st-desc {
     color: var(--text-muted);
-    font-size: 1.05rem;
-    max-width: 740px;
+    font-size: 1.02rem;
+    max-width: 720px;
     margin: 0 auto;
   }
 
-  /* Top Control Bar */
-  .top-control-bar {
+  /* Toolbar */
+  .st-toolbar {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
-    border-radius: 14px;
-    padding: 0.85rem 1.25rem;
+    border-radius: 12px;
+    padding: 0.75rem 1.25rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     gap: 0.75rem;
-    margin-bottom: 1.75rem;
+    margin-bottom: 1.5rem;
     box-shadow: 0 4px 15px rgba(0,0,0,0.02);
   }
-  .currency-picker-wrap {
+  .st-tool-group {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+  }
+  .st-tool-label {
     font-size: 0.88rem;
+    font-weight: 700;
     color: var(--text-main);
   }
-  .currency-select {
+  .st-select-mini {
     background: var(--bg-color);
     color: var(--text-main);
     border: 1px solid var(--card-border);
-    padding: 0.4rem 0.65rem;
+    padding: 0.35rem 0.6rem;
     border-radius: 8px;
     font-weight: 700;
+    font-size: 0.85rem;
     outline: none;
     cursor: pointer;
   }
-  .backup-status {
+  .st-save-status {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 0.84rem;
+    gap: 0.45rem;
+    font-size: 0.82rem;
     font-weight: 600;
     color: var(--text-muted);
   }
-  .status-indicator {
-    width: 9px;
-    height: 9px;
+  .st-dot {
+    width: 8px;
+    height: 8px;
     background: #10b981;
     border-radius: 50%;
     display: inline-block;
-    box-shadow: 0 0 8px #10b981;
+    box-shadow: 0 0 6px #10b981;
   }
-  .backup-buttons {
+  .st-actions-group {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    gap: 0.45rem;
     flex-wrap: wrap;
   }
-  .tool-btn {
+  .st-btn {
     border: 1px solid var(--card-border);
     background: var(--bg-color);
     color: var(--text-main);
     font-size: 0.78rem;
     font-weight: 700;
-    padding: 0.45rem 0.8rem;
+    padding: 0.4rem 0.75rem;
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.15s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
   }
-  .tool-btn:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
-  .btn-excel { background: rgba(16, 185, 129, 0.08); color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
-  .btn-excel:hover { background: #10b981; color: #fff !important; }
-  .btn-danger { color: #ef4444; }
-  .btn-danger:hover { background: #ef4444; color: #fff !important; }
+  .st-btn-green { background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
+  .st-btn-green:hover { background: #10b981; color: #fff; }
+  .st-btn-gray:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
+  .st-btn-red { color: #ef4444; }
+  .st-btn-red:hover { background: #ef4444; color: #fff; }
+  .st-btn-file { cursor: pointer; }
+  .st-btn-primary { background: #2563eb; color: #fff; border: none; font-size: 0.9rem; padding: 0.65rem 1.25rem; font-weight: 800; border-radius: 8px; }
+  .st-btn-primary:hover { background: #1d4ed8; }
+  .st-btn-outline { width: 100%; background: var(--bg-color); border: 1px dashed var(--primary-blue); color: var(--primary-blue); padding: 0.6rem; border-radius: 8px; font-weight: 700; font-size: 0.86rem; cursor: pointer; margin-top: 0.5rem; }
 
-  /* Mode Switcher Tabs */
-  .mode-tabs-container {
+  /* Tabs */
+  .st-tabs {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 0.5rem;
     background: rgba(150, 150, 150, 0.08);
     padding: 0.4rem;
     border-radius: 12px;
-    margin-bottom: 2rem;
+    margin-bottom: 1.75rem;
   }
-  .tab-btn {
+  .st-tab-btn {
     border: none;
     background: transparent;
     color: var(--text-muted);
     font-weight: 700;
-    font-size: 0.88rem;
+    font-size: 0.9rem;
     padding: 0.75rem 0.5rem;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
     text-align: center;
   }
-  .tab-btn.active {
+  .st-tab-btn.active {
     background: var(--card-bg);
     color: var(--primary-blue);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   }
 
-  .tracker-view { display: none; }
-  .active-view { display: block; }
+  .st-tab-content { display: none; }
+  .st-tab-content.active { display: block; }
 
-  /* DELIVERY SPLITTER STYLES */
-  .split-calculator-card {
+  /* Cards & Forms */
+  .st-card {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
     border-radius: 16px;
     padding: 1.75rem;
     margin-bottom: 1.75rem;
   }
-  .split-header { margin-bottom: 1.5rem; }
-  .split-header h2 { font-size: 1.35rem; font-weight: 800; margin: 0 0 0.35rem; color: var(--text-main); }
-  .split-sub { font-size: 0.88rem; color: var(--text-muted); margin: 0; }
+  .st-card-head { margin-bottom: 1.5rem; }
+  .st-card-title { font-size: 1.35rem; font-weight: 800; margin: 0 0 0.35rem; color: var(--text-main); }
+  .st-card-sub { font-size: 0.88rem; color: var(--text-muted); margin: 0; }
 
-  .split-grid-top {
+  .st-grid-3 {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1.15rem;
-    margin-bottom: 1.75rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px dashed var(--card-border);
-  }
-  .input-with-select { display: flex; gap: 0.4rem; }
-  .field-help { font-size: 0.74rem; color: var(--text-muted); display: block; margin-top: 0.25rem; }
-
-  .riders-section {
-    background: rgba(150, 150, 150, 0.03);
-    border: 1px solid var(--card-border);
-    border-radius: 14px;
-    padding: 1.25rem;
-    margin-bottom: 1.75rem;
-  }
-  .riders-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-  .riders-heading { font-size: 1rem; font-weight: 800; margin: 0; color: var(--text-main); }
-  .riders-count-badge { font-size: 0.76rem; font-weight: 800; background: rgba(37, 99, 235, 0.1); color: var(--primary-blue); padding: 0.2rem 0.6rem; border-radius: 20px; }
-
-  .riders-list { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
-  .rider-card-row {
-    display: grid;
-    grid-template-columns: 1.8fr 1.2fr 1.2fr auto;
-    gap: 0.75rem;
-    align-items: flex-end;
-    background: var(--card-bg);
-    padding: 0.85rem;
-    border-radius: 10px;
-    border: 1px solid var(--card-border);
-  }
-  .rider-card-row label { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.3rem; }
-  .input-with-label { display: flex; align-items: center; position: relative; }
-  .unit-tag { position: absolute; right: 10px; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); pointer-events: none; }
-  .btn-del-rider { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); border-radius: 6px; padding: 0.6rem 0.8rem; cursor: pointer; }
-  .btn-del-rider:hover { background: #ef4444; color: #fff; }
-
-  .split-result-box {
-    background: linear-gradient(135deg, rgba(37,99,235,0.04) 0%, rgba(16,185,129,0.04) 100%);
-    border: 1px solid var(--card-border);
-    border-radius: 14px;
-    padding: 1.5rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
     margin-bottom: 1.5rem;
   }
-  .result-summary-grid {
+  .st-grid-4 {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
-    padding-bottom: 1.25rem;
-    border-bottom: 1px dashed var(--card-border);
-    margin-bottom: 1.25rem;
-  }
-  .res-item span { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.2rem; }
-  .res-item strong { font-size: 1.35rem; font-weight: 900; font-family: var(--font-mono); }
-  
-  .payout-title { font-size: 1rem; font-weight: 800; margin: 0 0 0.85rem; color: var(--text-main); }
-  .payout-list { display: flex; flex-direction: column; gap: 0.75rem; }
-  .rider-payout-card {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 10px;
-    padding: 1rem 1.15rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-  }
-  .rpc-header { display: flex; justify-content: space-between; align-items: center; }
-  .rpc-name { font-size: 1.05rem; font-weight: 800; margin: 0; color: var(--text-main); }
-  .rpc-meta { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; }
-  .rpc-final-val { text-align: right; font-size: 1.5rem; font-weight: 900; color: #10b981; font-family: var(--font-mono); line-height: 1.1; }
-  .rpc-final-sub { display: block; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-  .rpc-breakdown {
-    display: flex;
-    flex-wrap: wrap;
     gap: 0.85rem;
-    font-size: 0.82rem;
-    color: var(--text-muted);
-    padding-top: 0.45rem;
-    border-top: 1px solid var(--card-border);
   }
-  .red-txt { color: #ef4444; }
-  .green-txt { color: #10b981; }
-
-  .btn-copy-summary { background: #059669; }
-  .btn-copy-summary:hover { background: #047857; }
-  .copy-hint { font-size: 0.85rem; font-weight: 800; color: #10b981; }
-
-  /* COMMON FORM & TABLE STYLES */
-  .month-filter-bar {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    padding: 0.85rem 1.25rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+  .st-grid-5 {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.75rem;
   }
-  .filter-left { display: flex; align-items: center; gap: 0.75rem; }
-  .month-input {
-    background: var(--bg-color);
-    color: var(--text-main);
-    border: 1px solid var(--card-border);
-    padding: 0.4rem 0.75rem;
-    border-radius: 8px;
-    font-family: inherit;
+
+  .st-field label {
+    display: block;
+    font-size: 0.84rem;
     font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 0.35rem;
   }
-  .month-tag {
-    background: rgba(37, 99, 235, 0.1);
-    color: var(--primary-blue);
-    font-size: 0.82rem;
-    font-weight: 800;
-    padding: 0.3rem 0.75rem;
-    border-radius: 20px;
-  }
-
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
-    margin-bottom: 1.75rem;
-  }
-  .stat-card {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 14px;
-    padding: 1.25rem 1rem;
-    text-align: center;
-  }
-  .stat-label { font-size: 0.76rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; }
-  .stat-val { font-size: 1.75rem; font-weight: 900; margin: 0.25rem 0; color: var(--text-main); font-family: var(--font-mono); }
-  .stat-sub { font-size: 0.75rem; color: var(--text-muted); }
-  .stat-green .stat-val { color: #10b981; }
-  .stat-red .stat-val { color: #ef4444; }
-  .stat-blue .stat-val { color: var(--primary-blue); }
-
-  .entry-form-card, .table-card {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 16px;
-    padding: 1.75rem;
-    margin-bottom: 1.75rem;
-  }
-  .form-title, .table-title { font-size: 1.15rem; font-weight: 800; margin: 0 0 1.25rem; color: var(--text-main); }
-  
-  .trans-type-toggle {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.6rem;
-    background: rgba(150, 150, 150, 0.08);
-    padding: 0.35rem;
-    border-radius: 10px;
-    margin-bottom: 1.25rem;
-  }
-  .type-btn {
-    border: none;
-    background: transparent;
-    color: var(--text-muted);
-    font-weight: 800;
-    font-size: 0.92rem;
-    padding: 0.65rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-  .type-expense.active { background: #ef4444; color: #fff; box-shadow: 0 2px 10px rgba(239, 68, 68, 0.3); }
-  .type-income.active { background: #10b981; color: #fff; box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3); }
-
-  .form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.25rem;
-  }
-  .form-field label { font-size: 0.85rem; color: var(--text-main); display: block; margin-bottom: 0.35rem; }
-  .t-input, .t-select {
+  .st-input, .st-select {
     width: 100%;
     background: var(--bg-color);
     color: var(--text-main);
@@ -1437,39 +1181,115 @@ const trackerSchema = {
     font-weight: 600;
     outline: none;
   }
-  .t-input:focus, .t-select:focus { border-color: var(--primary-blue); }
-  .btn-primary {
-    background: #2563eb;
-    color: #fff;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    font-weight: 800;
-    font-size: 0.92rem;
-    cursor: pointer;
-    transition: background 0.15s;
+  .st-input:focus, .st-select:focus { border-color: var(--primary-blue); }
+  .st-input-combo { display: flex; gap: 0.4rem; }
+  .st-hint { font-size: 0.72rem; color: var(--text-muted); display: block; margin-top: 0.25rem; }
+
+  /* Sub Box & Riders List */
+  .st-sub-box {
+    background: rgba(150, 150, 150, 0.04);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
   }
-  .btn-primary:hover { background: #1d4ed8; }
-  .btn-add-sub { background: var(--bg-color); border: 1px dashed var(--primary-blue); color: var(--primary-blue); padding: 0.55rem 1rem; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; width: 100%; }
+  .st-sub-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+  .st-sub-head h3 { font-size: 1rem; font-weight: 800; margin: 0; color: var(--text-main); }
+  .st-tag { font-size: 0.75rem; font-weight: 800; background: rgba(37, 99, 235, 0.1); color: var(--primary-blue); padding: 0.2rem 0.6rem; border-radius: 20px; }
 
-  .table-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-  .table-count { font-size: 0.8rem; font-weight: 700; background: rgba(150,150,150,0.1); padding: 0.2rem 0.55rem; border-radius: 20px; color: var(--text-muted); }
-  .table-responsive { overflow-x: auto; }
-  .data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
-  .data-table th, .data-table td { padding: 0.75rem 0.85rem; border-bottom: 1px solid var(--card-border); }
-  .data-table th { font-weight: 800; font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); }
+  .st-riders-list { display: flex; flex-direction: column; gap: 0.65rem; }
+  .st-rider-row {
+    display: grid;
+    grid-template-columns: 1.8fr 1.2fr 1.2fr auto;
+    gap: 0.75rem;
+    align-items: flex-end;
+    background: var(--card-bg);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--card-border);
+  }
+  .st-field-flex label { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.25rem; }
+  .st-input-unit { position: relative; display: flex; align-items: center; }
+  .st-unit-lbl { position: absolute; right: 10px; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); pointer-events: none; }
+  .st-btn-del { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 6px; padding: 0.6rem 0.8rem; cursor: pointer; }
+  .st-btn-del:hover { background: #ef4444; color: #fff; }
+
+  /* Result Box */
+  .st-result-box {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.04) 0%, rgba(16, 185, 129, 0.04) 100%);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  .st-result-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px dashed var(--card-border);
+    margin-bottom: 1rem;
+  }
+  .st-res-col span { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.2rem; }
+  .st-res-col strong { font-size: 1.35rem; font-weight: 900; font-family: var(--font-mono); }
+  .st-red strong { color: #ef4444; }
+  .st-green strong { color: #10b981; }
+
+  .st-payout-heading { font-size: 0.95rem; font-weight: 800; margin: 0 0 0.75rem; color: var(--text-main); }
+  .st-payout-cards { display: flex; flex-direction: column; gap: 0.65rem; }
+  .st-payout-item {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+  }
+  .st-p-top { display: flex; justify-content: space-between; align-items: center; }
+  .st-p-name { font-size: 1rem; font-weight: 800; margin: 0; color: var(--text-main); }
+  .st-p-meta { font-size: 0.76rem; color: var(--text-muted); font-weight: 600; }
+  .st-p-val { font-size: 1.4rem; font-weight: 900; color: #10b981; font-family: var(--font-mono); text-align: right; line-height: 1.1; }
+  .st-p-val small { display: block; font-size: 0.68rem; font-weight: 700; color: var(--text-muted); }
+  .st-p-breakdown { display: flex; gap: 0.75rem; font-size: 0.8rem; color: var(--text-muted); margin-top: 0.45rem; padding-top: 0.45rem; border-top: 1px solid var(--card-border); flex-wrap: wrap; }
+  .st-red-txt { color: #ef4444; }
+  .st-green-txt { color: #10b981; }
+
+  .st-foot-actions { display: flex; align-items: center; gap: 1rem; }
+  .st-feedback-msg { font-size: 0.85rem; font-weight: 800; color: #10b981; }
+
+  /* Ledger Specific */
+  .st-filter-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+  .st-input-mini { background: var(--bg-color); color: var(--text-main); border: 1px solid var(--card-border); padding: 0.35rem 0.65rem; border-radius: 8px; font-weight: 700; }
+  .st-tag-blue { background: rgba(37, 99, 235, 0.1); color: var(--primary-blue); font-size: 0.82rem; font-weight: 800; padding: 0.3rem 0.75rem; border-radius: 20px; }
+
+  .st-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.85rem; margin-bottom: 1.5rem; }
+  .st-stat-card { background: rgba(150, 150, 150, 0.04); border: 1px solid var(--card-border); border-radius: 12px; padding: 1rem; text-align: center; }
+  .st-stat-lbl { font-size: 0.74rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; }
+  .st-stat-num { font-size: 1.6rem; font-weight: 900; margin: 0.2rem 0; font-family: var(--font-mono); }
+  .st-stat-sub { font-size: 0.72rem; color: var(--text-muted); }
+  .st-stat-card.st-green .st-stat-num { color: #10b981; }
+  .st-stat-card.st-red .st-stat-num { color: #ef4444; }
+  .st-stat-card.st-blue .st-stat-num { color: var(--primary-blue); }
+
+  .st-entry-box { background: rgba(150, 150, 150, 0.03); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; }
+  .st-box-title { font-size: 1.05rem; font-weight: 800; margin: 0 0 1rem; color: var(--text-main); }
   
-  .badge-expense { background: rgba(239, 68, 68, 0.1); color: #ef4444; font-size: 0.76rem; font-weight: 800; padding: 0.2rem 0.5rem; border-radius: 4px; }
-  .badge-income { background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 0.76rem; font-weight: 800; padding: 0.2rem 0.5rem; border-radius: 4px; }
-  .amount-expense { font-weight: 800; color: #ef4444; font-family: var(--font-mono); }
-  .amount-income { font-weight: 800; color: #10b981; font-family: var(--font-mono); }
-  .earned-col { font-weight: 800; color: #10b981; font-family: var(--font-mono); }
-  .btn-delete { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); border-radius: 6px; padding: 0.25rem 0.5rem; cursor: pointer; }
-  .btn-delete:hover { background: #ef4444; color: #fff; }
-  .empty-state { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.92rem; }
+  .st-toggle-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; background: rgba(150, 150, 150, 0.08); padding: 0.3rem; border-radius: 8px; margin-bottom: 1rem; }
+  .st-toggle-btn { border: none; background: transparent; color: var(--text-muted); font-weight: 800; font-size: 0.88rem; padding: 0.55rem; border-radius: 6px; cursor: pointer; }
+  .st-toggle-btn.active-exp { background: #ef4444; color: #fff; }
+  .st-toggle-btn.active-inc { background: #10b981; color: #fff; }
 
-  /* Taptap Banner */
-  .taptap-banner-card {
+  /* Tables */
+  .st-table-wrapper { overflow-x: auto; }
+  .st-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem; }
+  .st-table th, .st-table td { padding: 0.75rem 0.85rem; border-bottom: 1px solid var(--card-border); }
+  .st-table th { font-weight: 800; font-size: 0.76rem; text-transform: uppercase; color: var(--text-muted); }
+  .st-badge-expense { background: rgba(239, 68, 68, 0.1); color: #ef4444; font-size: 0.74rem; font-weight: 800; padding: 0.15rem 0.45rem; border-radius: 4px; }
+  .st-badge-income { background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 0.74rem; font-weight: 800; padding: 0.15rem 0.45rem; border-radius: 4px; }
+  .st-amount-exp { font-weight: 800; color: #ef4444; font-family: var(--font-mono); }
+  .st-amount-inc { font-weight: 800; color: #10b981; font-family: var(--font-mono); }
+  .st-empty-msg { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.9rem; }
+
+  /* Taptap Box */
+  .st-taptap-card {
     background: #0f172a;
     border: 1px solid #334155;
     border-radius: 14px;
@@ -1482,20 +1302,21 @@ const trackerSchema = {
     flex-wrap: wrap;
     margin-top: 2rem;
   }
-  .taptap-left { flex: 1.5; }
-  .taptap-tag { color: #facc15; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.35rem; }
-  .taptap-h { font-size: 1.15rem; font-weight: 800; margin: 0 0 0.4rem; color: #f8fafc; }
-  .taptap-p { font-size: 0.85rem; color: #cbd5e1; margin: 0; line-height: 1.5; }
-  .taptap-right { display: flex; align-items: center; gap: 0.75rem; }
-  .promo-box { font-family: var(--font-mono); background: #1e293b; border: 1px dashed #facc15; color: #facc15; font-size: 0.85rem; font-weight: 800; padding: 0.45rem 0.75rem; border-radius: 6px; }
-  .btn-claim-taptap { background: #2563eb; color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 800; padding: 0.5rem 1rem; border-radius: 6px; }
+  .st-taptap-left { flex: 1.5; }
+  .st-taptap-badge { color: #facc15; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.35rem; }
+  .st-taptap-left h3 { font-size: 1.15rem; font-weight: 800; margin: 0 0 0.35rem; color: #f8fafc; }
+  .st-taptap-left p { font-size: 0.85rem; color: #cbd5e1; margin: 0; line-height: 1.5; }
+  .st-taptap-right { display: flex; align-items: center; gap: 0.75rem; }
+  .st-taptap-code { font-family: var(--font-mono); background: #1e293b; border: 1px dashed #facc15; color: #facc15; font-size: 0.85rem; font-weight: 800; padding: 0.45rem 0.75rem; border-radius: 6px; }
 
+  /* Responsive Fixes */
   @media (max-width: 860px) {
-    .mode-tabs-container { grid-template-columns: 1fr; }
-    .stats-grid { grid-template-columns: repeat(2, 1fr); }
-    .result-summary-grid { grid-template-columns: repeat(2, 1fr); }
-    .rider-card-row { grid-template-columns: 1fr; }
-    .taptap-banner-card { flex-direction: column; align-items: flex-start; }
-    .tracker-title { font-size: 1.85rem; }
+    .st-grid-3, .st-grid-4, .st-grid-5 { grid-template-columns: 1fr; }
+    .st-tabs { grid-template-columns: 1fr; }
+    .st-stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .st-result-grid { grid-template-columns: repeat(2, 1fr); }
+    .st-rider-row { grid-template-columns: 1fr; }
+    .st-taptap-card { flex-direction: column; align-items: flex-start; }
+    .st-title { font-size: 1.85rem; }
   }
 </style>
