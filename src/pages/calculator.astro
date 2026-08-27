@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const title = "Interactive Cyprus Student Monthly Budget & Income Calculator 2026";
-const description = "Comprehensive interactive budget & income calculator for international students in Cyprus. Calculate monthly living costs, part-time wages (20h/week limit), and net monthly savings balance across Limassol, Nicosia, Larnaca, and Paphos.";
+const description = "Comprehensive interactive budget & income calculator for international students in Cyprus. Calculate monthly living costs, hourly or fixed monthly salary, and net savings balance across Limassol, Nicosia, Larnaca, and Paphos.";
 const permalink = "https://cyprusstudentguide.com/calculator/";
 
 const calcSchema = {
@@ -23,67 +23,100 @@ const calcSchema = {
   <section class="calc-hero">
     <span class="calc-badge">⚡ Full Income & Expense Analysis Tool</span>
     <h1 class="calc-title">Cyprus Student Budget & Income Calculator</h1>
-    <p class="calc-desc">Calculate your real-time expenses, part-time earnings, and net monthly savings balance in Cyprus. Customize living costs and wages or use verified city benchmarks.</p>
+    <p class="calc-desc">Calculate your real-time expenses, monthly fixed salary or hourly wages, and net monthly savings balance in Cyprus.</p>
   </section>
 
   <div class="calc-container notranslate">
+    <!-- Left Column: Inputs (Income + Living Costs + Custom Expenses) -->
     <div class="calc-inputs-column">
       
+      <!-- Section A: Student Income (Toggle between Monthly Fixed & Hourly) -->
       <div class="calc-card income-card-wrap">
         <div class="section-title-row">
           <span class="sec-icon">💶</span>
           <div>
-            <h2 class="sec-heading">Part-Time Income & Earnings</h2>
-            <p class="sec-sub">Calculate potential monthly legal wages (Non-EU 20 hrs/week law)</p>
+            <h2 class="sec-heading">Student Income & Earnings</h2>
+            <p class="sec-sub">Select your employment type (Fixed monthly contract or Hourly rate)</p>
           </div>
         </div>
 
-        <div class="form-group">
-          <div class="label-row">
-            <label for="input-hourly"><strong>⏱️ Hourly Pay Rate (€/hr):</strong></label>
-            <span class="hint-badge">Legal Min ~€5.50</span>
-          </div>
-          <div class="input-wrapper">
-            <span class="input-prefix">€</span>
-            <input type="number" id="input-hourly" class="calc-input income-field" value="6.50" min="0" step="0.5" placeholder="e.g. 6.50" />
-          </div>
-          <div class="suggestion-chips">
-            <span class="chip-label">Presets:</span>
-            <button type="button" class="chip-btn" data-target="input-hourly" data-val="5.50">Hospitality (€5.50)</button>
-            <button type="button" class="chip-btn active" data-target="input-hourly" data-val="6.50">Average Standard (€6.50)</button>
-            <button type="button" class="chip-btn" data-target="input-hourly" data-val="8.00">Delivery/Skilled (€8.00)</button>
+        <!-- Income Mode Switcher -->
+        <div class="income-mode-toggle">
+          <button type="button" class="mode-tab-btn active" id="btn-mode-monthly">📅 Monthly Fixed Salary</button>
+          <button type="button" class="mode-tab-btn" id="btn-mode-hourly">⏱️ Hourly Wage Rate</button>
+        </div>
+
+        <!-- Mode 1: Monthly Fixed Salary Block -->
+        <div id="block-monthly-salary" class="income-mode-block">
+          <div class="form-group">
+            <div class="label-row">
+              <label for="input-monthly-sal"><strong>💰 Monthly Fixed Net Salary (€):</strong></label>
+              <span class="hint-badge">Contract Base</span>
+            </div>
+            <div class="input-wrapper">
+              <span class="input-prefix">€</span>
+              <input type="number" id="input-monthly-sal" class="calc-input income-field" value="850" min="0" step="25" placeholder="e.g. 850" />
+            </div>
+            <div class="suggestion-chips">
+              <span class="chip-label">Presets:</span>
+              <button type="button" class="chip-btn" data-target="input-monthly-sal" data-val="650">Part-Time (€650)</button>
+              <button type="button" class="chip-btn active" data-target="input-monthly-sal" data-val="850">Standard (€850)</button>
+              <button type="button" class="chip-btn" data-target="input-monthly-sal" data-val="1050">Full/Delivery (€1,050)</button>
+            </div>
           </div>
         </div>
 
-        <div class="form-group">
-          <div class="label-row">
-            <label for="input-hours"><strong>📅 Weekly Working Hours:</strong></label>
-            <span class="hint-badge">Legal Limit: 20h</span>
+        <!-- Mode 2: Hourly Wage Block -->
+        <div id="block-hourly-wage" class="income-mode-block" style="display: none;">
+          <div class="form-group">
+            <div class="label-row">
+              <label for="input-hourly"><strong>⏱️ Hourly Pay Rate (€/hr):</strong></label>
+              <span class="hint-badge">Legal Min ~€5.50</span>
+            </div>
+            <div class="input-wrapper">
+              <span class="input-prefix">€</span>
+              <input type="number" id="input-hourly" class="calc-input income-field" value="6.50" min="0" step="0.5" placeholder="e.g. 6.50" />
+            </div>
+            <div class="suggestion-chips">
+              <span class="chip-label">Presets:</span>
+              <button type="button" class="chip-btn" data-target="input-hourly" data-val="5.50">Hospitality (€5.50)</button>
+              <button type="button" class="chip-btn active" data-target="input-hourly" data-val="6.50">Average Standard (€6.50)</button>
+              <button type="button" class="chip-btn" data-target="input-hourly" data-val="8.00">Delivery/Skilled (€8.00)</button>
+            </div>
           </div>
-          <div class="input-wrapper">
-            <span class="input-prefix">⌛</span>
-            <input type="number" id="input-hours" class="calc-input income-field" value="20" min="0" max="48" step="1" placeholder="e.g. 20" />
-          </div>
-          <div class="suggestion-chips">
-            <span class="chip-label">Presets:</span>
-            <button type="button" class="chip-btn" data-target="input-hours" data-val="10">Light (10 hrs/wk)</button>
-            <button type="button" class="chip-btn active" data-target="input-hours" data-val="20">Legal Max (20 hrs/wk)</button>
-            <button type="button" class="chip-btn" data-target="input-hours" data-val="0">No Job / Studies Only</button>
+
+          <div class="form-group">
+            <div class="label-row">
+              <label for="input-hours"><strong>📅 Weekly Working Hours:</strong></label>
+              <span class="hint-badge">Legal Max: 20h</span>
+            </div>
+            <div class="input-wrapper">
+              <span class="input-prefix">⌛</span>
+              <input type="number" id="input-hours" class="calc-input income-field" value="20" min="0" max="48" step="1" placeholder="e.g. 20" />
+            </div>
+            <div class="suggestion-chips">
+              <span class="chip-label">Presets:</span>
+              <button type="button" class="chip-btn" data-target="input-hours" data-val="10">Light (10 hrs/wk)</button>
+              <button type="button" class="chip-btn active" data-target="input-hours" data-val="20">Legal Max (20 hrs/wk)</button>
+              <button type="button" class="chip-btn" data-target="input-hours" data-val="0">No Job / €0</button>
+            </div>
           </div>
         </div>
 
-        <div class="form-group">
+        <!-- Additional Support / Freelance -->
+        <div class="form-group" style="margin-top: 1rem;">
           <div class="label-row">
-            <label for="input-other-inc"><strong>🎁 Other Support / Freelance (€/mo):</strong></label>
+            <label for="input-other-inc"><strong>🎁 Family Support / Freelancing (€/mo):</strong></label>
             <span class="hint-badge">Optional</span>
           </div>
           <div class="input-wrapper">
             <span class="input-prefix">€</span>
-            <input type="number" id="input-other-inc" class="calc-input income-field" value="0" min="0" step="20" placeholder="Family support / freelance" />
+            <input type="number" id="input-other-inc" class="calc-input income-field" value="0" min="0" step="20" placeholder="Family funds / freelance" />
           </div>
         </div>
       </div>
 
+      <!-- Section B: Monthly Living Expenses -->
       <div class="calc-card">
         <div class="section-title-row">
           <span class="sec-icon">🏠</span>
@@ -188,6 +221,7 @@ const calcSchema = {
           </div>
         </div>
 
+        <!-- Dynamic Custom Expense Rows -->
         <div class="custom-expense-section">
           <div class="custom-header">
             <label><strong>➕ Other Personal Expenses:</strong></label>
@@ -203,22 +237,25 @@ const calcSchema = {
       </div>
     </div>
 
+    <!-- Right Column: Results & Financial Health Summary -->
     <div class="calc-results-column">
       
+      <!-- Primary Net Balance Banner -->
       <div class="net-balance-card" id="balance-card">
         <span class="balance-label">Net Monthly Balance (Savings / Deficit)</span>
         <div class="balance-amount" id="balance-val-container">
-          <span class="currency">€</span><span id="net-balance-amount">-85</span>
+          <span class="currency">€</span><span id="net-balance-amount">+205</span>
         </div>
-        <div id="balance-status-pill" class="status-pill status-neutral">Calculating...</div>
+        <div id="balance-status-pill" class="status-pill status-surplus">Calculating...</div>
       </div>
 
+      <!-- Financial Totals Summary -->
       <div class="calc-card summary-card">
         <h3 class="summary-heading">📊 Monthly Financial Overview</h3>
         
         <div class="financial-row green-row">
           <span>💚 Total Monthly Income:</span>
-          <strong id="total-income-display">€560</strong>
+          <strong id="total-income-display">€850</strong>
         </div>
         <div class="financial-row red-row">
           <span>🔻 Total Monthly Expenses:</span>
@@ -250,11 +287,13 @@ const calcSchema = {
           <div id="custom-breakdown-items"></div>
         </div>
 
+        <!-- Dynamic Insight Tip -->
         <div class="analysis-box">
           <h4 class="analysis-title">💡 Real Student Field Analysis</h4>
           <p class="analysis-txt" id="analysis-text">Loading verified city analysis...</p>
         </div>
 
+        <!-- High Conversion Taptap Hook -->
         <div class="taptap-calc-box">
           <div class="taptap-badge">🎁 Remittance & Tuition Fee Tip</div>
           <p class="taptap-txt">Sending money from Cyprus or receiving funds from abroad? Use Taptap Send with <strong>0% fee</strong> + get <strong>€10 bonus</strong> on your first transfer.</p>
@@ -270,23 +309,30 @@ const calcSchema = {
 </BaseLayout>
 
 <script is:inline>
+  let currentIncomeMode = 'monthly'; // 'monthly' or 'hourly'
+
   function runCalculation() {
-    // 1. Income Calculation (Hourly * Weekly Hours * 4.33 weeks/mo + Other)
-    const hourlyRate = parseFloat(document.getElementById('input-hourly').value) || 0;
-    const weeklyHours = parseFloat(document.getElementById('input-hours').value) || 0;
+    let wageIncome = 0;
     const otherIncome = parseFloat(document.getElementById('input-other-inc').value) || 0;
 
-    const wageIncome = Math.round(hourlyRate * weeklyHours * 4.33);
+    if (currentIncomeMode === 'monthly') {
+      wageIncome = parseFloat(document.getElementById('input-monthly-sal').value) || 0;
+    } else {
+      const hourlyRate = parseFloat(document.getElementById('input-hourly').value) || 0;
+      const weeklyHours = parseFloat(document.getElementById('input-hours').value) || 0;
+      wageIncome = Math.round(hourlyRate * weeklyHours * 4.33);
+    }
+
     const totalIncome = wageIncome + otherIncome;
 
-    // 2. Standard Expenses
+    // Standard Expenses
     const rentVal = parseFloat(document.getElementById('input-rent').value) || 0;
     const foodVal = parseFloat(document.getElementById('input-food').value) || 0;
     const elecVal = parseFloat(document.getElementById('input-elec').value) || 0;
     const transVal = parseFloat(document.getElementById('input-trans').value) || 0;
     const miscVal = parseFloat(document.getElementById('input-misc').value) || 0;
 
-    // 3. Custom Expenses
+    // Custom Expenses
     let customTotal = 0;
     const customRows = document.querySelectorAll('.custom-expense-row');
     const customBreakdownContainer = document.getElementById('custom-breakdown-items');
@@ -316,7 +362,7 @@ const calcSchema = {
     const totalExpense = Math.round(rentVal + foodVal + elecVal + transVal + miscVal + customTotal);
     const netBalance = totalIncome - totalExpense;
 
-    // 4. Update Displays
+    // Update Displays
     document.getElementById('total-income-display').innerText = '€' + totalIncome;
     document.getElementById('total-expense-display').innerText = '€' + totalExpense;
 
@@ -345,17 +391,17 @@ const calcSchema = {
       balanceCard.style.borderColor = 'rgba(239, 68, 68, 0.4)';
     }
 
-    // 5. Dynamic Field Insight
+    // Dynamic Field Insight
     const city = document.getElementById('city-select').value;
     const analysis = document.getElementById('analysis-text');
     if (city === 'limassol') {
-      analysis.innerText = `In Limassol, housing is the primary expense. Working legal 20 hrs/week earns ~€${wageIncome}/mo. Sharing a flat helps secure an immediate surplus.`;
+      analysis.innerText = `In Limassol, living costs average €600-€700. With a standard income of €${wageIncome}/mo, sharing a room creates immediate financial stability.`;
     } else if (city === 'nicosia') {
-      analysis.innerText = `In Nicosia, lower rent around Engomi/Aglantzia combined with ~€${wageIncome}/mo wages allows students to achieve a comfortable break-even point.`;
+      analysis.innerText = `In Nicosia, lower accommodation rates make a monthly earning of €${wageIncome}/mo highly sufficient for covering tuition installments or savings.`;
     } else if (city === 'larnaca') {
-      analysis.innerText = `In Larnaca, moderate living costs make ~€${wageIncome}/mo wages highly efficient, often leaving €100+ monthly net savings.`;
+      analysis.innerText = `In Larnaca, moderate living expenses paired with ~€${wageIncome}/mo earnings yield consistent monthly savings.`;
     } else {
-      analysis.innerText = `In Paphos, hospitality positions offer steady wages with lower accommodation costs throughout the academic term.`;
+      analysis.innerText = `In Paphos, hospitality opportunities offer steady earnings with the lowest housing rates in the Republic.`;
     }
   }
 
@@ -446,6 +492,32 @@ const calcSchema = {
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    // Mode Switcher Listeners
+    const btnMonthly = document.getElementById('btn-mode-monthly');
+    const btnHourly = document.getElementById('btn-mode-hourly');
+    const blockMonthly = document.getElementById('block-monthly-salary');
+    const blockHourly = document.getElementById('block-hourly-wage');
+
+    if (btnMonthly && btnHourly) {
+      btnMonthly.addEventListener('click', () => {
+        currentIncomeMode = 'monthly';
+        btnMonthly.classList.add('active');
+        btnHourly.classList.remove('active');
+        blockMonthly.style.display = 'block';
+        blockHourly.style.display = 'none';
+        runCalculation();
+      });
+
+      btnHourly.addEventListener('click', () => {
+        currentIncomeMode = 'hourly';
+        btnHourly.classList.add('active');
+        btnMonthly.classList.remove('active');
+        blockHourly.style.display = 'block';
+        blockMonthly.style.display = 'none';
+        runCalculation();
+      });
+    }
+
     const allInputs = document.querySelectorAll('.calc-input');
     allInputs.forEach(input => {
       input.addEventListener('input', runCalculation);
@@ -471,7 +543,7 @@ const calcSchema = {
 <style>
   .calc-hero {
     text-align: center;
-    margin-bottom: 2.5rem;
+    margin-bottom: 2.25rem;
   }
   .calc-badge {
     background: rgba(37, 99, 235, 0.1);
@@ -527,15 +599,15 @@ const calcSchema = {
   }
 
   .income-card-wrap {
-    border-color: rgba(34, 197, 94, 0.3);
-    background: linear-gradient(135deg, rgba(34, 197, 94, 0.03) 0%, rgba(56, 189, 248, 0.02) 100%);
+    border-color: rgba(34, 197, 94, 0.35);
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.04) 0%, rgba(56, 189, 248, 0.02) 100%);
   }
 
   .section-title-row {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    margin-bottom: 1.35rem;
+    margin-bottom: 1.25rem;
     padding-bottom: 0.75rem;
     border-bottom: 1px solid var(--card-border);
   }
@@ -550,6 +622,33 @@ const calcSchema = {
     font-size: 0.8rem;
     color: var(--text-muted);
     margin: 0.15rem 0 0;
+  }
+
+  /* Income Mode Switcher */
+  .income-mode-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    background: rgba(150, 150, 150, 0.1);
+    padding: 0.35rem;
+    border-radius: 10px;
+    margin-bottom: 1.35rem;
+  }
+  .mode-tab-btn {
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0.55rem;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .mode-tab-btn.active {
+    background: var(--card-bg);
+    color: var(--primary-blue);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   }
 
   .form-group {
@@ -729,7 +828,6 @@ const calcSchema = {
   }
   .status-surplus { background: #dcfce7; color: #15803d; }
   .status-deficit { background: #fee2e2; color: #b91c1c; }
-  .status-neutral { background: #f1f5f9; color: #475569; }
 
   /* Summary Card */
   .summary-heading {
@@ -812,5 +910,6 @@ const calcSchema = {
   @media (max-width: 900px) {
     .calc-container { grid-template-columns: 1fr; }
     .calc-results-column { position: static; }
+    .calc-title { font-size: 1.85rem; }
   }
 </style>
