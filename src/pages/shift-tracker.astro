@@ -1,16 +1,16 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-const title = "Cyprus Student Work Shift & Delivery Split Tracker | Excel Backup Tool 2026";
-const description = "Track daily student work hours, hourly rates, and multi-rider delivery earnings splits in Cyprus. Auto-saves offline with one-click Excel (.CSV) and JSON backup & restore.";
+const title = "Cyprus Student Daily Money Ledger, Shift Tracker & Delivery Fleet Splitter 2026";
+const description = "Track daily student income and expenses, log hourly shifts, or split shared food delivery earnings (Wolt/Foody) with ID rent, vehicle rental, and fuel deductions. 100% offline auto-save with Excel export.";
 const permalink = "https://cyprusstudentguide.com/shift-tracker/";
 
 const trackerSchema = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "Cyprus Student Work Shift & Split Tracker",
+  "name": "Cyprus Student Daily Money & Delivery Shift Tracker",
   "url": permalink,
-  "applicationCategory": "BusinessApplication",
+  "applicationCategory": "FinanceApplication",
   "operatingSystem": "All",
   "browserRequirements": "Requires JavaScript and LocalStorage",
   "description": description
@@ -21,23 +21,36 @@ const trackerSchema = {
   <script type="application/ld+json" is:inline set:html={JSON.stringify(trackerSchema)} />
 
   <section class="tracker-hero">
-    <span class="tracker-badge">🔒 100% Private • Local Auto-Save • Excel Backup</span>
-    <h1 class="tracker-title">Student Work Shift & Delivery Split Log</h1>
-    <p class="tracker-desc">Keep accurate records of your working hours, calculate hourly earnings, or split shared delivery shifts with fuel deductions. Your data stays safely saved in your browser and can be exported to Excel anytime.</p>
+    <span class="tracker-badge">🔒 100% Private • Local Storage Auto-Save • Excel Backup</span>
+    <h1 class="tracker-title">Student Daily Money & Delivery Shift Tracker</h1>
+    <p class="tracker-desc">Log your personal income & expenses, track hourly work shifts, or split shared food delivery earnings with ID rent, vehicle hire, and fuel deductions. Everything auto-saves in your browser.</p>
   </section>
 
-  <!-- Backup & Restore Control Center Bar -->
-  <div class="backup-toolbar notranslate">
+  <!-- Top Toolbar: Currency Selector & Backup Control Center -->
+  <div class="top-control-bar notranslate">
+    <div class="currency-picker-wrap">
+      <label for="global-currency-select"><strong>💱 Currency:</strong></label>
+      <select id="global-currency-select" class="currency-select">
+        <option value="€" selected>Euro (€)</option>
+        <option value="৳">BDT (৳)</option>
+        <option value="₹">INR (₹)</option>
+        <option value="$">USD ($)</option>
+        <option value="£">GBP (£)</option>
+        <option value="₨">PKR / NPR (₨)</option>
+      </select>
+    </div>
+
     <div class="backup-status">
       <span class="status-indicator"></span>
-      <span id="save-status-text">All changes auto-saved to browser</span>
+      <span id="save-status-text">Auto-saved to browser</span>
     </div>
+
     <div class="backup-buttons">
       <button type="button" id="btn-export-csv" class="tool-btn btn-excel">
-        📊 Download Excel (.CSV)
+        📊 Export Excel (.CSV)
       </button>
       <button type="button" id="btn-export-json" class="tool-btn btn-json">
-        💾 Save Backup File (.json)
+        💾 Save Backup (.json)
       </button>
       <label class="tool-btn btn-restore">
         📂 Restore File
@@ -49,22 +62,252 @@ const trackerSchema = {
     </div>
   </div>
 
-  <!-- Mode Switcher Tabs -->
+  <!-- 3-Mode Switcher Tabs -->
   <div class="mode-tabs-container notranslate">
-    <button type="button" class="tab-btn active" id="tab-daily-log">
-      📝 Daily Shift & Wage Log
+    <button type="button" class="tab-btn active" id="tab-delivery-split">
+      🛵 Delivery Splitter (ID & Bike Rent)
     </button>
-    <button type="button" class="tab-btn" id="tab-delivery-split">
-      🛵 Multi-Rider Delivery Splitter
+    <button type="button" class="tab-btn" id="tab-money-ledger">
+      💰 Daily Income & Expense Ledger
+    </button>
+    <button type="button" class="tab-btn" id="tab-daily-log">
+      ⏱️ Hourly Work Shifts Log
     </button>
   </div>
 
   <div class="tracker-body notranslate">
-    
-    <!-- ================= MODE 1: DAILY WORK & WAGE LOG ================= -->
-    <div id="view-daily-log" class="tracker-view active-view">
+
+    <!-- ================= MODE 1: ADVANCED FOOD DELIVERY SPLITTER ================= -->
+    <div id="view-delivery-split" class="tracker-view active-view">
+      <div class="split-calculator-card">
+        <div class="split-header">
+          <h2>🛵 Real-World Food Delivery Earnings & Rent Splitter</h2>
+          <p class="split-sub">Calculate exact net earnings per rider after deducting Fleet/ID rent commission, vehicle rent, and fuel costs. Split fairly by total orders delivered or hours worked.</p>
+        </div>
+
+        <!-- App Gross & Deductions Setup -->
+        <div class="split-grid-top">
+          
+          <div class="form-field">
+            <label for="split-gross-app"><strong>📱 Total Gross App Earnings (<span class="curr-sym">€</span>):</strong></label>
+            <input type="number" id="split-gross-app" class="t-input calc-split-input" placeholder="e.g. 165" value="165" step="1" min="0" />
+            <span class="field-help">Total amount shown on Wolt / Foody / Bolt app</span>
+          </div>
+
+          <div class="form-field">
+            <label for="split-split-basis"><strong>⚖️ Split Calculation Basis:</strong></label>
+            <select id="split-split-basis" class="t-select calc-split-input">
+              <option value="orders" selected>By Orders Completed (Most Accurate)</option>
+              <option value="hours">By Hours on Road</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="split-fleet-type"><strong>📑 Fleet / ID Rent Deduction:</strong></label>
+            <div class="input-with-select">
+              <select id="split-fleet-type" class="t-select calc-split-input" style="flex: 1.2;">
+                <option value="percent" selected>Percentage (%)</option>
+                <option value="fixed">Fixed Flat (<span class="curr-sym">€</span>)</option>
+              </select>
+              <input type="number" id="split-fleet-val" class="t-input calc-split-input" style="flex: 1;" value="18" placeholder="e.g. 18" min="0" step="0.5" />
+            </div>
+            <span class="field-help" id="fleet-help-txt">Fleet cut (e.g. 18% or fixed daily fee)</span>
+          </div>
+
+          <div class="form-field">
+            <label for="split-vehicle-rent"><strong>🛵 Vehicle / Scooter / Car Rent (<span class="curr-sym">€</span>):</strong></label>
+            <input type="number" id="split-vehicle-rent" class="t-input calc-split-input" placeholder="Daily rent (0 if owned)" value="15" step="1" min="0" />
+            <span class="field-help">Daily rental fee for bike/scooter/car</span>
+          </div>
+
+          <div class="form-field">
+            <label for="split-fuel-cost"><strong>⛽ Petrol / Battery Charging (<span class="curr-sym">€</span>):</strong></label>
+            <input type="number" id="split-fuel-cost" class="t-input calc-split-input" placeholder="Fuel cost" value="12" step="1" min="0" />
+            <span class="field-help">Total fuel/charging expense today</span>
+          </div>
+
+          <div class="form-field">
+            <label for="split-expense-split-mode"><strong>⚙️ Expense Sharing Method:</strong></label>
+            <select id="split-expense-split-mode" class="t-select calc-split-input">
+              <option value="proportional" selected>Proportional to Work/Orders (Fair)</option>
+              <option value="equal">Equal 50/50 Split</option>
+            </select>
+          </div>
+
+        </div>
+
+        <!-- Dynamic Riders Working on This Shift -->
+        <div class="riders-section">
+          <div class="riders-header-row">
+            <h4 class="riders-heading">👥 Riders Sharing This Shift / Account</h4>
+            <span class="riders-count-badge" id="split-basis-indicator">Basis: Orders Completed</span>
+          </div>
+          
+          <div id="delivery-riders-container" class="riders-list">
+            <!-- Dynamically populated rider rows -->
+          </div>
+
+          <button type="button" id="btn-add-delivery-rider" class="btn-add-sub">
+            + Add Another Delivery Partner
+          </button>
+        </div>
+
+        <!-- Master Split Calculation Result -->
+        <div class="split-result-box">
+          <div class="result-summary-grid">
+            <div class="res-item">
+              <span>Gross App Income:</span>
+              <strong><span class="curr-sym">€</span><span id="res-d-gross">165.00</span></strong>
+            </div>
+            <div class="res-item">
+              <span>Fleet/ID Commission:</span>
+              <strong style="color: #ef4444;">-<span class="curr-sym">€</span><span id="res-d-fleet">29.70</span></strong>
+            </div>
+            <div class="res-item">
+              <span>Vehicle + Fuel:</span>
+              <strong style="color: #ef4444;">-<span class="curr-sym">€</span><span id="res-d-expenses">27.00</span></strong>
+            </div>
+            <div class="res-item res-net">
+              <span>Total Net Payout:</span>
+              <strong style="color: #10b981;"><span class="curr-sym">€</span><span id="res-d-net">108.30</span></strong>
+            </div>
+          </div>
+
+          <h4 class="payout-title">💵 Final Individual Payouts:</h4>
+          <div id="delivery-payouts-list" class="payout-list">
+            <!-- Individual payout cards calculated here -->
+          </div>
+        </div>
+
+        <!-- Copy / WhatsApp Share Button -->
+        <div class="split-share-actions">
+          <button type="button" id="btn-copy-delivery-summary" class="btn-primary btn-copy-summary">
+            📋 Copy Complete Shift Summary for WhatsApp
+          </button>
+          <span id="delivery-copy-feedback" class="copy-hint" style="display: none;">✅ Copied to clipboard!</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= MODE 2: DAILY INCOME & EXPENSE LEDGER ================= -->
+    <div id="view-money-ledger" class="tracker-view">
       
-      <!-- Summary Dashboard Bar -->
+      <div class="month-filter-bar">
+        <div class="filter-left">
+          <label for="ledger-month-filter"><strong>📅 Select Month to Review:</strong></label>
+          <input type="month" id="ledger-month-filter" class="month-input" />
+        </div>
+        <div class="filter-right">
+          <span class="month-tag" id="current-month-display">Current Month Report</span>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card stat-green">
+          <span class="stat-label">Total Monthly Income</span>
+          <div class="stat-val"><span class="curr-sym">€</span><span id="stat-ledger-income">0.00</span></div>
+          <span class="stat-sub">Wages, salary, support</span>
+        </div>
+        <div class="stat-card stat-red">
+          <span class="stat-label">Total Monthly Expenses</span>
+          <div class="stat-val"><span class="curr-sym">€</span><span id="stat-ledger-expense">0.00</span></div>
+          <span class="stat-sub">Rent, food, bills, misc</span>
+        </div>
+        <div class="stat-card stat-blue">
+          <span class="stat-label">Month-End Net Balance</span>
+          <div class="stat-val"><span class="curr-sym">€</span><span id="stat-ledger-net">0.00</span></div>
+          <span class="stat-sub" id="stat-ledger-status">Savings / Deficit</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Total Entries Logged</span>
+          <div class="stat-val" id="stat-ledger-count">0</div>
+          <span class="stat-sub">In selected month</span>
+        </div>
+      </div>
+
+      <div class="entry-form-card">
+        <h3 class="form-title">➕ Add Daily Income / Expense Entry</h3>
+        
+        <div class="trans-type-toggle">
+          <button type="button" class="type-btn active type-expense" id="btn-type-expense">🔻 Expense (খরচ)</button>
+          <button type="button" class="type-btn type-income" id="btn-type-income">💚 Income (আয়)</button>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="trans-date"><strong>📅 Date:</strong></label>
+            <input type="date" id="trans-date" class="t-input" />
+          </div>
+          
+          <div class="form-field">
+            <label for="trans-category"><strong>🏷️ Category:</strong></label>
+            <select id="trans-category" class="t-select">
+              <optgroup label="Expenses (খরচ)">
+                <option value="Groceries & Food">🛒 Groceries & Food</option>
+                <option value="Rent & Housing">🏠 Rent & Housing</option>
+                <option value="Electricity & Utilities">⚡ Electricity & Water</option>
+                <option value="Bus & Commute">🚌 Bus / Commute</option>
+                <option value="Phone & Internet">📱 Phone & Internet</option>
+                <option value="Dining Out & Coffee">☕ Dining Out & Coffee</option>
+                <option value="Personal & Misc">🛍️ Personal & Misc</option>
+              </optgroup>
+              <optgroup label="Income (আয়)">
+                <option value="Work Wages / Salary">💼 Work Wages / Salary</option>
+                <option value="Delivery Earnings">🛵 Delivery Earnings</option>
+                <option value="Family Support">🎁 Family Support</option>
+                <option value="Freelancing / Other">💻 Freelancing / Other</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="trans-desc"><strong>📝 Note / Description:</strong></label>
+            <input type="text" id="trans-desc" class="t-input" placeholder="e.g. Lidl grocery, August room rent" />
+          </div>
+
+          <div class="form-field">
+            <label for="trans-amount"><strong>💰 Amount (<span class="curr-sym">€</span>):</strong></label>
+            <input type="number" id="trans-amount" class="t-input" step="0.5" min="0" placeholder="e.g. 25.50" />
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" id="btn-save-transaction" class="btn-primary">
+            + Save Entry to Ledger
+          </button>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header-row">
+          <h3 class="table-title">📑 Transaction History</h3>
+          <span class="table-count" id="ledger-count-badge">0 Entries</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="ledger-tbody"></tbody>
+          </table>
+        </div>
+        <div id="no-ledger-msg" class="empty-state">
+          <p>No transactions recorded for this month yet. Add your daily income or expense above!</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= MODE 3: HOURLY WORK & WAGE LOG ================= -->
+    <div id="view-daily-log" class="tracker-view">
       <div class="stats-grid">
         <div class="stat-card">
           <span class="stat-label">Total Hours Recorded</span>
@@ -73,12 +316,12 @@ const trackerSchema = {
         </div>
         <div class="stat-card stat-green">
           <span class="stat-label">Total Earned Wages</span>
-          <div class="stat-val">€<span id="stat-total-earned">0.00</span></div>
-          <span class="stat-sub">Including recorded tips</span>
+          <div class="stat-val"><span class="curr-sym">€</span><span id="stat-total-earned">0.00</span></div>
+          <span class="stat-sub">Including tips</span>
         </div>
         <div class="stat-card stat-blue">
           <span class="stat-label">Average Hourly Rate</span>
-          <div class="stat-val">€<span id="stat-avg-rate">0.00</span>/hr</div>
+          <div class="stat-val"><span class="curr-sym">€</span><span id="stat-avg-rate">0.00</span>/hr</div>
           <span class="stat-sub">Across all entries</span>
         </div>
         <div class="stat-card">
@@ -88,40 +331,38 @@ const trackerSchema = {
         </div>
       </div>
 
-      <!-- Add New Shift Entry Form -->
       <div class="entry-form-card">
-        <h3 class="form-title">➕ Add New Work Shift Entry</h3>
+        <h3 class="form-title">➕ Add Hourly Work Shift Entry</h3>
         <div class="form-grid">
           <div class="form-field">
             <label for="shift-date"><strong>📅 Date:</strong></label>
             <input type="date" id="shift-date" class="t-input" />
           </div>
           <div class="form-field">
-            <label for="shift-job"><strong>🏢 Workplace / Category:</strong></label>
-            <input type="text" id="shift-job" class="t-input" placeholder="e.g. Restaurant / Delivery / Hotel" />
+            <label for="shift-job"><strong>🏢 Workplace / Role:</strong></label>
+            <input type="text" id="shift-job" class="t-input" placeholder="e.g. Restaurant / Hotel / Construction" />
           </div>
           <div class="form-field">
             <label for="shift-hours"><strong>⌛ Hours Worked:</strong></label>
             <input type="number" id="shift-hours" class="t-input" step="0.5" min="0" placeholder="e.g. 5.5" />
           </div>
           <div class="form-field">
-            <label for="shift-rate"><strong>💶 Hourly Rate (€/hr):</strong></label>
+            <label for="shift-rate"><strong>💶 Hourly Rate (<span class="curr-sym">€</span>/hr):</strong></label>
             <input type="number" id="shift-rate" class="t-input" step="0.5" min="0" value="6.50" placeholder="e.g. 6.50" />
           </div>
           <div class="form-field">
-            <label for="shift-tips"><strong>🎁 Extra Tips (€):</strong></label>
+            <label for="shift-tips"><strong>🎁 Extra Tips (<span class="curr-sym">€</span>):</strong></label>
             <input type="number" id="shift-tips" class="t-input" step="1" min="0" value="0" placeholder="e.g. 10" />
           </div>
         </div>
         
         <div class="form-actions">
           <button type="button" id="btn-save-shift" class="btn-primary">
-            + Save Shift to Local Log
+            + Save Shift to Log
           </button>
         </div>
       </div>
 
-      <!-- Log Table View -->
       <div class="table-card">
         <div class="table-header-row">
           <h3 class="table-title">📋 Recorded Shift History</h3>
@@ -129,7 +370,7 @@ const trackerSchema = {
         </div>
         
         <div class="table-responsive">
-          <table class="data-table" id="shifts-table">
+          <table class="data-table">
             <thead>
               <tr>
                 <th>Date</th>
@@ -141,92 +382,18 @@ const trackerSchema = {
                 <th>Action</th>
               </tr>
             </thead>
-            <tbody id="shifts-tbody">
-              <!-- Dynamically rendered -->
-            </tbody>
+            <tbody id="shifts-tbody"></tbody>
           </table>
         </div>
         <div id="no-data-msg" class="empty-state">
-          <p>No work shifts recorded yet. Add your first entry above to start tracking your wages!</p>
+          <p>No work shifts recorded yet. Add your first entry above to start tracking!</p>
         </div>
       </div>
-
-    </div>
-
-    <!-- ================= MODE 2: MULTI-RIDER DELIVERY SPLITTER ================= -->
-    <div id="view-delivery-split" class="tracker-view">
-      
-      <div class="split-calculator-card">
-        <div class="split-header">
-          <h2>🛵 Food Delivery Shift Earnings & Fuel Splitter</h2>
-          <p class="split-sub">Accurately divide total platform earnings (Wolt/Foody) between delivery partners according to hours worked, with fuel/scooter expenses deducted fairly.</p>
-        </div>
-
-        <!-- Shift Overview Inputs -->
-        <div class="split-inputs-row">
-          <div class="form-field">
-            <label for="split-total-earnings"><strong>💰 Total Gross App Earnings (€):</strong></label>
-            <input type="number" id="split-total-earnings" class="t-input calc-split-input" placeholder="Total € earned" value="180" />
-          </div>
-          <div class="form-field">
-            <label for="split-fuel-cost"><strong>⛽ Shared Fuel / Scooter Expense (€):</strong></label>
-            <input type="number" id="split-fuel-cost" class="t-input calc-split-input" placeholder="Fuel cost to deduct" value="20" />
-          </div>
-          <div class="form-field">
-            <label for="split-deduct-mode"><strong>⚙️ Expense Deduction Method:</strong></label>
-            <select id="split-deduct-mode" class="t-select calc-split-input">
-              <option value="proportional" selected>Deduct by Hours Worked (Fair Proportion)</option>
-              <option value="equal">Deduct Fuel 50/50 Equally</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Riders List & Hours -->
-        <div class="riders-section">
-          <h4 class="riders-heading">👥 Riders on This Shift</h4>
-          <div id="riders-list" class="riders-list">
-            <!-- Dynamically populated rider rows -->
-          </div>
-          <button type="button" id="btn-add-rider" class="btn-add-sub">+ Add Another Rider</button>
-        </div>
-
-        <!-- Split Result Calculation Summary -->
-        <div class="split-result-box">
-          <div class="result-summary-grid">
-            <div class="res-item">
-              <span>Gross Earnings:</span>
-              <strong id="res-gross">€180.00</strong>
-            </div>
-            <div class="res-item">
-              <span>Fuel Deduction:</span>
-              <strong id="res-fuel" style="color: #ef4444;">-€20.00</strong>
-            </div>
-            <div class="res-item res-net">
-              <span>Net Distributable:</span>
-              <strong id="res-net" style="color: #10b981;">€160.00</strong>
-            </div>
-          </div>
-
-          <h4 class="payout-title">💵 Payout Breakdown per Rider:</h4>
-          <div id="payout-breakdown-list" class="payout-list">
-            <!-- Dynamically calculated payouts -->
-          </div>
-        </div>
-
-        <!-- Copy / WhatsApp Share Summary -->
-        <div class="split-share-actions">
-          <button type="button" id="btn-copy-split-summary" class="btn-primary btn-copy-summary">
-            📋 Copy Shift Breakdown for WhatsApp
-          </button>
-          <span id="copy-feedback" class="copy-hint" style="display: none;">✅ Copied to clipboard!</span>
-        </div>
-      </div>
-
     </div>
 
   </div>
 
-  <!-- Monetization / Safe Remittance Box -->
+  <!-- Safe Remittance / Taptap Send Box -->
   <div class="taptap-banner-card notranslate">
     <div class="taptap-left">
       <span class="taptap-tag">💡 Remittance & Tuition Fee Tip</span>
@@ -241,86 +408,496 @@ const trackerSchema = {
 </BaseLayout>
 
 <script is:inline>
-  // State Storage Keys
+  // Storage Keys
+  const STORAGE_KEY_CURRENCY = 'csg_user_currency';
+  const STORAGE_KEY_LEDGER = 'csg_daily_ledger_data';
   const STORAGE_KEY_SHIFTS = 'csg_student_shifts_data';
-  const STORAGE_KEY_RIDERS = 'csg_delivery_split_data';
+  const STORAGE_KEY_DELIVERY = 'csg_delivery_fleet_data';
 
   // State
+  let currentCurrency = '€';
+  let currentTransType = 'expense';
+  let ledgerRecords = [];
   let shiftRecords = [];
-  let riderList = [
-    { name: 'Rider 1 (You)', hours: 6 },
-    { name: 'Rider 2 (Partner)', hours: 4 }
+  
+  // Real-world Delivery Shift State
+  let deliveryRiders = [
+    { name: 'Rider 1 (Morning)', units: 14, cashTips: 5 },
+    { name: 'Rider 2 (Evening)', units: 11, cashTips: 8 }
   ];
 
-  // Initialize
   document.addEventListener('DOMContentLoaded', () => {
-    // Set default date to today
-    const dateInput = document.getElementById('shift-date');
-    if (dateInput) {
-      dateInput.value = new Date().toISOString().split('T')[0];
-    }
+    const today = new Date().toISOString().split('T')[0];
+    const currentMonth = today.substring(0, 7);
+
+    const transDateInput = document.getElementById('trans-date');
+    if (transDateInput) transDateInput.value = today;
+
+    const shiftDateInput = document.getElementById('shift-date');
+    if (shiftDateInput) shiftDateInput.value = today;
+
+    const monthFilter = document.getElementById('ledger-month-filter');
+    if (monthFilter) monthFilter.value = currentMonth;
 
     loadLocalData();
+    initCurrencyPicker();
     initTabSwitching();
+    initDeliverySplitter();
+    initLedgerEvents();
     initDailyLogEvents();
-    initSplitterEvents();
     initBackupEvents();
     renderAll();
   });
 
-  // Load from localStorage
   function loadLocalData() {
     try {
+      const savedCurr = localStorage.getItem(STORAGE_KEY_CURRENCY);
+      if (savedCurr) currentCurrency = savedCurr;
+
+      const savedLedger = localStorage.getItem(STORAGE_KEY_LEDGER);
+      if (savedLedger) ledgerRecords = JSON.parse(savedLedger);
+
       const savedShifts = localStorage.getItem(STORAGE_KEY_SHIFTS);
       if (savedShifts) shiftRecords = JSON.parse(savedShifts);
 
-      const savedRiders = localStorage.getItem(STORAGE_KEY_RIDERS);
-      if (savedRiders) riderList = JSON.parse(savedRiders);
+      const savedDelivery = localStorage.getItem(STORAGE_KEY_DELIVERY);
+      if (savedDelivery) deliveryRiders = JSON.parse(savedDelivery);
     } catch (e) {
-      console.warn('Could not parse local data', e);
+      console.warn('Error reading local data:', e);
     }
   }
 
   function saveLocalData() {
+    localStorage.setItem(STORAGE_KEY_CURRENCY, currentCurrency);
+    localStorage.setItem(STORAGE_KEY_LEDGER, JSON.stringify(ledgerRecords));
     localStorage.setItem(STORAGE_KEY_SHIFTS, JSON.stringify(shiftRecords));
-    localStorage.setItem(STORAGE_KEY_RIDERS, JSON.stringify(riderList));
+    localStorage.setItem(STORAGE_KEY_DELIVERY, JSON.stringify(deliveryRiders));
     showSaveStatus();
   }
 
   function showSaveStatus() {
     const el = document.getElementById('save-status-text');
     if (el) {
-      el.innerText = 'Saved to browser at ' + new Date().toLocaleTimeString();
+      el.innerText = 'Auto-saved at ' + new Date().toLocaleTimeString();
       setTimeout(() => {
-        el.innerText = 'All changes auto-saved to browser';
+        el.innerText = 'Auto-saved to browser';
       }, 3000);
     }
   }
 
-  // Tab Switching
-  function initTabSwitching() {
-    const tabLog = document.getElementById('tab-daily-log');
-    const tabSplit = document.getElementById('tab-delivery-split');
-    const viewLog = document.getElementById('view-daily-log');
-    const viewSplit = document.getElementById('view-delivery-split');
+  function initCurrencyPicker() {
+    const currSelect = document.getElementById('global-currency-select');
+    if (currSelect) {
+      currSelect.value = currentCurrency;
+      currSelect.addEventListener('change', (e) => {
+        currentCurrency = e.target.value;
+        saveLocalData();
+        updateCurrencySymbols();
+        renderAll();
+      });
+    }
+    updateCurrencySymbols();
+  }
 
-    tabLog.addEventListener('click', () => {
-      tabLog.classList.add('active');
-      tabSplit.classList.remove('active');
-      viewLog.classList.add('active-view');
-      viewSplit.classList.remove('active-view');
-    });
-
-    tabSplit.addEventListener('click', () => {
-      tabSplit.classList.add('active');
-      tabLog.classList.remove('active');
-      viewSplit.classList.add('active-view');
-      viewLog.classList.remove('active-view');
-      calculateDeliverySplit();
+  function updateCurrencySymbols() {
+    document.querySelectorAll('.curr-sym').forEach(el => {
+      el.innerText = currentCurrency;
     });
   }
 
-  // --- DAILY LOG LOGIC ---
+  function initTabSwitching() {
+    const tabDelivery = document.getElementById('tab-delivery-split');
+    const tabLedger = document.getElementById('tab-money-ledger');
+    const tabShift = document.getElementById('tab-daily-log');
+
+    const viewDelivery = document.getElementById('view-delivery-split');
+    const viewLedger = document.getElementById('view-money-ledger');
+    const viewShift = document.getElementById('view-daily-log');
+
+    tabDelivery.addEventListener('click', () => {
+      tabDelivery.classList.add('active');
+      tabLedger.classList.remove('active');
+      tabShift.classList.remove('active');
+      viewDelivery.classList.add('active-view');
+      viewLedger.classList.remove('active-view');
+      viewShift.classList.remove('active-view');
+      calculateDeliverySplit();
+    });
+
+    tabLedger.addEventListener('click', () => {
+      tabLedger.classList.add('active');
+      tabDelivery.classList.remove('active');
+      tabShift.classList.remove('active');
+      viewLedger.classList.add('active-view');
+      viewDelivery.classList.remove('active-view');
+      viewShift.classList.remove('active-view');
+      renderLedgerTable();
+    });
+
+    tabShift.addEventListener('click', () => {
+      tabShift.classList.add('active');
+      tabDelivery.classList.remove('active');
+      tabLedger.classList.remove('active');
+      viewShift.classList.add('active-view');
+      viewDelivery.classList.remove('active-view');
+      viewLedger.classList.remove('active-view');
+      renderShiftsTable();
+    });
+  }
+
+  // ================= DELIVERY SPLITTER LOGIC =================
+  function initDeliverySplitter() {
+    const basisSelect = document.getElementById('split-split-basis');
+    if (basisSelect) {
+      basisSelect.addEventListener('change', (e) => {
+        const indicator = document.getElementById('split-basis-indicator');
+        if (e.target.value === 'orders') {
+          indicator.innerText = 'Basis: Orders Completed';
+        } else {
+          indicator.innerText = 'Basis: Hours Worked';
+        }
+        renderDeliveryRidersInputs();
+        calculateDeliverySplit();
+      });
+    }
+
+    const addRiderBtn = document.getElementById('btn-add-delivery-rider');
+    addRiderBtn.addEventListener('click', () => {
+      deliveryRiders.push({
+        name: `Rider ${deliveryRiders.length + 1}`,
+        units: 8,
+        cashTips: 0
+      });
+      renderDeliveryRidersInputs();
+      calculateDeliverySplit();
+      saveLocalData();
+    });
+
+    const splitInputs = document.querySelectorAll('.calc-split-input');
+    splitInputs.forEach(i => i.addEventListener('input', calculateDeliverySplit));
+
+    document.getElementById('btn-copy-delivery-summary').addEventListener('click', copyDeliverySummary);
+
+    renderDeliveryRidersInputs();
+    calculateDeliverySplit();
+  }
+
+  function renderDeliveryRidersInputs() {
+    const container = document.getElementById('delivery-riders-container');
+    const basis = document.getElementById('split-split-basis').value;
+    const unitLabel = basis === 'orders' ? 'orders' : 'hrs';
+
+    container.innerHTML = '';
+
+    deliveryRiders.forEach((rider, idx) => {
+      const row = document.createElement('div');
+      row.className = 'rider-card-row';
+      row.innerHTML = `
+        <div class="rider-name-box">
+          <label>Rider Name / Shift:</label>
+          <input type="text" class="t-input d-rider-name" value="${rider.name}" placeholder="e.g. Rider ${idx + 1}" />
+        </div>
+        <div class="rider-units-box">
+          <label>${basis === 'orders' ? 'Orders Done:' : 'Hours on Road:'}</label>
+          <div class="input-with-label">
+            <input type="number" class="t-input d-rider-units" value="${rider.units}" min="0" step="${basis === 'orders' ? '1' : '0.5'}" />
+            <span class="unit-tag">${unitLabel}</span>
+          </div>
+        </div>
+        <div class="rider-tips-box">
+          <label>Cash Tips Kept (<span class="curr-sym">${currentCurrency}</span>):</label>
+          <input type="number" class="t-input d-rider-tips" value="${rider.cashTips || 0}" min="0" step="1" placeholder="0" />
+        </div>
+        ${deliveryRiders.length > 1 ? `<button type="button" class="btn-del-rider" title="Remove rider">✕</button>` : ''}
+      `;
+
+      row.querySelector('.d-rider-name').addEventListener('input', (e) => {
+        deliveryRiders[idx].name = e.target.value;
+        calculateDeliverySplit();
+        saveLocalData();
+      });
+
+      row.querySelector('.d-rider-units').addEventListener('input', (e) => {
+        deliveryRiders[idx].units = parseFloat(e.target.value) || 0;
+        calculateDeliverySplit();
+        saveLocalData();
+      });
+
+      row.querySelector('.d-rider-tips').addEventListener('input', (e) => {
+        deliveryRiders[idx].cashTips = parseFloat(e.target.value) || 0;
+        calculateDeliverySplit();
+        saveLocalData();
+      });
+
+      const delBtn = row.querySelector('.btn-del-rider');
+      if (delBtn) {
+        delBtn.addEventListener('click', () => {
+          deliveryRiders.splice(idx, 1);
+          renderDeliveryRidersInputs();
+          calculateDeliverySplit();
+          saveLocalData();
+        });
+      }
+
+      container.appendChild(row);
+    });
+  }
+
+  function calculateDeliverySplit() {
+    const grossApp = parseFloat(document.getElementById('split-gross-app').value) || 0;
+    const fleetType = document.getElementById('split-fleet-type').value;
+    const fleetVal = parseFloat(document.getElementById('split-fleet-val').value) || 0;
+    const vehicleRent = parseFloat(document.getElementById('split-vehicle-rent').value) || 0;
+    const fuelCost = parseFloat(document.getElementById('split-fuel-cost').value) || 0;
+    const expenseMode = document.getElementById('split-expense-split-mode').value;
+    const basis = document.getElementById('split-split-basis').value;
+
+    // 1. Calculate Fleet / ID cut
+    let fleetCut = 0;
+    if (fleetType === 'percent') {
+      fleetCut = (grossApp * fleetVal) / 100;
+    } else {
+      fleetCut = fleetVal;
+    }
+
+    // 2. Fixed & Variable Operating Expenses
+    const operationalExpenses = vehicleRent + fuelCost;
+    const netDistributable = Math.max(0, grossApp - fleetCut - operationalExpenses);
+
+    // Update Top Summary Stats
+    document.getElementById('res-d-gross').innerText = grossApp.toFixed(2);
+    document.getElementById('res-d-fleet').innerText = fleetCut.toFixed(2);
+    document.getElementById('res-d-expenses').innerText = operationalExpenses.toFixed(2);
+    document.getElementById('res-d-net').innerText = netDistributable.toFixed(2);
+
+    let totalUnits = 0;
+    deliveryRiders.forEach(r => totalUnits += (r.units || 0));
+
+    const payoutList = document.getElementById('delivery-payouts-list');
+    payoutList.innerHTML = '';
+
+    deliveryRiders.forEach(rider => {
+      const ratio = totalUnits > 0 ? ((rider.units || 0) / totalUnits) : (1 / deliveryRiders.length);
+      
+      let riderGrossShare = grossApp * ratio;
+      let riderFleetShare = fleetCut * ratio;
+      let riderExpenseShare = 0;
+
+      if (expenseMode === 'proportional') {
+        riderExpenseShare = operationalExpenses * ratio;
+      } else {
+        riderExpenseShare = operationalExpenses / deliveryRiders.length;
+      }
+
+      const riderNetAppPayout = Math.max(0, riderGrossShare - riderFleetShare - riderExpenseShare);
+      const totalPocketEarned = riderNetAppPayout + (rider.cashTips || 0);
+
+      const card = document.createElement('div');
+      card.className = 'rider-payout-card';
+      card.innerHTML = `
+        <div class="rpc-header">
+          <div>
+            <h5 class="rpc-name">👤 ${rider.name || 'Rider'}</h5>
+            <span class="rpc-meta">${rider.units || 0} ${basis === 'orders' ? 'orders' : 'hrs'} (${(ratio * 100).toFixed(1)}% of shift)</span>
+          </div>
+          <div class="rpc-final-val">
+            <span class="curr-sym">${currentCurrency}</span>${totalPocketEarned.toFixed(2)}
+            <span class="rpc-final-sub">Total Take-Home</span>
+          </div>
+        </div>
+        <div class="rpc-breakdown">
+          <span>App Share: <strong>${currentCurrency}${riderGrossShare.toFixed(2)}</strong></span>
+          <span>Fleet Cut: <strong class="red-txt">-${currentCurrency}${riderFleetShare.toFixed(2)}</strong></span>
+          <span>Rent+Fuel: <strong class="red-txt">-${currentCurrency}${riderExpenseShare.toFixed(2)}</strong></span>
+          <span>Cash Tips: <strong class="green-txt">+${currentCurrency}${(rider.cashTips || 0).toFixed(2)}</strong></span>
+        </div>
+      `;
+      payoutList.appendChild(card);
+    });
+  }
+
+  function copyDeliverySummary() {
+    const grossApp = parseFloat(document.getElementById('split-gross-app').value) || 0;
+    const fleetType = document.getElementById('split-fleet-type').value;
+    const fleetVal = parseFloat(document.getElementById('split-fleet-val').value) || 0;
+    const vehicleRent = parseFloat(document.getElementById('split-vehicle-rent').value) || 0;
+    const fuelCost = parseFloat(document.getElementById('split-fuel-cost').value) || 0;
+    const basis = document.getElementById('split-split-basis').value;
+    const expenseMode = document.getElementById('split-expense-split-mode').value;
+
+    let fleetCut = fleetType === 'percent' ? ((grossApp * fleetVal) / 100) : fleetVal;
+    const operationalExpenses = vehicleRent + fuelCost;
+    const netDistributable = Math.max(0, grossApp - fleetCut - operationalExpenses);
+
+    let totalUnits = 0;
+    deliveryRiders.forEach(r => totalUnits += (r.units || 0));
+
+    let text = `🛵 *Cyprus Food Delivery Shift Split Summary*\n`;
+    text += `📅 Date: ${new Date().toLocaleDateString()}\n`;
+    text += `📱 App Gross Total: ${currentCurrency}${grossApp.toFixed(2)}\n`;
+    text += `📑 Fleet/ID Commission: -${currentCurrency}${fleetCut.toFixed(2)} (${fleetType === 'percent' ? fleetVal + '%' : 'Fixed'})\n`;
+    text += `🛵 Vehicle Rent: -${currentCurrency}${vehicleRent.toFixed(2)}\n`;
+    text += `⛽ Fuel/Charging: -${currentCurrency}${fuelCost.toFixed(2)}\n`;
+    text += `💵 Net Distributable Pool: ${currentCurrency}${netDistributable.toFixed(2)}\n`;
+    text += `------------------------------------\n`;
+
+    deliveryRiders.forEach(rider => {
+      const ratio = totalUnits > 0 ? ((rider.units || 0) / totalUnits) : (1 / deliveryRiders.length);
+      let riderGrossShare = grossApp * ratio;
+      let riderFleetShare = fleetCut * ratio;
+      let riderExpenseShare = expenseMode === 'proportional' ? (operationalExpenses * ratio) : (operationalExpenses / deliveryRiders.length);
+      const riderNetAppPayout = Math.max(0, riderGrossShare - riderFleetShare - riderExpenseShare);
+      const totalPocket = riderNetAppPayout + (rider.cashTips || 0);
+
+      text += `👤 *${rider.name}*:\n`;
+      text += `   • Shift Done: ${rider.units} ${basis === 'orders' ? 'orders' : 'hours'} (${(ratio * 100).toFixed(0)}%)\n`;
+      text += `   • Net App Payout: ${currentCurrency}${riderNetAppPayout.toFixed(2)}\n`;
+      if (rider.cashTips > 0) text += `   • Cash Tips Kept: +${currentCurrency}${rider.cashTips.toFixed(2)}\n`;
+      text += `   👉 *Total Net: ${currentCurrency}${totalPocket.toFixed(2)}*\n\n`;
+    });
+
+    text += `Calculated accurately on CyprusStudentGuide.com`;
+
+    navigator.clipboard.writeText(text).then(() => {
+      const hint = document.getElementById('delivery-copy-feedback');
+      hint.style.display = 'inline';
+      setTimeout(() => hint.style.display = 'none', 3000);
+    });
+  }
+
+  // ================= LEDGER & WORK LOG LOGIC =================
+  function initLedgerEvents() {
+    const btnExp = document.getElementById('btn-type-expense');
+    const btnInc = document.getElementById('btn-type-income');
+    const catSelect = document.getElementById('trans-category');
+
+    btnExp.addEventListener('click', () => {
+      currentTransType = 'expense';
+      btnExp.classList.add('active');
+      btnInc.classList.remove('active');
+      catSelect.value = 'Groceries & Food';
+    });
+
+    btnInc.addEventListener('click', () => {
+      currentTransType = 'income';
+      btnInc.classList.add('active');
+      btnExp.classList.remove('active');
+      catSelect.value = 'Work Wages / Salary';
+    });
+
+    const monthFilter = document.getElementById('ledger-month-filter');
+    if (monthFilter) {
+      monthFilter.addEventListener('change', renderLedgerTable);
+    }
+
+    const btnSave = document.getElementById('btn-save-transaction');
+    btnSave.addEventListener('click', () => {
+      const date = document.getElementById('trans-date').value;
+      const category = document.getElementById('trans-category').value;
+      const desc = document.getElementById('trans-desc').value.trim() || category;
+      const amount = parseFloat(document.getElementById('trans-amount').value) || 0;
+
+      if (amount <= 0) {
+        alert('Please enter a valid amount.');
+        return;
+      }
+
+      const item = {
+        id: 'tx_' + Date.now(),
+        date,
+        type: currentTransType,
+        category,
+        desc,
+        amount,
+        currency: currentCurrency
+      };
+
+      ledgerRecords.unshift(item);
+      saveLocalData();
+      renderLedgerTable();
+
+      document.getElementById('trans-desc').value = '';
+      document.getElementById('trans-amount').value = '';
+    });
+  }
+
+  function renderLedgerTable() {
+    const tbody = document.getElementById('ledger-tbody');
+    const emptyMsg = document.getElementById('no-ledger-msg');
+    const countBadge = document.getElementById('ledger-count-badge');
+    const selectedMonth = document.getElementById('ledger-month-filter').value;
+    const monthDisplay = document.getElementById('current-month-display');
+
+    if (monthDisplay && selectedMonth) {
+      const [year, month] = selectedMonth.split('-');
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      monthDisplay.innerText = `${monthNames[parseInt(month)-1]} ${year} Report`;
+    }
+
+    tbody.innerHTML = '';
+    const filtered = ledgerRecords.filter(item => item.date.startsWith(selectedMonth));
+    countBadge.innerText = `${filtered.length} Entries`;
+
+    let totalIncome = 0;
+    let totalExpense = 0;
+
+    if (filtered.length === 0) {
+      emptyMsg.style.display = 'block';
+    } else {
+      emptyMsg.style.display = 'none';
+      filtered.forEach((item) => {
+        if (item.type === 'income') totalIncome += item.amount;
+        else totalExpense += item.amount;
+
+        const tr = document.createElement('tr');
+        const isInc = item.type === 'income';
+        tr.innerHTML = `
+          <td><strong>${item.date}</strong></td>
+          <td><span class="badge-${item.type}">${isInc ? '💚 Income' : '🔻 Expense'}</span></td>
+          <td>${item.category}</td>
+          <td>${item.desc}</td>
+          <td class="${isInc ? 'amount-income' : 'amount-expense'}">
+            ${isInc ? '+' : '-'}${currentCurrency}${item.amount.toFixed(2)}
+          </td>
+          <td>
+            <button type="button" class="btn-delete" title="Delete entry">✕</button>
+          </td>
+        `;
+
+        tr.querySelector('.btn-delete').addEventListener('click', () => {
+          if (confirm('Delete this transaction?')) {
+            const index = ledgerRecords.findIndex(r => r.id === item.id);
+            if (index !== -1) {
+              ledgerRecords.splice(index, 1);
+              saveLocalData();
+              renderLedgerTable();
+            }
+          }
+        });
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    const netBalance = totalIncome - totalExpense;
+    document.getElementById('stat-ledger-income').innerText = totalIncome.toFixed(2);
+    document.getElementById('stat-ledger-expense').innerText = totalExpense.toFixed(2);
+    
+    const netEl = document.getElementById('stat-ledger-net');
+    const netStatus = document.getElementById('stat-ledger-status');
+    netEl.innerText = (netBalance >= 0 ? '+' : '') + netBalance.toFixed(2);
+
+    if (netBalance >= 0) {
+      netEl.style.color = '#10b981';
+      netStatus.innerText = '✅ Net Savings Surplus';
+    } else {
+      netEl.style.color = '#ef4444';
+      netStatus.innerText = '⚠️ Net Monthly Deficit';
+    }
+
+    document.getElementById('stat-ledger-count').innerText = filtered.length;
+  }
+
   function initDailyLogEvents() {
     const btnSave = document.getElementById('btn-save-shift');
     btnSave.addEventListener('click', () => {
@@ -336,7 +913,6 @@ const trackerSchema = {
       }
 
       const totalEarned = (hours * rate) + tips;
-
       const entry = {
         id: 'shift_' + Date.now(),
         date,
@@ -351,7 +927,6 @@ const trackerSchema = {
       saveLocalData();
       renderShiftsTable();
 
-      // Clear hours input
       document.getElementById('shift-hours').value = '';
       document.getElementById('shift-tips').value = '0';
     });
@@ -375,11 +950,11 @@ const trackerSchema = {
           <td><strong>${item.date}</strong></td>
           <td>${item.job}</td>
           <td>${item.hours} hrs</td>
-          <td>€${item.rate.toFixed(2)}/hr</td>
-          <td>€${item.tips.toFixed(2)}</td>
-          <td class="earned-col">€${item.totalEarned.toFixed(2)}</td>
+          <td>${currentCurrency}${item.rate.toFixed(2)}/hr</td>
+          <td>${currentCurrency}${item.tips.toFixed(2)}</td>
+          <td class="earned-col">${currentCurrency}${item.totalEarned.toFixed(2)}</td>
           <td>
-            <button type="button" class="btn-delete" data-id="${item.id}" title="Delete shift">✕</button>
+            <button type="button" class="btn-delete" title="Delete shift">✕</button>
           </td>
         `;
 
@@ -395,10 +970,10 @@ const trackerSchema = {
       });
     }
 
-    updateDashboardStats();
+    updateShiftStats();
   }
 
-  function updateDashboardStats() {
+  function updateShiftStats() {
     let totalHours = 0;
     let totalEarned = 0;
 
@@ -423,164 +998,20 @@ const trackerSchema = {
     }
   }
 
-  // --- DELIVERY SPLITTER LOGIC ---
-  function initSplitterEvents() {
-    const addRiderBtn = document.getElementById('btn-add-rider');
-    addRiderBtn.addEventListener('click', () => {
-      riderList.push({ name: `Rider ${riderList.length + 1}`, hours: 4 });
-      renderRidersInputs();
-      calculateDeliverySplit();
-      saveLocalData();
-    });
-
-    const splitInputs = document.querySelectorAll('.calc-split-input');
-    splitInputs.forEach(i => i.addEventListener('input', calculateDeliverySplit));
-
-    // WhatsApp Summary Copy
-    document.getElementById('btn-copy-split-summary').addEventListener('click', copySplitSummary);
-
-    renderRidersInputs();
-    calculateDeliverySplit();
-  }
-
-  function renderRidersInputs() {
-    const container = document.getElementById('riders-list');
-    container.innerHTML = '';
-
-    riderList.forEach((rider, idx) => {
-      const row = document.createElement('div');
-      row.className = 'rider-input-row';
-      row.innerHTML = `
-        <input type="text" class="t-input rider-name" value="${rider.name}" placeholder="Rider name" />
-        <div class="rider-hrs-wrap">
-          <input type="number" class="t-input rider-hours" value="${rider.hours}" min="0" step="0.5" placeholder="Hours" />
-          <span class="hrs-label">hrs</span>
-        </div>
-        ${riderList.length > 1 ? `<button type="button" class="btn-del-rider" title="Remove rider">✕</button>` : ''}
-      `;
-
-      row.querySelector('.rider-name').addEventListener('input', (e) => {
-        riderList[idx].name = e.target.value;
-        calculateDeliverySplit();
-        saveLocalData();
-      });
-
-      row.querySelector('.rider-hours').addEventListener('input', (e) => {
-        riderList[idx].hours = parseFloat(e.target.value) || 0;
-        calculateDeliverySplit();
-        saveLocalData();
-      });
-
-      const delBtn = row.querySelector('.btn-del-rider');
-      if (delBtn) {
-        delBtn.addEventListener('click', () => {
-          riderList.splice(idx, 1);
-          renderRidersInputs();
-          calculateDeliverySplit();
-          saveLocalData();
-        });
-      }
-
-      container.appendChild(row);
-    });
-  }
-
-  function calculateDeliverySplit() {
-    const gross = parseFloat(document.getElementById('split-total-earnings').value) || 0;
-    const fuel = parseFloat(document.getElementById('split-fuel-cost').value) || 0;
-    const mode = document.getElementById('split-deduct-mode').value;
-    const net = Math.max(0, gross - fuel);
-
-    document.getElementById('res-gross').innerText = '€' + gross.toFixed(2);
-    document.getElementById('res-fuel').innerText = '-€' + fuel.toFixed(2);
-    document.getElementById('res-net').innerText = '€' + net.toFixed(2);
-
-    let totalRiderHours = 0;
-    riderList.forEach(r => totalRiderHours += r.hours);
-
-    const breakdownList = document.getElementById('payout-breakdown-list');
-    breakdownList.innerHTML = '';
-
-    riderList.forEach(rider => {
-      let riderPayout = 0;
-      let riderFuelShare = 0;
-
-      if (totalRiderHours > 0) {
-        const ratio = rider.hours / totalRiderHours;
-        if (mode === 'proportional') {
-          riderPayout = net * ratio;
-          riderFuelShare = fuel * ratio;
-        } else {
-          // Equal fuel split
-          const riderGross = gross * ratio;
-          riderFuelShare = fuel / riderList.length;
-          riderPayout = Math.max(0, riderGross - riderFuelShare);
-        }
-      }
-
-      const item = document.createElement('div');
-      item.className = 'payout-row';
-      item.innerHTML = `
-        <div class="p-name">
-          <strong>${rider.name || 'Rider'}</strong>
-          <span>(${rider.hours} hrs • Fuel Share: €${riderFuelShare.toFixed(2)})</span>
-        </div>
-        <div class="p-amount">
-          €${riderPayout.toFixed(2)}
-        </div>
-      `;
-      breakdownList.appendChild(item);
-    });
-  }
-
-  function copySplitSummary() {
-    const gross = parseFloat(document.getElementById('split-total-earnings').value) || 0;
-    const fuel = parseFloat(document.getElementById('split-fuel-cost').value) || 0;
-    const net = Math.max(0, gross - fuel);
-    let totalRiderHours = 0;
-    riderList.forEach(r => totalRiderHours += r.hours);
-
-    let text = `🛵 *Cyprus Food Delivery Shift Split Summary*\n`;
-    text += `📅 Date: ${new Date().toLocaleDateString()}\n`;
-    text += `💰 Gross Total: €${gross.toFixed(2)}\n`;
-    text += `⛽ Fuel Deducted: -€${fuel.toFixed(2)}\n`;
-    text += `💵 Net Total: €${net.toFixed(2)}\n`;
-    text += `--------------------------\n`;
-
-    riderList.forEach(rider => {
-      const ratio = totalRiderHours > 0 ? (rider.hours / totalRiderHours) : 0;
-      const payout = net * ratio;
-      text += `👤 *${rider.name}*: €${payout.toFixed(2)} (${rider.hours} hrs)\n`;
-    });
-
-    text += `--------------------------\nCalculated with CyprusStudentGuide.com`;
-
-    navigator.clipboard.writeText(text).then(() => {
-      const hint = document.getElementById('copy-feedback');
-      hint.style.display = 'inline';
-      setTimeout(() => hint.style.display = 'none', 3000);
-    });
-  }
-
-  // --- BACKUP & RESTORE / EXCEL EXPORT ---
   function initBackupEvents() {
-    // Export CSV (Excel format)
     document.getElementById('btn-export-csv').addEventListener('click', exportToCSV);
-
-    // Export JSON
     document.getElementById('btn-export-json').addEventListener('click', exportToJSON);
 
-    // Restore File
     const fileInput = document.getElementById('file-restore-input');
     fileInput.addEventListener('change', handleFileRestore);
 
-    // Clear Data
     document.getElementById('btn-clear-all').addEventListener('click', () => {
-      if (confirm('Are you sure you want to clear all recorded shifts and split data? Please make sure you have saved an Excel or Backup file first!')) {
+      if (confirm('Are you sure you want to clear all data? Make sure you have exported an Excel or JSON backup first!')) {
+        ledgerRecords = [];
         shiftRecords = [];
-        riderList = [
-          { name: 'Rider 1 (You)', hours: 6 },
-          { name: 'Rider 2 (Partner)', hours: 4 }
+        deliveryRiders = [
+          { name: 'Rider 1 (Morning)', units: 14, cashTips: 5 },
+          { name: 'Rider 2 (Evening)', units: 11, cashTips: 8 }
         ];
         saveLocalData();
         renderAll();
@@ -589,38 +1020,47 @@ const trackerSchema = {
   }
 
   function exportToCSV() {
-    if (shiftRecords.length === 0) {
-      alert('No recorded shifts to export yet. Please add shift entries first!');
+    if (ledgerRecords.length === 0 && shiftRecords.length === 0) {
+      alert('No records to export yet. Please add entries first!');
       return;
     }
 
-    let csv = "Date,Workplace,Hours,Hourly Rate (EUR),Tips (EUR),Total Earned (EUR)\n";
+    let csv = "=== DAILY INCOME & EXPENSE LEDGER ===\n";
+    csv += "Date,Type,Category,Description,Amount,Currency\n";
+    ledgerRecords.forEach(item => {
+      csv += `"${item.date}","${item.type}","${item.category}","${item.desc.replace(/"/g, '""')}",${item.amount},"${currentCurrency}"\n`;
+    });
+
+    csv += "\n=== WORK SHIFTS LOG ===\n";
+    csv += "Date,Workplace,Hours,Hourly Rate,Tips,Total Earned,Currency\n";
     shiftRecords.forEach(s => {
-      csv += `"${s.date}","${s.job.replace(/"/g, '""')}",${s.hours},${s.rate},${s.tips},${s.totalEarned}\n`;
+      csv += `"${s.date}","${s.job.replace(/"/g, '""')}",${s.hours},${s.rate},${s.tips},${s.totalEarned},"${currentCurrency}"\n`;
     });
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Cyprus_Student_Work_Log_${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `Cyprus_Student_Financial_Log_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }
 
   function exportToJSON() {
     const backupData = {
-      version: "1.0",
+      version: "3.0",
       exportDate: new Date().toISOString(),
+      currency: currentCurrency,
+      ledger: ledgerRecords,
       shifts: shiftRecords,
-      riders: riderList
+      delivery: deliveryRiders
     };
 
     const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Cyprus_Student_Tracker_Backup_${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `Cyprus_Student_Backup_${new Date().toISOString().split('T')[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -635,53 +1075,30 @@ const trackerSchema = {
         const content = evt.target.result;
         if (file.name.endsWith('.json')) {
           const parsed = JSON.parse(content);
-          if (parsed.shifts && Array.isArray(parsed.shifts)) {
-            shiftRecords = parsed.shifts;
-            if (parsed.riders && Array.isArray(parsed.riders)) riderList = parsed.riders;
-            saveLocalData();
-            renderAll();
-            alert('✅ Backup restored successfully!');
-          } else {
-            alert('Invalid backup JSON format.');
-          }
-        } else if (file.name.endsWith('.csv')) {
-          // Parse CSV
-          const lines = content.split('\n');
-          const imported = [];
-          for (let i = 1; i < lines.length; i++) {
-            const line = lines[i].trim();
-            if (!line) continue;
-            const parts = line.split(',');
-            if (parts.length >= 6) {
-              imported.push({
-                id: 'shift_' + Date.now() + '_' + i,
-                date: parts[0].replace(/"/g, ''),
-                job: parts[1].replace(/"/g, ''),
-                hours: parseFloat(parts[2]) || 0,
-                rate: parseFloat(parts[3]) || 0,
-                tips: parseFloat(parts[4]) || 0,
-                totalEarned: parseFloat(parts[5]) || 0
-              });
-            }
-          }
-          if (imported.length > 0) {
-            shiftRecords = imported;
-            saveLocalData();
-            renderAll();
-            alert(`✅ Restored ${imported.length} shift entries from CSV!`);
-          }
+          if (parsed.currency) currentCurrency = parsed.currency;
+          if (parsed.ledger) ledgerRecords = parsed.ledger;
+          if (parsed.shifts) shiftRecords = parsed.shifts;
+          if (parsed.delivery) deliveryRiders = parsed.delivery;
+          
+          saveLocalData();
+          initCurrencyPicker();
+          renderAll();
+          alert('✅ Backup restored successfully!');
+        } else {
+          alert('Please upload a valid .json backup file for complete restoration.');
         }
       } catch (err) {
-        alert('Could not parse file. Error: ' + err.message);
+        alert('Could not parse file: ' + err.message);
       }
     };
     reader.readAsText(file);
   }
 
   function renderAll() {
-    renderShiftsTable();
-    renderRidersInputs();
+    renderDeliveryRidersInputs();
     calculateDeliverySplit();
+    renderLedgerTable();
+    renderShiftsTable();
   }
 </script>
 
@@ -711,15 +1128,15 @@ const trackerSchema = {
   .tracker-desc {
     color: var(--text-muted);
     font-size: 1.05rem;
-    max-width: 720px;
+    max-width: 740px;
     margin: 0 auto;
   }
 
-  /* Backup Toolbar */
-  .backup-toolbar {
+  /* Top Control Bar */
+  .top-control-bar {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
-    border-radius: 12px;
+    border-radius: 14px;
     padding: 0.85rem 1.25rem;
     display: flex;
     justify-content: space-between;
@@ -728,6 +1145,23 @@ const trackerSchema = {
     gap: 0.75rem;
     margin-bottom: 1.75rem;
     box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+  }
+  .currency-picker-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.88rem;
+    color: var(--text-main);
+  }
+  .currency-select {
+    background: var(--bg-color);
+    color: var(--text-main);
+    border: 1px solid var(--card-border);
+    padding: 0.4rem 0.65rem;
+    border-radius: 8px;
+    font-weight: 700;
+    outline: none;
+    cursor: pointer;
   }
   .backup-status {
     display: flex;
@@ -771,8 +1205,8 @@ const trackerSchema = {
   /* Mode Switcher Tabs */
   .mode-tabs-container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.6rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
     background: rgba(150, 150, 150, 0.08);
     padding: 0.4rem;
     border-radius: 12px;
@@ -783,11 +1217,12 @@ const trackerSchema = {
     background: transparent;
     color: var(--text-muted);
     font-weight: 700;
-    font-size: 0.95rem;
-    padding: 0.75rem 1rem;
+    font-size: 0.88rem;
+    padding: 0.75rem 0.5rem;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
+    text-align: center;
   }
   .tab-btn.active {
     background: var(--card-bg);
@@ -798,7 +1233,139 @@ const trackerSchema = {
   .tracker-view { display: none; }
   .active-view { display: block; }
 
-  /* Stats Grid */
+  /* DELIVERY SPLITTER STYLES */
+  .split-calculator-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin-bottom: 1.75rem;
+  }
+  .split-header { margin-bottom: 1.5rem; }
+  .split-header h2 { font-size: 1.35rem; font-weight: 800; margin: 0 0 0.35rem; color: var(--text-main); }
+  .split-sub { font-size: 0.88rem; color: var(--text-muted); margin: 0; }
+
+  .split-grid-top {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.15rem;
+    margin-bottom: 1.75rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px dashed var(--card-border);
+  }
+  .input-with-select { display: flex; gap: 0.4rem; }
+  .field-help { font-size: 0.74rem; color: var(--text-muted); display: block; margin-top: 0.25rem; }
+
+  .riders-section {
+    background: rgba(150, 150, 150, 0.03);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 1.25rem;
+    margin-bottom: 1.75rem;
+  }
+  .riders-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+  .riders-heading { font-size: 1rem; font-weight: 800; margin: 0; color: var(--text-main); }
+  .riders-count-badge { font-size: 0.76rem; font-weight: 800; background: rgba(37, 99, 235, 0.1); color: var(--primary-blue); padding: 0.2rem 0.6rem; border-radius: 20px; }
+
+  .riders-list { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
+  .rider-card-row {
+    display: grid;
+    grid-template-columns: 1.8fr 1.2fr 1.2fr auto;
+    gap: 0.75rem;
+    align-items: flex-end;
+    background: var(--card-bg);
+    padding: 0.85rem;
+    border-radius: 10px;
+    border: 1px solid var(--card-border);
+  }
+  .rider-card-row label { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.3rem; }
+  .input-with-label { display: flex; align-items: center; position: relative; }
+  .unit-tag { position: absolute; right: 10px; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); pointer-events: none; }
+  .btn-del-rider { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); border-radius: 6px; padding: 0.6rem 0.8rem; cursor: pointer; }
+  .btn-del-rider:hover { background: #ef4444; color: #fff; }
+
+  .split-result-box {
+    background: linear-gradient(135deg, rgba(37,99,235,0.04) 0%, rgba(16,185,129,0.04) 100%);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .result-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px dashed var(--card-border);
+    margin-bottom: 1.25rem;
+  }
+  .res-item span { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.2rem; }
+  .res-item strong { font-size: 1.35rem; font-weight: 900; font-family: var(--font-mono); }
+  
+  .payout-title { font-size: 1rem; font-weight: 800; margin: 0 0 0.85rem; color: var(--text-main); }
+  .payout-list { display: flex; flex-direction: column; gap: 0.75rem; }
+  .rider-payout-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .rpc-header { display: flex; justify-content: space-between; align-items: center; }
+  .rpc-name { font-size: 1.05rem; font-weight: 800; margin: 0; color: var(--text-main); }
+  .rpc-meta { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; }
+  .rpc-final-val { text-align: right; font-size: 1.5rem; font-weight: 900; color: #10b981; font-family: var(--font-mono); line-height: 1.1; }
+  .rpc-final-sub { display: block; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+  .rpc-breakdown {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    padding-top: 0.45rem;
+    border-top: 1px solid var(--card-border);
+  }
+  .red-txt { color: #ef4444; }
+  .green-txt { color: #10b981; }
+
+  .btn-copy-summary { background: #059669; }
+  .btn-copy-summary:hover { background: #047857; }
+  .copy-hint { font-size: 0.85rem; font-weight: 800; color: #10b981; }
+
+  /* COMMON FORM & TABLE STYLES */
+  .month-filter-bar {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 0.85rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .filter-left { display: flex; align-items: center; gap: 0.75rem; }
+  .month-input {
+    background: var(--bg-color);
+    color: var(--text-main);
+    border: 1px solid var(--card-border);
+    padding: 0.4rem 0.75rem;
+    border-radius: 8px;
+    font-family: inherit;
+    font-weight: 700;
+  }
+  .month-tag {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary-blue);
+    font-size: 0.82rem;
+    font-weight: 800;
+    padding: 0.3rem 0.75rem;
+    border-radius: 20px;
+  }
+
   .stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -813,25 +1380,47 @@ const trackerSchema = {
     text-align: center;
   }
   .stat-label { font-size: 0.76rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; }
-  .stat-val { font-size: 1.75rem; font-weight: 900; margin: 0.25rem 0; color: var(--text-main); }
+  .stat-val { font-size: 1.75rem; font-weight: 900; margin: 0.25rem 0; color: var(--text-main); font-family: var(--font-mono); }
   .stat-sub { font-size: 0.75rem; color: var(--text-muted); }
   .stat-green .stat-val { color: #10b981; }
+  .stat-red .stat-val { color: #ef4444; }
   .stat-blue .stat-val { color: var(--primary-blue); }
 
-  /* Entry Form Card */
-  .entry-form-card, .table-card, .split-calculator-card {
+  .entry-form-card, .table-card {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
     border-radius: 16px;
     padding: 1.75rem;
     margin-bottom: 1.75rem;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.02);
   }
   .form-title, .table-title { font-size: 1.15rem; font-weight: 800; margin: 0 0 1.25rem; color: var(--text-main); }
   
+  .trans-type-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+    background: rgba(150, 150, 150, 0.08);
+    padding: 0.35rem;
+    border-radius: 10px;
+    margin-bottom: 1.25rem;
+  }
+  .type-btn {
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-weight: 800;
+    font-size: 0.92rem;
+    padding: 0.65rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .type-expense.active { background: #ef4444; color: #fff; box-shadow: 0 2px 10px rgba(239, 68, 68, 0.3); }
+  .type-income.active { background: #10b981; color: #fff; box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3); }
+
   .form-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
     gap: 1rem;
     margin-bottom: 1.25rem;
   }
@@ -861,56 +1450,23 @@ const trackerSchema = {
     transition: background 0.15s;
   }
   .btn-primary:hover { background: #1d4ed8; }
+  .btn-add-sub { background: var(--bg-color); border: 1px dashed var(--primary-blue); color: var(--primary-blue); padding: 0.55rem 1rem; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; width: 100%; }
 
-  /* Table View */
   .table-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
   .table-count { font-size: 0.8rem; font-weight: 700; background: rgba(150,150,150,0.1); padding: 0.2rem 0.55rem; border-radius: 20px; color: var(--text-muted); }
   .table-responsive { overflow-x: auto; }
   .data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
   .data-table th, .data-table td { padding: 0.75rem 0.85rem; border-bottom: 1px solid var(--card-border); }
   .data-table th { font-weight: 800; font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); }
+  
+  .badge-expense { background: rgba(239, 68, 68, 0.1); color: #ef4444; font-size: 0.76rem; font-weight: 800; padding: 0.2rem 0.5rem; border-radius: 4px; }
+  .badge-income { background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 0.76rem; font-weight: 800; padding: 0.2rem 0.5rem; border-radius: 4px; }
+  .amount-expense { font-weight: 800; color: #ef4444; font-family: var(--font-mono); }
+  .amount-income { font-weight: 800; color: #10b981; font-family: var(--font-mono); }
   .earned-col { font-weight: 800; color: #10b981; font-family: var(--font-mono); }
   .btn-delete { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); border-radius: 6px; padding: 0.25rem 0.5rem; cursor: pointer; }
   .btn-delete:hover { background: #ef4444; color: #fff; }
   .empty-state { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.92rem; }
-
-  /* Delivery Split Section */
-  .split-header { margin-bottom: 1.5rem; }
-  .split-header h2 { font-size: 1.35rem; font-weight: 800; margin: 0 0 0.4rem; color: var(--text-main); }
-  .split-sub { font-size: 0.88rem; color: var(--text-muted); margin: 0; }
-  
-  .split-inputs-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
-  .riders-section { background: rgba(150,150,150,0.04); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; }
-  .riders-heading { font-size: 0.95rem; font-weight: 800; margin: 0 0 0.85rem; color: var(--text-main); }
-  .riders-list { display: flex; flex-direction: column; gap: 0.65rem; margin-bottom: 0.85rem; }
-  .rider-input-row { display: flex; gap: 0.6rem; align-items: center; }
-  .rider-name { flex: 1.8; }
-  .rider-hrs-wrap { flex: 1; display: flex; align-items: center; position: relative; }
-  .hrs-label { position: absolute; right: 10px; font-size: 0.8rem; color: var(--text-muted); font-weight: 700; pointer-events: none; }
-  .btn-del-rider { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); border-radius: 6px; padding: 0.55rem 0.75rem; cursor: pointer; }
-  .btn-add-sub { background: var(--bg-color); border: 1px dashed var(--primary-blue); color: var(--primary-blue); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; width: 100%; }
-
-  .split-result-box {
-    background: linear-gradient(135deg, rgba(37,99,235,0.05) 0%, rgba(16,185,129,0.05) 100%);
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-  .result-summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; padding-bottom: 1rem; border-bottom: 1px dashed var(--card-border); margin-bottom: 1rem; }
-  .res-item span { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; }
-  .res-item strong { font-size: 1.35rem; font-weight: 900; }
-  .payout-title { font-size: 0.95rem; font-weight: 800; margin: 0 0 0.75rem; color: var(--text-main); }
-  .payout-list { display: flex; flex-direction: column; gap: 0.5rem; }
-  .payout-row { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--card-border); }
-  .p-name strong { display: block; font-size: 0.95rem; }
-  .p-name span { font-size: 0.78rem; color: var(--text-muted); }
-  .p-amount { font-size: 1.35rem; font-weight: 900; color: #10b981; font-family: var(--font-mono); }
-
-  .split-share-actions { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
-  .btn-copy-summary { background: #059669; }
-  .btn-copy-summary:hover { background: #047857; }
-  .copy-hint { font-size: 0.85rem; font-weight: 800; color: #10b981; }
 
   /* Taptap Banner */
   .taptap-banner-card {
@@ -934,9 +1490,11 @@ const trackerSchema = {
   .promo-box { font-family: var(--font-mono); background: #1e293b; border: 1px dashed #facc15; color: #facc15; font-size: 0.85rem; font-weight: 800; padding: 0.45rem 0.75rem; border-radius: 6px; }
   .btn-claim-taptap { background: #2563eb; color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 800; padding: 0.5rem 1rem; border-radius: 6px; }
 
-  @media (max-width: 820px) {
+  @media (max-width: 860px) {
+    .mode-tabs-container { grid-template-columns: 1fr; }
     .stats-grid { grid-template-columns: repeat(2, 1fr); }
-    .result-summary-grid { grid-template-columns: 1fr; gap: 0.5rem; }
+    .result-summary-grid { grid-template-columns: repeat(2, 1fr); }
+    .rider-card-row { grid-template-columns: 1fr; }
     .taptap-banner-card { flex-direction: column; align-items: flex-start; }
     .tracker-title { font-size: 1.85rem; }
   }
