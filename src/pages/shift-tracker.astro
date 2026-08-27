@@ -1,8 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-const title = "Cyprus Student Food Delivery Payout & Shift Settlement Tracker 2026";
-const description = "Track individual food delivery shifts (Wolt, Foody), filter by weekly/bi-weekly withdrawal dates, calculate fleet commissions & vehicle rent, and distribute net payouts seamlessly.";
+const title = "Cyprus Student Delivery Shift Settlement & Progress Tracker 2026";
+const description = "Track individual food delivery shifts (Wolt, Foody), log multiple shift slots per rider, add custom shared expenses (Scooter rent, SIM, fuel), and settle payouts easily with complete Excel export.";
 const permalink = "https://cyprusstudentguide.com/shift-tracker/";
 
 const trackerSchema = {
@@ -23,9 +23,9 @@ const trackerSchema = {
   <div class="st-wrapper notranslate">
     <!-- Header Hero -->
     <div class="st-hero">
-      <span class="st-badge">🛵 Delivery Settlement & Multi-Rider Wallet Tool</span>
-      <h1 class="st-title">Delivery Shift & Payout Settlement Tracker</h1>
-      <p class="st-desc">Log individual delivery time slots, group them by weekly or monthly withdrawal pay cycles, deduct fleet cuts & vehicle rental, and generate instant payout settlements per rider.</p>
+      <span class="st-badge">🛵 Multi-Rider Slot Tracker • Complete Settlement Reports • Excel Export</span>
+      <h1 class="st-title">Delivery Shift Settlement & Progress Tracker</h1>
+      <p class="st-desc">Log delivery shift sessions, pick rider names via quick suggestion chips, add custom vehicle & operating expenses, and export complete audit settlement sheets for Excel.</p>
     </div>
 
     <!-- Top Toolbar -->
@@ -48,7 +48,9 @@ const trackerSchema = {
       </div>
 
       <div class="st-actions-group">
-        <button type="button" id="btn-export-csv" class="st-btn st-btn-green">📊 Excel (.CSV)</button>
+        <button type="button" id="btn-export-csv" class="st-btn st-btn-green" title="Export complete settlement sheet to clean Excel format">
+          📊 Export Complete Excel (.CSV)
+        </button>
         <button type="button" id="btn-export-json" class="st-btn st-btn-gray">💾 Save Backup</button>
         <label class="st-btn st-btn-gray st-btn-file">
           📂 Restore
@@ -61,7 +63,7 @@ const trackerSchema = {
     <!-- Navigation Tabs -->
     <div class="st-tabs">
       <button type="button" class="st-tab-btn active" data-target="view-delivery-sessions">
-        🛵 Delivery Shift Sessions & Withdrawal Settlement
+        🛵 Delivery Shifts & Payment Progress
       </button>
       <button type="button" class="st-tab-btn" data-target="view-money-ledger">
         💰 Daily Income & Expenses
@@ -71,17 +73,17 @@ const trackerSchema = {
       </button>
     </div>
 
-    <!-- ================= TAB 1: DELIVERY SESSIONS & PAYOUT SETTLEMENT ================= -->
+    <!-- ================= TAB 1: DELIVERY SESSIONS & SETTLEMENT ================= -->
     <div id="view-delivery-sessions" class="st-tab-content active">
       
-      <!-- Top Shift Settings -->
+      <!-- Section A: Global Fleet Cut & Dynamic Custom Expenses -->
       <div class="st-card">
         <div class="st-card-head">
-          <h2 class="st-card-title">⚙️ Fleet Commission & Shared Vehicle Deductions</h2>
-          <p class="st-card-sub">Configure fleet account commission and shared vehicle/fuel expenses. Deductions are calculated proportionally based on each rider's gross earnings.</p>
+          <h2 class="st-card-title">⚙️ Fleet Commission & Shared Operating Expenses</h2>
+          <p class="st-card-sub">Set fleet deduction rate and add any shared costs (Scooter Rent, Petrol, Mobile Data, Maintenance). Deductions are shared proportionally based on earnings.</p>
         </div>
 
-        <div class="st-grid-3">
+        <div class="st-grid-fleet-config">
           <div class="st-field">
             <label>Fleet / ID Commission (%):</label>
             <div class="st-input-unit-left">
@@ -90,30 +92,43 @@ const trackerSchema = {
             </div>
             <span class="st-hint">Standard fleet fee (usually 15% - 20%)</span>
           </div>
+        </div>
 
-          <div class="st-field">
-            <label>Total Shared Vehicle Rent (<span class="curr-sym">€</span>):</label>
-            <input type="number" id="cfg-scooter-rent" class="st-input cfg-input" value="15" min="0" step="1" />
-            <span class="st-hint">Total rental cost during this cycle</span>
+        <!-- Dynamic Shared Expenses Container -->
+        <div class="st-sub-box" style="margin-top: 1.25rem;">
+          <div class="st-sub-head">
+            <h3>⛽ Shared Expenses for this Batch / Cycle</h3>
+            <span class="st-tag">Total: <span class="curr-sym">€</span><span id="label-total-expenses">0.00</span></span>
           </div>
 
-          <div class="st-field">
-            <label>Total Shared Fuel / Charging (<span class="curr-sym">€</span>):</label>
-            <input type="number" id="cfg-fuel-cost" class="st-input cfg-input" value="10" min="0" step="1" />
-            <span class="st-hint">Total petrol/power cost during this cycle</span>
+          <div id="delivery-expenses-container" class="st-expenses-list">
+            <!-- Dynamically populated expense rows -->
           </div>
+
+          <button type="button" id="btn-add-expense-row" class="st-btn-outline">
+            + Add Another Custom Shared Expense (Rent, SIM, Petrol, Repairs)
+          </button>
         </div>
       </div>
 
-      <!-- Add Shift Session Form -->
+      <!-- Section B: Add Shift Session Form with Quick Name Chips -->
       <div class="st-card">
-        <h3 class="st-box-title">➕ Add Shift Session</h3>
-        <p class="st-card-sub" style="margin-top: -0.5rem; margin-bottom: 1.25rem;">Log individual time slots and exact money earned on the Wolt / Foody delivery app.</p>
+        <h3 class="st-box-title">➕ Add Delivery Shift Session</h3>
+        <p class="st-card-sub" style="margin-top: -0.5rem; margin-bottom: 1rem;">Log each individual shift slot and exact app earnings.</p>
+
+        <!-- Rider Quick Selection Chips -->
+        <div class="st-rider-chips-wrap">
+          <span class="st-chip-label">Quick Select Rider:</span>
+          <div id="rider-chips-container" class="st-chips-list">
+            <!-- Dynamically populated name chips -->
+          </div>
+        </div>
 
         <div class="st-grid-session-form">
           <div class="st-field">
             <label>Rider Name:</label>
-            <input type="text" id="sess-rider-name" class="st-input" placeholder="e.g. Saidur, Tanvir, Rider 1" />
+            <input type="text" id="sess-rider-name" list="rider-datalist" class="st-input" placeholder="e.g. Saidur, Tanvir, Rider 1" />
+            <datalist id="rider-datalist"></datalist>
           </div>
 
           <div class="st-field">
@@ -132,7 +147,7 @@ const trackerSchema = {
 
           <div class="st-field">
             <label>App Gross Earned (<span class="curr-sym">€</span>):</label>
-            <input type="number" id="sess-app-gross" class="st-input" placeholder="e.g. 20.00" step="0.5" min="0" />
+            <input type="number" id="sess-app-gross" class="st-input" placeholder="e.g. 25.00" step="0.5" min="0" />
           </div>
 
           <div class="st-field">
@@ -142,20 +157,24 @@ const trackerSchema = {
         </div>
 
         <button type="button" id="btn-add-session" class="st-btn st-btn-primary" style="margin-top: 1.25rem;">
-          + Log Shift Session
+          + Log Shift Session (Pending Status)
         </button>
       </div>
 
-      <!-- Payout Settlement Period Filter & Summary Card -->
+      <!-- Section C: Pay Day Settlement & Progress Tracker -->
       <div class="st-card" style="border: 2px solid var(--primary-glow);">
         <div class="st-card-head">
           <div class="st-filter-row" style="margin: 0;">
             <div>
-              <h2 class="st-card-title" style="color: var(--primary-blue);">🏦 Withdrawal Cycle Settlement (Pay Day Summary)</h2>
-              <p class="st-card-sub">Filter sessions up to withdrawal date to determine how much money each rider withdraws from bank payout.</p>
+              <h2 class="st-card-title" style="color: var(--primary-blue);">🏦 Pay Day Settlement & Progress Tracker</h2>
+              <p class="st-card-sub">Filter by date or status, review individual balances, and settle payments.</p>
             </div>
-            <div class="st-cycle-filter">
-              <label>Filter Date Range:</label>
+            <div class="st-progress-filters">
+              <select id="filter-status-select" class="st-select-mini">
+                <option value="all" selected>All Statuses (Pending + Paid)</option>
+                <option value="pending">🟡 Unsettled / Pending Only</option>
+                <option value="paid">🟢 Settled / Paid Only</option>
+              </select>
               <div class="st-time-combo">
                 <input type="date" id="filter-start-date" class="st-input-mini" />
                 <span class="st-time-sep">to</span>
@@ -165,10 +184,10 @@ const trackerSchema = {
           </div>
         </div>
 
-        <!-- Macro Stats for Current Settlement Window -->
+        <!-- Macro Stats for Current Filter Window -->
         <div class="st-stats-grid">
           <div class="st-stat-card">
-            <span class="st-stat-lbl">Cycle App Gross</span>
+            <span class="st-stat-lbl">App Gross In View</span>
             <div class="st-stat-num"><span class="curr-sym">€</span><span id="stat-cycle-gross">0.00</span></div>
             <span class="st-stat-sub">Total earned on app</span>
           </div>
@@ -178,19 +197,25 @@ const trackerSchema = {
             <span class="st-stat-sub" id="stat-cycle-fleet-pct">18% rate</span>
           </div>
           <div class="st-stat-card st-red">
-            <span class="st-stat-lbl">Rent + Fuel Share</span>
+            <span class="st-stat-lbl">Shared Expenses</span>
             <div class="st-stat-num">-<span class="curr-sym">€</span><span id="stat-cycle-expenses">0.00</span></div>
-            <span class="st-stat-sub">Vehicle & fuel costs</span>
+            <span class="st-stat-sub">Rent, fuel & misc</span>
           </div>
           <div class="st-stat-card st-green">
-            <span class="st-stat-lbl">Total Net Bank Payout</span>
+            <span class="st-stat-lbl">Distributable Net</span>
             <div class="st-stat-num"><span class="curr-sym">€</span><span id="stat-cycle-net">0.00</span></div>
-            <span class="st-stat-sub">Distributable to riders</span>
+            <span class="st-stat-sub">Take-home earnings</span>
           </div>
         </div>
 
-        <!-- Rider-wise Breakdown Cards (Who gets how much) -->
-        <h4 class="st-payout-heading">💵 Rider Settlement Distribution (Final Bank / Cash Payout):</h4>
+        <!-- Rider-wise Breakdown Cards -->
+        <div class="st-sub-head" style="margin-top: 1rem; margin-bottom: 0.75rem;">
+          <h4 class="st-payout-heading" style="margin: 0;">💵 Individual Rider Balances (Current Window):</h4>
+          <button type="button" id="btn-settle-all-pending" class="st-btn st-btn-green">
+            ✅ Mark All Pending in View as Paid
+          </button>
+        </div>
+
         <div id="cycle-rider-settlement-list" class="st-rider-settlement-cards">
           <!-- Dynamically populated rider settlement summary cards -->
         </div>
@@ -203,10 +228,10 @@ const trackerSchema = {
         </div>
       </div>
 
-      <!-- Individual Shift Sessions History Table -->
+      <!-- Section D: Individual Shift Sessions History Table -->
       <div class="st-card">
         <div class="st-filter-row">
-          <h3 class="st-box-title" style="margin: 0;">📋 Individual Logged Sessions</h3>
+          <h3 class="st-box-title" style="margin: 0;">📋 Individual Logged Sessions & Statuses</h3>
           <span class="st-tag-blue" id="session-count-badge">0 Sessions</span>
         </div>
 
@@ -214,20 +239,21 @@ const trackerSchema = {
           <table class="st-table">
             <thead>
               <tr>
+                <th>Status</th>
                 <th>Date</th>
                 <th>Rider</th>
                 <th>Shift Time Slot</th>
                 <th>App Gross</th>
                 <th>Fleet Cut</th>
-                <th>Rent/Fuel</th>
+                <th>Expenses</th>
                 <th>Cash Tips</th>
-                <th>Net Share</th>
+                <th>Net Payout</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody id="delivery-sessions-tbody"></tbody>
           </table>
-          <div id="no-sessions-msg" class="st-empty-msg">No delivery sessions logged in this range. Add your shifts above!</div>
+          <div id="no-sessions-msg" class="st-empty-msg">No delivery sessions match the selected filters.</div>
         </div>
       </div>
 
@@ -418,7 +444,7 @@ const trackerSchema = {
       <div class="st-taptap-left">
         <span class="st-taptap-badge">💡 Smart Money Transfer Tip</span>
         <h3>Sending Wages to Home Country or Receiving Funds?</h3>
-        <p>Use Taptap Send with <strong>0% fee</strong> and receive an extra <strong>€10 bonus</strong> on your first transfer using the student code below.</p>
+        <p>Use Taptap Send with <strong>0% fee</strong> and receive an extra <strong>€10 bonus</strong> on your first transfer using the verified promo code.</p>
       </div>
       <div class="st-taptap-right">
         <span class="st-taptap-code">CODE: MDSAIDUR240</span>
@@ -435,26 +461,30 @@ const trackerSchema = {
   const STORAGE_KEY_SHIFTS = 'csg_student_shifts_data';
   const STORAGE_KEY_SESSIONS = 'csg_delivery_sessions_data';
   const STORAGE_KEY_CONFIG = 'csg_delivery_config_data';
+  const STORAGE_KEY_EXPENSES = 'csg_delivery_custom_expenses_data';
 
   // State
   let currentCurrency = '€';
   let currentTransType = 'expense';
+  let currentActiveTab = 'view-delivery-sessions';
   let ledgerRecords = [];
   let shiftRecords = [];
 
-  // Delivery Sessions & Config State
+  // Delivery Sessions & Custom Expenses State
   let deliverySessions = [
-    { id: 'ds_1', name: 'Saidur', date: '2026-08-25', startTime: '11:00', endTime: '14:00', appGross: 20.0, cashTips: 2.0 },
-    { id: 'ds_2', name: 'Tanvir', date: '2026-08-25', startTime: '15:00', endTime: '17:00', appGross: 35.0, cashTips: 5.0 },
-    { id: 'ds_3', name: 'Rahim', date: '2026-08-26', startTime: '10:00', endTime: '12:00', appGross: 25.0, cashTips: 1.0 },
-    { id: 'ds_4', name: 'Tanvir', date: '2026-08-26', startTime: '13:00', endTime: '15:00', appGross: 30.0, cashTips: 3.0 },
-    { id: 'ds_5', name: 'Saidur', date: '2026-08-26', startTime: '21:00', endTime: '00:00', appGross: 45.0, cashTips: 4.0 }
+    { id: 'ds_1', name: 'said', date: '2026-08-27', startTime: '11:00', endTime: '14:00', appGross: 10.0, cashTips: 0.0, status: 'pending' },
+    { id: 'ds_2', name: 'azhar', date: '2026-08-27', startTime: '11:00', endTime: '14:00', appGross: 20.0, cashTips: 0.0, status: 'pending' },
+    { id: 'ds_3', name: 'said', date: '2026-08-27', startTime: '11:00', endTime: '14:00', appGross: 15.0, cashTips: 0.0, status: 'pending' },
+    { id: 'ds_4', name: 'said', date: '2026-08-28', startTime: '11:00', endTime: '14:00', appGross: 45.0, cashTips: 0.0, status: 'pending' }
+  ];
+
+  let deliveryCustomExpenses = [
+    { id: 'exp_1', name: 'Scooter / Bike Rent', amount: 15.0 },
+    { id: 'exp_2', name: 'Petrol / Fuel', amount: 10.0 }
   ];
 
   let deliveryConfig = {
-    fleetPercent: 18.0,
-    scooterRent: 15.0,
-    fuelCost: 10.0
+    fleetPercent: 18.0
   };
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -474,7 +504,6 @@ const trackerSchema = {
     const mFilter = document.getElementById('ledger-month-filter');
     if (mFilter) mFilter.value = currentMonth;
 
-    // Default Filter Range: Start of current month to today
     const fStart = document.getElementById('filter-start-date');
     const fEnd = document.getElementById('filter-end-date');
     if (fStart) fStart.value = `${currentMonth}-01`;
@@ -504,6 +533,9 @@ const trackerSchema = {
       const ds = localStorage.getItem(STORAGE_KEY_SESSIONS);
       if (ds) deliverySessions = JSON.parse(ds);
 
+      const exp = localStorage.getItem(STORAGE_KEY_EXPENSES);
+      if (exp) deliveryCustomExpenses = JSON.parse(exp);
+
       const cfg = localStorage.getItem(STORAGE_KEY_CONFIG);
       if (cfg) deliveryConfig = JSON.parse(cfg);
     } catch (e) {
@@ -516,6 +548,7 @@ const trackerSchema = {
     localStorage.setItem(STORAGE_KEY_LEDGER, JSON.stringify(ledgerRecords));
     localStorage.setItem(STORAGE_KEY_SHIFTS, JSON.stringify(shiftRecords));
     localStorage.setItem(STORAGE_KEY_SESSIONS, JSON.stringify(deliverySessions));
+    localStorage.setItem(STORAGE_KEY_EXPENSES, JSON.stringify(deliveryCustomExpenses));
     localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(deliveryConfig));
     
     const txt = document.getElementById('save-status-text');
@@ -525,7 +558,7 @@ const trackerSchema = {
     }
   }
 
-  // Currency
+  // 1. Currency
   function initCurrency() {
     const sel = document.getElementById('global-currency-select');
     if (sel) {
@@ -544,7 +577,7 @@ const trackerSchema = {
     document.querySelectorAll('.curr-sym').forEach(el => el.innerText = currentCurrency);
   }
 
-  // Tabs Switcher
+  // 2. Tabs Switcher
   function initTabs() {
     const tabBtns = document.querySelectorAll('.st-tab-btn');
     const contents = document.querySelectorAll('.st-tab-content');
@@ -552,6 +585,7 @@ const trackerSchema = {
     tabBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         const targetId = btn.getAttribute('data-target');
+        currentActiveTab = targetId;
         
         tabBtns.forEach(b => b.classList.remove('active'));
         contents.forEach(c => c.classList.remove('active'));
@@ -567,38 +601,44 @@ const trackerSchema = {
     });
   }
 
-  // ================= DELIVERY SESSIONS & PAYOUT SETTLEMENT =================
+  // ================= 3. DELIVERY SESSIONS & EXPENSES ENGINE =================
   function initDeliverySessionsEngine() {
     const fleetInp = document.getElementById('cfg-fleet-percent');
-    const rentInp = document.getElementById('cfg-scooter-rent');
-    const fuelInp = document.getElementById('cfg-fuel-cost');
-
-    if (fleetInp) fleetInp.value = deliveryConfig.fleetPercent;
-    if (rentInp) rentInp.value = deliveryConfig.scooterRent;
-    if (fuelInp) fuelInp.value = deliveryConfig.fuelCost;
-
-    const cfgInputs = document.querySelectorAll('.cfg-input');
-    cfgInputs.forEach(inp => {
-      inp.addEventListener('input', () => {
+    if (fleetInp) {
+      fleetInp.value = deliveryConfig.fleetPercent;
+      fleetInp.addEventListener('input', () => {
         deliveryConfig.fleetPercent = parseFloat(fleetInp.value) || 0;
-        deliveryConfig.scooterRent = parseFloat(rentInp.value) || 0;
-        deliveryConfig.fuelCost = parseFloat(fuelInp.value) || 0;
         saveData();
         renderDeliverySessions();
       });
-    });
+    }
 
+    const addExpBtn = document.getElementById('btn-add-expense-row');
+    if (addExpBtn) {
+      addExpBtn.addEventListener('click', () => {
+        deliveryCustomExpenses.push({
+          id: 'exp_' + Date.now(),
+          name: '',
+          amount: 0
+        });
+        saveData();
+        renderCustomExpenses();
+        renderDeliverySessions();
+      });
+    }
+
+    const statusFilter = document.getElementById('filter-status-select');
     const fStart = document.getElementById('filter-start-date');
     const fEnd = document.getElementById('filter-end-date');
-    if (fStart && fEnd) {
-      fStart.addEventListener('change', renderDeliverySessions);
-      fEnd.addEventListener('change', renderDeliverySessions);
-    }
+    if (statusFilter) statusFilter.addEventListener('change', renderDeliverySessions);
+    if (fStart) fStart.addEventListener('change', renderDeliverySessions);
+    if (fEnd) fEnd.addEventListener('change', renderDeliverySessions);
 
     const addSessBtn = document.getElementById('btn-add-session');
     if (addSessBtn) {
       addSessBtn.addEventListener('click', () => {
-        const name = document.getElementById('sess-rider-name').value.trim() || 'Rider';
+        const nameInput = document.getElementById('sess-rider-name');
+        const name = nameInput.value.trim() || 'Rider';
         const date = document.getElementById('sess-date').value;
         const startTime = document.getElementById('sess-start-time').value;
         const endTime = document.getElementById('sess-end-time').value;
@@ -617,10 +657,12 @@ const trackerSchema = {
           startTime,
           endTime,
           appGross,
-          cashTips
+          cashTips,
+          status: 'pending'
         });
 
         saveData();
+        updateRiderSuggestions();
         renderDeliverySessions();
 
         document.getElementById('sess-app-gross').value = '';
@@ -628,17 +670,129 @@ const trackerSchema = {
       });
     }
 
+    const settleAllBtn = document.getElementById('btn-settle-all-pending');
+    if (settleAllBtn) {
+      settleAllBtn.addEventListener('click', () => {
+        const filtered = getFilteredSessions();
+        const pendingInView = filtered.filter(s => s.status !== 'paid');
+
+        if (pendingInView.length === 0) {
+          alert('No pending shift sessions in this view.');
+          return;
+        }
+
+        if (confirm(`Mark ${pendingInView.length} pending sessions as Paid & Settled?`)) {
+          pendingInView.forEach(s => {
+            s.status = 'paid';
+          });
+          saveData();
+          renderDeliverySessions();
+        }
+      });
+    }
+
     const copyBtn = document.getElementById('btn-copy-delivery-summary');
     if (copyBtn) copyBtn.addEventListener('click', copyDeliverySummaryText);
+  }
+
+  function renderCustomExpenses() {
+    const container = document.getElementById('delivery-expenses-container');
+    const totalExpLbl = document.getElementById('label-total-expenses');
+    if (!container) return;
+
+    container.innerHTML = '';
+    let totalExp = 0;
+
+    deliveryCustomExpenses.forEach((exp, idx) => {
+      totalExp += (exp.amount || 0);
+      const row = document.createElement('div');
+      row.className = 'st-expense-row';
+      row.innerHTML = `
+        <div class="st-exp-name">
+          <input type="text" class="st-input exp-name-input" value="${exp.name}" placeholder="Expense name (e.g. Scooter Rent, SIM, Petrol, Oil)" />
+        </div>
+        <div class="st-exp-amt">
+          <span class="st-curr-tag">${currentCurrency}</span>
+          <input type="number" class="st-input exp-amt-input" value="${exp.amount}" min="0" step="1" placeholder="0.00" />
+        </div>
+        <button type="button" class="st-btn-del" title="Remove this expense">✕</button>
+      `;
+
+      row.querySelector('.exp-name-input').addEventListener('input', (e) => {
+        deliveryCustomExpenses[idx].name = e.target.value;
+        saveData();
+      });
+
+      row.querySelector('.exp-amt-input').addEventListener('input', (e) => {
+        deliveryCustomExpenses[idx].amount = parseFloat(e.target.value) || 0;
+        saveData();
+        renderDeliverySessions();
+        updateExpenseTotalLabel();
+      });
+
+      row.querySelector('.st-btn-del').addEventListener('click', () => {
+        deliveryCustomExpenses.splice(idx, 1);
+        saveData();
+        renderCustomExpenses();
+        renderDeliverySessions();
+      });
+
+      container.appendChild(row);
+    });
+
+    if (totalExpLbl) totalExpLbl.innerText = totalExp.toFixed(2);
+  }
+
+  function updateExpenseTotalLabel() {
+    let totalExp = 0;
+    deliveryCustomExpenses.forEach(e => totalExp += (e.amount || 0));
+    const totalExpLbl = document.getElementById('label-total-expenses');
+    if (totalExpLbl) totalExpLbl.innerText = totalExp.toFixed(2);
+  }
+
+  function updateRiderSuggestions() {
+    const chipsContainer = document.getElementById('rider-chips-container');
+    const datalist = document.getElementById('rider-datalist');
+    const nameInput = document.getElementById('sess-rider-name');
+
+    const uniqueNames = [...new Set(deliverySessions.map(s => s.name).filter(Boolean))];
+
+    if (datalist) {
+      datalist.innerHTML = uniqueNames.map(n => `<option value="${n}"></option>`).join('');
+    }
+
+    if (chipsContainer) {
+      chipsContainer.innerHTML = '';
+      if (uniqueNames.length === 0) {
+        chipsContainer.innerHTML = `<span class="st-hint">No recent riders yet. Enter name below.</span>`;
+      } else {
+        uniqueNames.forEach(name => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'st-chip-btn';
+          btn.innerText = `👤 ${name}`;
+          btn.addEventListener('click', () => {
+            if (nameInput) {
+              nameInput.value = name;
+              nameInput.focus();
+            }
+          });
+          chipsContainer.appendChild(btn);
+        });
+      }
+    }
   }
 
   function getFilteredSessions() {
     const fStart = document.getElementById('filter-start-date').value;
     const fEnd = document.getElementById('filter-end-date').value;
+    const statusVal = document.getElementById('filter-status-select').value;
 
     return deliverySessions.filter(s => {
       if (fStart && s.date < fStart) return false;
       if (fEnd && s.date > fEnd) return false;
+      if (statusVal === 'pending' && s.status === 'paid') return false;
+      if (statusVal === 'paid' && s.status !== 'paid') return false;
       return true;
     });
   }
@@ -650,34 +804,41 @@ const trackerSchema = {
     const settlementList = document.getElementById('cycle-rider-settlement-list');
 
     const filtered = getFilteredSessions();
-    if (countBadge) countBadge.innerText = `${filtered.length} Sessions (In Cycle)`;
+    if (countBadge) countBadge.innerText = `${filtered.length} Sessions In View`;
 
     let totalAppGross = 0;
     filtered.forEach(s => totalAppGross += s.appGross);
 
+    let totalSharedExpenses = 0;
+    deliveryCustomExpenses.forEach(e => totalSharedExpenses += (e.amount || 0));
+
     const totalFleetCut = (totalAppGross * deliveryConfig.fleetPercent) / 100;
-    const totalSharedExpenses = deliveryConfig.scooterRent + deliveryConfig.fuelCost;
     const totalNetDistributed = Math.max(0, totalAppGross - totalFleetCut - totalSharedExpenses);
 
-    // Update Overview Stats
     document.getElementById('stat-cycle-gross').innerText = totalAppGross.toFixed(2);
     document.getElementById('stat-cycle-fleet').innerText = totalFleetCut.toFixed(2);
     document.getElementById('stat-cycle-fleet-pct').innerText = `${deliveryConfig.fleetPercent}% fleet cut`;
     document.getElementById('stat-cycle-expenses').innerText = totalSharedExpenses.toFixed(2);
     document.getElementById('stat-cycle-net').innerText = totalNetDistributed.toFixed(2);
 
-    // 1. Group by Rider for Pay Day Settlement
+    updateExpenseTotalLabel();
+
     const riderMap = {};
     filtered.forEach(s => {
       if (!riderMap[s.name]) {
         riderMap[s.name] = {
           name: s.name,
           sessionCount: 0,
+          pendingCount: 0,
+          paidCount: 0,
           gross: 0,
           tips: 0
         };
       }
       riderMap[s.name].sessionCount += 1;
+      if (s.status === 'paid') riderMap[s.name].paidCount += 1;
+      else riderMap[s.name].pendingCount += 1;
+
       riderMap[s.name].gross += s.appGross;
       riderMap[s.name].tips += (s.cashTips || 0);
     });
@@ -687,7 +848,7 @@ const trackerSchema = {
       const riderNames = Object.keys(riderMap);
 
       if (riderNames.length === 0) {
-        settlementList.innerHTML = `<div class="st-empty-msg">No shift sessions logged in this withdrawal window.</div>`;
+        settlementList.innerHTML = `<div class="st-empty-msg">No shift sessions found in this filter range.</div>`;
       } else {
         riderNames.forEach(rName => {
           const r = riderMap[rName];
@@ -696,18 +857,19 @@ const trackerSchema = {
           const rExpenseShare = totalSharedExpenses * ratio;
           const rNetBankPayout = Math.max(0, r.gross - rFleetShare - rExpenseShare);
           const rTotalMoney = rNetBankPayout + r.tips;
+          const isAllPaid = r.pendingCount === 0;
 
           const card = document.createElement('div');
-          card.className = 'st-rider-settlement-card';
+          card.className = `st-rider-settlement-card ${isAllPaid ? 'card-paid' : 'card-pending'}`;
           card.innerHTML = `
             <div class="sr-head">
               <div>
                 <h4 class="sr-name">👤 ${r.name}</h4>
-                <span class="sr-badge">${r.sessionCount} Sessions Completed (${(ratio * 100).toFixed(1)}% share)</span>
+                <span class="sr-badge">${r.sessionCount} Shifts (${r.pendingCount} Pending, ${r.paidCount} Paid)</span>
               </div>
               <div class="sr-payout-box">
-                <span class="sr-payout-val">${currentCurrency}${rNetBankPayout.toFixed(2)}</span>
-                <span class="sr-payout-lbl">Net Bank / Cash Payout</span>
+                <span class="sr-payout-val ${isAllPaid ? 'txt-paid' : 'txt-pending'}">${currentCurrency}${rNetBankPayout.toFixed(2)}</span>
+                <span class="sr-payout-lbl">${isAllPaid ? '🟢 Fully Settled / Paid' : '🟡 Net Payout Due'}</span>
               </div>
             </div>
 
@@ -721,11 +883,11 @@ const trackerSchema = {
                 <strong>-${currentCurrency}${rFleetShare.toFixed(2)}</strong>
               </div>
               <div class="sr-col st-red-txt">
-                <small>Rent & Fuel Share:</small>
+                <small>Shared Expenses Share:</small>
                 <strong>-${currentCurrency}${rExpenseShare.toFixed(2)}</strong>
               </div>
               <div class="sr-col st-green-txt">
-                <small>Cash Tips (Kept in Pocket):</small>
+                <small>Cash Tips (Kept in Hand):</small>
                 <strong>+${currentCurrency}${r.tips.toFixed(2)}</strong>
               </div>
               <div class="sr-col sr-total-col">
@@ -739,7 +901,6 @@ const trackerSchema = {
       }
     }
 
-    // 2. Render Individual Sessions Table
     if (tbody) {
       tbody.innerHTML = '';
       if (filtered.length === 0) {
@@ -752,9 +913,16 @@ const trackerSchema = {
           const riderFleetCut = (sess.appGross * deliveryConfig.fleetPercent) / 100;
           const riderExpenseShare = totalSharedExpenses * ratio;
           const riderNetApp = Math.max(0, sess.appGross - riderFleetCut - riderExpenseShare);
+          const isPaid = sess.status === 'paid';
 
           const tr = document.createElement('tr');
+          tr.className = isPaid ? 'tr-paid' : 'tr-pending';
           tr.innerHTML = `
+            <td>
+              <button type="button" class="st-status-btn ${isPaid ? 'status-paid' : 'status-pending'}" title="Click to toggle Paid/Pending">
+                ${isPaid ? '🟢 Paid' : '🟡 Pending'}
+              </button>
+            </td>
             <td><strong>${sess.date}</strong></td>
             <td><strong>${sess.name}</strong></td>
             <td><span class="st-tag-time">⏰ ${sess.startTime} - ${sess.endTime}</span></td>
@@ -766,12 +934,19 @@ const trackerSchema = {
             <td><button type="button" class="st-btn-del" title="Delete Session">✕</button></td>
           `;
 
+          tr.querySelector('.st-status-btn').addEventListener('click', () => {
+            sess.status = sess.status === 'paid' ? 'pending' : 'paid';
+            saveData();
+            renderDeliverySessions();
+          });
+
           tr.querySelector('.st-btn-del').addEventListener('click', () => {
             if (confirm(`Delete shift session for ${sess.name} on ${sess.date}?`)) {
               const origIdx = deliverySessions.findIndex(x => x.id === sess.id);
               if (origIdx !== -1) {
                 deliverySessions.splice(origIdx, 1);
                 saveData();
+                updateRiderSuggestions();
                 renderDeliverySessions();
               }
             }
@@ -791,28 +966,41 @@ const trackerSchema = {
     let totalAppGross = 0;
     filtered.forEach(s => totalAppGross += s.appGross);
 
+    let totalSharedExpenses = 0;
+    let expDetails = [];
+    deliveryCustomExpenses.forEach(e => {
+      if (e.amount > 0) {
+        totalSharedExpenses += e.amount;
+        expDetails.push(`${e.name}: ${currentCurrency}${e.amount.toFixed(2)}`);
+      }
+    });
+
     const totalFleetCut = (totalAppGross * deliveryConfig.fleetPercent) / 100;
-    const totalSharedExpenses = deliveryConfig.scooterRent + deliveryConfig.fuelCost;
     const totalNetDistributed = Math.max(0, totalAppGross - totalFleetCut - totalSharedExpenses);
 
     const riderMap = {};
     filtered.forEach(s => {
       if (!riderMap[s.name]) {
-        riderMap[s.name] = { name: s.name, count: 0, gross: 0, tips: 0 };
+        riderMap[s.name] = { name: s.name, count: 0, pending: 0, paid: 0, gross: 0, tips: 0 };
       }
       riderMap[s.name].count += 1;
+      if (s.status === 'paid') riderMap[s.name].paid += 1;
+      else riderMap[s.name].pending += 1;
+
       riderMap[s.name].gross += s.appGross;
       riderMap[s.name].tips += (s.cashTips || 0);
     });
 
-    let text = `🏦 *Cyprus Food Delivery Payout Settlement Statement*\n`;
-    text += `📅 Pay Cycle: ${fStart} to ${fEnd}\n`;
+    let text = `🏦 *Cyprus Food Delivery Payout Progress Statement*\n`;
+    text += `📅 Settlement Window: ${fStart} to ${fEnd}\n`;
     text += `📱 App Gross Total: ${currentCurrency}${totalAppGross.toFixed(2)}\n`;
     text += `📑 Fleet Commission (${deliveryConfig.fleetPercent}%): -${currentCurrency}${totalFleetCut.toFixed(2)}\n`;
-    text += `⛽ Vehicle Rent & Fuel: -${currentCurrency}${totalSharedExpenses.toFixed(2)}\n`;
-    text += `💵 Distributable Bank Pool: ${currentCurrency}${totalNetDistributed.toFixed(2)}\n`;
+    if (expDetails.length > 0) {
+      text += `⛽ Shared Expenses: -${currentCurrency}${totalSharedExpenses.toFixed(2)} (${expDetails.join(', ')})\n`;
+    }
+    text += `💵 Net Distributable Bank Pool: ${currentCurrency}${totalNetDistributed.toFixed(2)}\n`;
     text += `------------------------------------\n`;
-    text += `*FINAL RIDER PAYOUTS (TO RECEIVE):*\n\n`;
+    text += `*RIDER SETTLEMENT BALANCES:*\n\n`;
 
     Object.keys(riderMap).forEach(rName => {
       const r = riderMap[rName];
@@ -820,15 +1008,16 @@ const trackerSchema = {
       const rFleet = (r.gross * deliveryConfig.fleetPercent) / 100;
       const rExp = totalSharedExpenses * ratio;
       const rNet = Math.max(0, r.gross - rFleet - rExp);
+      const statusTxt = r.pending === 0 ? '🟢 Settled / Paid' : `🟡 Pending (${r.pending} shifts due)`;
 
-      text += `👤 *${r.name}* (${r.count} sessions):\n`;
-      text += `   • App Gross: ${currentCurrency}${r.gross.toFixed(2)}\n`;
-      text += `   • Deductions (Fleet+Rent+Fuel): -${currentCurrency}${(rFleet + rExp).toFixed(2)}\n`;
-      text += `   👉 *NET BANK PAYOUT: ${currentCurrency}${rNet.toFixed(2)}*\n`;
+      text += `👤 *${r.name}* [${statusTxt}]:\n`;
+      text += `   • App Gross: ${currentCurrency}${r.gross.toFixed(2)} (${r.count} sessions)\n`;
+      text += `   • Deductions: -${currentCurrency}${(rFleet + rExp).toFixed(2)}\n`;
+      text += `   👉 *NET PAYOUT: ${currentCurrency}${rNet.toFixed(2)}*\n`;
       if (r.tips > 0) text += `   (Plus cash tips kept in hand: +${currentCurrency}${r.tips.toFixed(2)})\n\n`;
     });
 
-    text += `------------------------------------\nCalculated accurately via CyprusStudentGuide.com`;
+    text += `------------------------------------\nCalculated & Tracked via CyprusStudentGuide.com`;
 
     navigator.clipboard.writeText(text).then(() => {
       const fb = document.getElementById('delivery-copy-feedback');
@@ -839,7 +1028,7 @@ const trackerSchema = {
     });
   }
 
-  // ================= LEDGER & HOURLY SHIFTS =================
+  // ================= 4. LEDGER & HOURLY SHIFTS =================
   function initLedgerEngine() {
     const btnExp = document.getElementById('btn-type-expense');
     const btnInc = document.getElementById('btn-type-income');
@@ -1050,40 +1239,130 @@ const trackerSchema = {
     document.getElementById('stat-avg-rate').innerText = totalHours > 0 ? (totalEarned / totalHours).toFixed(2) : '0.00';
   }
 
-  // Backup
+  // ================= 5. COMPLETE MULTI-SECTION AUDIT EXCEL EXPORT =================
   function initBackupEngine() {
     document.getElementById('btn-export-csv').addEventListener('click', () => {
-      let csv = "=== FOOD DELIVERY SHIFT SESSIONS ===\nDate,Rider,StartTime,EndTime,AppGross,CashTips,Currency\n";
-      deliverySessions.forEach(d => {
-        csv += `"${d.date}","${d.name}","${d.startTime}","${d.endTime}",${d.appGross},${d.cashTips},"${currentCurrency}"\n`;
-      });
+      const todayStr = new Date().toISOString().split('T')[0];
+      const fStart = document.getElementById('filter-start-date') ? document.getElementById('filter-start-date').value : todayStr;
+      const fEnd = document.getElementById('filter-end-date') ? document.getElementById('filter-end-date').value : todayStr;
 
-      csv += "\n=== DAILY INCOME & EXPENSE LEDGER ===\nDate,Type,Category,Description,Amount,Currency\n";
-      ledgerRecords.forEach(i => {
-        csv += `"${i.date}","${i.type}","${i.category}","${i.desc.replace(/"/g, '""')}",${i.amount},"${currentCurrency}"\n`;
-      });
+      let csv = "";
+      let filename = "Cyprus_Student_Delivery_Settlement";
 
-      csv += "\n=== WORK SHIFTS ===\nDate,Workplace,Hours,Rate,Tips,Total,Currency\n";
-      shiftRecords.forEach(s => {
-        csv += `"${s.date}","${s.job.replace(/"/g, '""')}",${s.hours},${s.rate},${s.tips},${s.totalEarned},"${currentCurrency}"\n`;
-      });
+      if (currentActiveTab === 'view-delivery-sessions') {
+        const filtered = getFilteredSessions();
 
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        let totalAppGross = 0;
+        filtered.forEach(s => totalAppGross += s.appGross);
+
+        let totalSharedExpenses = 0;
+        deliveryCustomExpenses.forEach(e => totalSharedExpenses += (e.amount || 0));
+
+        const totalFleetCut = (totalAppGross * deliveryConfig.fleetPercent) / 100;
+        const totalNetDistributed = Math.max(0, totalAppGross - totalFleetCut - totalSharedExpenses);
+
+        // 1. Report Header with Official Branding & URL
+        csv += `=== CYPRUS STUDENT GUIDE - FOOD DELIVERY PAYOUT SETTLEMENT REPORT ===\n`;
+        csv += `Report Generated From:,"Cyprus Student Guide (https://cyprusstudentguide.com/shift-tracker/)"\n`;
+        csv += `Export Date:,${todayStr}\n`;
+        csv += `Pay Cycle Filter Range:,${fStart} to ${fEnd}\n`;
+        csv += `Currency Base:,${currentCurrency}\n`;
+        csv += `Fleet Commission Rate:,${deliveryConfig.fleetPercent}%\n\n`;
+
+        // 2. Section 1: Rider-wise Settlement Summary
+        csv += `--- SECTION 1: RIDER PAYOUT SETTLEMENT SUMMARY ---\n`;
+        csv += `Rider Name,Total Shifts,App Gross (${currentCurrency}),Fleet Cut (${currentCurrency}),Shared Expense Share (${currentCurrency}),Cash Tips Kept (${currentCurrency}),Net Bank Payout (${currentCurrency}),Total Take-Home (${currentCurrency}),Settlement Status\n`;
+
+        const riderMap = {};
+        filtered.forEach(s => {
+          if (!riderMap[s.name]) {
+            riderMap[s.name] = { name: s.name, count: 0, pending: 0, paid: 0, gross: 0, tips: 0 };
+          }
+          riderMap[s.name].count += 1;
+          if (s.status === 'paid') riderMap[s.name].paid += 1;
+          else riderMap[s.name].pending += 1;
+
+          riderMap[s.name].gross += s.appGross;
+          riderMap[s.name].tips += (s.cashTips || 0);
+        });
+
+        Object.keys(riderMap).forEach(rName => {
+          const r = riderMap[rName];
+          const ratio = totalAppGross > 0 ? (r.gross / totalAppGross) : 0;
+          const rFleet = (r.gross * deliveryConfig.fleetPercent) / 100;
+          const rExp = totalSharedExpenses * ratio;
+          const rNet = Math.max(0, r.gross - rFleet - rExp);
+          const rTakeHome = rNet + r.tips;
+          const statusTxt = r.pending === 0 ? "PAID / SETTLED" : `PENDING (${r.pending} shifts due)`;
+
+          csv += `"${r.name.replace(/"/g, '""')}",${r.count},${r.gross.toFixed(2)},${rFleet.toFixed(2)},${rExp.toFixed(2)},${r.tips.toFixed(2)},${rNet.toFixed(2)},${rTakeHome.toFixed(2)},"${statusTxt}"\n`;
+        });
+
+        csv += `TOTALS:,${filtered.length},${totalAppGross.toFixed(2)},${totalFleetCut.toFixed(2)},${totalSharedExpenses.toFixed(2)},--,${totalNetDistributed.toFixed(2)},--,--\n\n`;
+
+        // 3. Section 2: Shared Expenses Breakdown
+        csv += `--- SECTION 2: SHARED OPERATING EXPENSES ---\n`;
+        csv += `Expense Item,Amount (${currentCurrency})\n`;
+        deliveryCustomExpenses.forEach(e => {
+          csv += `"${e.name.replace(/"/g, '""')}",${(e.amount || 0).toFixed(2)}\n`;
+        });
+        csv += `TOTAL SHARED EXPENSES:,${totalSharedExpenses.toFixed(2)}\n\n`;
+
+        // 4. Section 3: Detailed Individual Shift Sessions
+        csv += `--- SECTION 3: DETAILED SHIFT SESSIONS LOG ---\n`;
+        csv += `Status,Date,Rider Name,Start Time,End Time,App Gross (${currentCurrency}),Fleet Cut (${currentCurrency}),Expense Share (${currentCurrency}),Cash Tips (${currentCurrency}),Net Payout (${currentCurrency})\n`;
+
+        filtered.forEach(sess => {
+          const ratio = totalAppGross > 0 ? (sess.appGross / totalAppGross) : 0;
+          const rFleet = (sess.appGross * deliveryConfig.fleetPercent) / 100;
+          const rExp = totalSharedExpenses * ratio;
+          const rNet = Math.max(0, sess.appGross - rFleet - rExp);
+
+          csv += `"${(sess.status || 'pending').toUpperCase()}","${sess.date}","${sess.name.replace(/"/g, '""')}","${sess.startTime}","${sess.endTime}",${sess.appGross.toFixed(2)},${rFleet.toFixed(2)},${rExp.toFixed(2)},${(sess.cashTips || 0).toFixed(2)},${rNet.toFixed(2)}\n`;
+        });
+
+      } else if (currentActiveTab === 'view-money-ledger') {
+        filename = "Daily_Money_Ledger_Report";
+        csv += `=== CYPRUS STUDENT GUIDE - DAILY INCOME & EXPENSE LEDGER ===\n`;
+        csv += `Website:,"https://cyprusstudentguide.com/shift-tracker/"\n`;
+        csv += `Export Date:,${todayStr}\n`;
+        csv += `Currency:,${currentCurrency}\n\n`;
+        csv += `Date,Type,Category,Description,Amount (${currentCurrency})\n`;
+        
+        ledgerRecords.forEach(i => {
+          csv += `"${i.date}","${i.type}","${i.category}","${i.desc.replace(/"/g, '""')}",${i.amount.toFixed(2)}\n`;
+        });
+      } else {
+        filename = "Hourly_Work_Shifts_Report";
+        csv += `=== CYPRUS STUDENT GUIDE - HOURLY WORK SHIFTS LOG ===\n`;
+        csv += `Website:,"https://cyprusstudentguide.com/shift-tracker/"\n`;
+        csv += `Export Date:,${todayStr}\n`;
+        csv += `Currency:,${currentCurrency}\n\n`;
+        csv += `Date,Workplace,Hours Worked,Hourly Rate (${currentCurrency}),Tips (${currentCurrency}),Total Earned (${currentCurrency})\n`;
+
+        shiftRecords.forEach(s => {
+          csv += `"${s.date}","${s.job.replace(/"/g, '""')}",${s.hours},${s.rate.toFixed(2)},${s.tips.toFixed(2)},${s.totalEarned.toFixed(2)}\n`;
+        });
+      }
+
+      // Prepend UTF-8 BOM so Excel opens currency symbols (€, ৳, ₹) perfectly
+      const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Student_Delivery_And_Money_Log_${new Date().toISOString().split('T')[0]}.csv`;
+      a.download = `${filename}_${todayStr}.csv`;
       a.click();
       URL.revokeObjectURL(url);
     });
 
     document.getElementById('btn-export-json').addEventListener('click', () => {
       const backup = {
-        version: "5.0",
+        version: "8.5",
         currency: currentCurrency,
         ledger: ledgerRecords,
         shifts: shiftRecords,
         deliverySessions: deliverySessions,
+        deliveryCustomExpenses: deliveryCustomExpenses,
         deliveryConfig: deliveryConfig
       };
 
@@ -1109,12 +1388,13 @@ const trackerSchema = {
             if (parsed.ledger) ledgerRecords = parsed.ledger;
             if (parsed.shifts) shiftRecords = parsed.shifts;
             if (parsed.deliverySessions) deliverySessions = parsed.deliverySessions;
+            if (parsed.deliveryCustomExpenses) deliveryCustomExpenses = parsed.deliveryCustomExpenses;
             if (parsed.deliveryConfig) deliveryConfig = parsed.deliveryConfig;
 
             saveData();
             initCurrency();
             renderAll();
-            alert('✅ Complete backup restored successfully!');
+            alert('✅ Complete settlement backup restored successfully!');
           }
         } catch (err) {
           alert('Invalid backup file format.');
@@ -1128,6 +1408,7 @@ const trackerSchema = {
         ledgerRecords = [];
         shiftRecords = [];
         deliverySessions = [];
+        deliveryCustomExpenses = [];
         saveData();
         renderAll();
       }
@@ -1135,6 +1416,8 @@ const trackerSchema = {
   }
 
   function renderAll() {
+    renderCustomExpenses();
+    updateRiderSuggestions();
     renderDeliverySessions();
     renderLedger();
     renderShifts();
@@ -1255,6 +1538,7 @@ const trackerSchema = {
   .st-btn-file { cursor: pointer; }
   .st-btn-primary { background: #2563eb; color: #fff; border: none; font-size: 0.9rem; padding: 0.65rem 1.25rem; font-weight: 800; border-radius: 8px; }
   .st-btn-primary:hover { background: #1d4ed8; }
+  .st-btn-outline { width: 100%; background: var(--bg-color); border: 1px dashed var(--primary-blue); color: var(--primary-blue); padding: 0.6rem; border-radius: 8px; font-weight: 700; font-size: 0.86rem; cursor: pointer; margin-top: 0.5rem; }
 
   /* Tabs */
   .st-tabs {
@@ -1299,23 +1583,56 @@ const trackerSchema = {
   .st-card-title { font-size: 1.25rem; font-weight: 800; margin: 0 0 0.35rem; color: var(--text-main); }
   .st-card-sub { font-size: 0.86rem; color: var(--text-muted); margin: 0; }
 
-  .st-grid-3 {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-  }
-  .st-grid-4 {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.85rem;
-  }
-  .st-grid-5 {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 0.75rem;
-  }
+  .st-grid-fleet-config { max-width: 320px; }
+  .st-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+  .st-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.85rem; }
+  .st-grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.75rem; }
 
-  /* Specific Session Grid */
+  /* Dynamic Custom Expenses */
+  .st-sub-box {
+    background: rgba(150, 150, 150, 0.04);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .st-sub-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; }
+  .st-sub-head h3 { font-size: 0.95rem; font-weight: 800; margin: 0; color: var(--text-main); }
+  .st-tag { font-size: 0.78rem; font-weight: 800; background: rgba(37, 99, 235, 0.1); color: var(--primary-blue); padding: 0.2rem 0.6rem; border-radius: 20px; }
+
+  .st-expenses-list { display: flex; flex-direction: column; gap: 0.65rem; margin-bottom: 0.5rem; }
+  .st-expense-row { display: flex; gap: 0.65rem; align-items: center; }
+  .st-exp-name { flex: 2; }
+  .st-exp-amt { flex: 1; display: flex; align-items: center; position: relative; }
+  .st-curr-tag { position: absolute; left: 10px; font-weight: 800; color: var(--text-muted); font-size: 0.88rem; pointer-events: none; }
+  .st-exp-amt input { padding-left: 1.8rem !important; }
+
+  /* Rider Suggestion Chips */
+  .st-rider-chips-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px dashed var(--card-border);
+  }
+  .st-chip-label { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); }
+  .st-chips-list { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .st-chip-btn {
+    background: rgba(37, 99, 235, 0.08);
+    border: 1px solid rgba(37, 99, 235, 0.2);
+    color: var(--primary-blue);
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.25rem 0.65rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .st-chip-btn:hover { background: var(--primary-blue); color: #fff; }
+
+  /* Session Form Grid */
   .st-grid-session-form {
     display: grid;
     grid-template-columns: 1.5fr 1.2fr 1.8fr 1.2fr 1.2fr;
@@ -1360,6 +1677,21 @@ const trackerSchema = {
   .st-stat-card.st-red .st-stat-num { color: #ef4444; }
   .st-stat-card.st-blue .st-stat-num { color: var(--primary-blue); }
 
+  /* Progress Filters */
+  .st-progress-filters { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+  .st-status-btn {
+    border: none;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  .st-status-btn:active { transform: scale(0.95); }
+  .status-pending { background: rgba(245, 158, 11, 0.15); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.3); }
+  .status-paid { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+
   /* Rider Settlement Cards */
   .st-rider-settlement-cards {
     display: flex;
@@ -1374,6 +1706,9 @@ const trackerSchema = {
     padding: 1.15rem 1.25rem;
     box-shadow: 0 4px 12px rgba(0,0,0,0.02);
   }
+  .st-rider-settlement-card.card-pending { border-left: 4px solid #f59e0b; }
+  .st-rider-settlement-card.card-paid { border-left: 4px solid #10b981; }
+
   .sr-head {
     display: flex;
     justify-content: space-between;
@@ -1385,7 +1720,9 @@ const trackerSchema = {
   .sr-name { font-size: 1.15rem; font-weight: 800; margin: 0 0 0.2rem; color: var(--text-main); }
   .sr-badge { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); }
   .sr-payout-box { text-align: right; }
-  .sr-payout-val { font-size: 1.65rem; font-weight: 900; color: #10b981; font-family: var(--font-mono); display: block; line-height: 1.1; }
+  .sr-payout-val { font-size: 1.65rem; font-weight: 900; font-family: var(--font-mono); display: block; line-height: 1.1; }
+  .txt-pending { color: #f59e0b; }
+  .txt-paid { color: #10b981; }
   .sr-payout-lbl { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
 
   .sr-grid-breakdown {
@@ -1408,8 +1745,6 @@ const trackerSchema = {
 
   /* Tables */
   .st-filter-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem; }
-  .st-cycle-filter { display: flex; align-items: center; gap: 0.5rem; }
-  .st-cycle-filter label { font-size: 0.82rem; font-weight: 700; color: var(--text-muted); }
   .st-input-mini { background: var(--bg-color); color: var(--text-main); border: 1px solid var(--card-border); padding: 0.35rem 0.65rem; border-radius: 8px; font-weight: 700; font-size: 0.82rem; }
   .st-tag-blue { background: rgba(37, 99, 235, 0.1); color: var(--primary-blue); font-size: 0.82rem; font-weight: 800; padding: 0.3rem 0.75rem; border-radius: 20px; }
 
@@ -1417,6 +1752,10 @@ const trackerSchema = {
   .st-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem; }
   .st-table th, .st-table td { padding: 0.75rem 0.85rem; border-bottom: 1px solid var(--card-border); }
   .st-table th { font-weight: 800; font-size: 0.76rem; text-transform: uppercase; color: var(--text-muted); }
+  
+  .tr-pending { background: rgba(245, 158, 11, 0.02); }
+  .tr-paid { opacity: 0.85; }
+
   .st-badge-expense { background: rgba(239, 68, 68, 0.1); color: #ef4444; font-size: 0.74rem; font-weight: 800; padding: 0.15rem 0.45rem; border-radius: 4px; }
   .st-badge-income { background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 0.74rem; font-weight: 800; padding: 0.15rem 0.45rem; border-radius: 4px; }
   .st-amount-exp { font-weight: 800; color: #ef4444; font-family: var(--font-mono); }
