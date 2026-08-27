@@ -1,385 +1,390 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-const title = "Cyprus Student Cost of Living & Budget Calculator 2026 | Field-Tested";
-const description = "Calculate your exact monthly student living expenses in Cyprus across Limassol, Nicosia, Larnaca, and Paphos. Balance accommodation, food, utilities, and 20-hour legal student earnings.";
+const title = "Cyprus Student Monthly Living Cost & Budget Calculator 2026";
+const description = "Calculate real-time monthly living costs in Cyprus for international students. Compare rent, food, electricity, transport across Limassol, Nicosia, Larnaca, and Paphos.";
 const permalink = "https://cyprusstudentguide.com/calculator/";
 
-// JSON-LD WebPage & SoftwareApplication Schema
-const schemaData = {
+const calcSchema = {
   "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "WebApplication",
-      "@id": `${permalink}#app`,
-      "name": "Cyprus Student Living Cost Calculator",
-      "url": permalink,
-      "applicationCategory": "EducationalApplication",
-      "operatingSystem": "All",
-      "browserRequirements": "Requires JavaScript. Requires HTML5.",
-      "description": description,
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "EUR"
-      }
-    },
-    {
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Home",
-          "item": "https://cyprusstudentguide.com/"
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Cost Calculator",
-          "item": permalink
-        }
-      ]
-    }
-  ]
+  "@type": "WebApplication",
+  "name": "Cyprus Student Living Cost Calculator",
+  "url": permalink,
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "All",
+  "browserRequirements": "Requires JavaScript",
+  "description": description
 };
 ---
 
 <BaseLayout title={title} description={description} permalink={permalink} current="calculator">
-  <script type="application/ld+json" is:inline set:html={JSON.stringify(schemaData)} />
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(calcSchema)} />
 
   <section class="calc-hero">
-    <div class="calc-badge">📊 Authentic Field Tool</div>
-    <h1 class="calc-main-title">Cyprus Student Living Cost Calculator</h1>
-    <p class="calc-subtitle">
-      Plan your real-world monthly budget in Cyprus. Adjust your city, accommodation, lifestyle, and compare it against legal part-time student income.
-    </p>
+    <span class="calc-badge">📊 Interactive Financial Tool</span>
+    <h1 class="calc-title">Cyprus Student Monthly Budget Calculator</h1>
+    <p class="calc-desc">Calculate realistic monthly living expenses across Cyprus cities. Adjust your room type, grocery style, and air conditioning usage to get an authentic budget estimation.</p>
   </section>
 
-  <div class="calculator-grid">
-    <div class="calc-controls-card">
-      <div class="section-title-wrap">
-        <span class="step-num">1</span>
-        <h2>Select City & Living Setup</h2>
-      </div>
-
-      <div class="input-group">
-        <label for="calc-city" class="input-label">City in Cyprus</label>
-        <select id="calc-city" class="custom-select">
-          <option value="limassol" selected>Limassol (Higher Rents & Jobs)</option>
-          <option value="nicosia">Nicosia (Capital • Balanced)</option>
-          <option value="larnaca">Larnaca (Affordable Coastal)</option>
-          <option value="paphos">Paphos (Student-Friendly)</option>
-        </select>
-        <span class="field-hint">Rental rates adjust dynamically based on 2026 average field surveys.</span>
-      </div>
-
-      <div class="input-group">
-        <label class="input-label">Accommodation Style</label>
-        <div class="radio-pill-grid">
-          <label class="radio-pill-label">
-            <input type="radio" name="housing" value="shared" checked />
-            <span class="pill-box">
-              <span class="pill-title">Shared Room</span>
-              <span class="pill-desc">2 students sharing</span>
-            </span>
-          </label>
-          <label class="radio-pill-label">
-            <input type="radio" name="housing" value="single" />
-            <span class="pill-box">
-              <span class="pill-title">Private Room</span>
-              <span class="pill-desc">Private in flat</span>
-            </span>
-          </label>
-          <label class="radio-pill-label">
-            <input type="radio" name="housing" value="studio" />
-            <span class="pill-box">
-              <span class="pill-title">Studio / 1-BHK</span>
-              <span class="pill-desc">Independent flat</span>
-            </span>
-          </label>
-        </div>
-      </div>
-
-      <hr class="calc-divider" />
-
-      <div class="section-title-wrap">
-        <span class="step-num">2</span>
-        <h2>Monthly Expenses & Lifestyle</h2>
-      </div>
-
-      <div class="input-group">
-        <div class="slider-header">
-          <label for="range-food" class="input-label">Food & Groceries (Lidl / Sklavenitis)</label>
-          <span class="slider-val-badge">€<span id="val-food">160</span> / mo</span>
-        </div>
-        <input type="range" id="range-food" min="100" max="350" step="10" value="160" class="custom-range" />
-        <span class="field-hint">Includes staple cooking, rice, chicken, vegetables & occasional snacks.</span>
-      </div>
-
-      <div class="input-group">
-        <div class="slider-header">
-          <label for="range-utility" class="input-label">Electricity (EAC) & Water Bills</label>
-          <span class="slider-val-badge">€<span id="val-utility">60</span> / mo</span>
-        </div>
-        <input type="range" id="range-utility" min="30" max="180" step="5" value="60" class="custom-range" />
-        <span class="field-hint">AC heavy usage during summer months (July–Sept) raises this bill significantly.</span>
-      </div>
-
-      <div class="input-group">
-        <label for="calc-transport" class="input-label">Daily Commute & Transport</label>
-        <select id="calc-transport" class="custom-select">
-          <option value="20" selected>Student Monthly Bus Card (€20/mo)</option>
-          <option value="50">E-Scooter / Bike Maintenance (€50/mo)</option>
-          <option value="120">Car / Motorbike Fuel & Basic Upkeep (€120/mo)</option>
-          <option value="0">Walking (Near Campus / City Center - €0)</option>
+  <div class="calc-container notranslate">
+    <!-- Controls Section -->
+    <div class="calc-inputs-card">
+      <div class="form-group">
+        <label for="city-select"><strong>📍 Select Study City:</strong></label>
+        <select id="city-select" class="calc-select">
+          <option value="limassol" selected>Limassol (Highest Rent / High Job Density)</option>
+          <option value="nicosia">Nicosia (Moderate Rent / University Hub)</option>
+          <option value="larnaca">Larnaca (Lower Rent / Coastal Living)</option>
+          <option value="paphos">Paphos (Affordable Rent / Tourism Focus)</option>
         </select>
       </div>
 
-      <div class="input-group">
-        <label for="calc-internet" class="input-label">Mobile SIM & Home Internet Share</label>
-        <select id="calc-internet" class="custom-select">
-          <option value="25" selected>Standard SIM Data Plan + Wi-Fi Share (€25/mo)</option>
-          <option value="15">Budget SIM Only (€15/mo)</option>
-          <option value="40">Unlimited 5G SIM + Fiber Wi-Fi (€40/mo)</option>
+      <div class="form-group">
+        <label for="room-type"><strong>🏠 Accommodation Type:</strong></label>
+        <select id="room-type" class="calc-select">
+          <option value="shared_room" selected>Shared Room in 2-3 Bed Flat (€250 - €400)</option>
+          <option value="private_room">Private Room in Shared Flat (€350 - €550)</option>
+          <option value="studio">Private Studio / 1-Bedroom (€550 - €850)</option>
         </select>
       </div>
 
-      <div class="input-group">
-        <div class="slider-header">
-          <label for="range-misc" class="input-label">Personal, Coffee & Toiletries</label>
-          <span class="slider-val-badge">€<span id="val-misc">50</span> / mo</span>
-        </div>
-        <input type="range" id="range-misc" min="20" max="200" step="10" value="50" class="custom-range" />
+      <div class="form-group">
+        <label for="grocery-tier"><strong>🛒 Monthly Grocery & Food:</strong></label>
+        <select id="grocery-tier" class="calc-select">
+          <option value="budget" selected>Self-Cooking & Discount Stores (Lidl/Sklavenitis) ~ €140</option>
+          <option value="standard">Moderate Cooking + Occasional Takeout ~ €210</option>
+          <option value="premium">Frequent Dining Out & Deliveries (Wolt/Foody) ~ €320</option>
+        </select>
       </div>
 
-      <hr class="calc-divider" />
-
-      <div class="section-title-wrap">
-        <span class="step-num">3</span>
-        <h2>Part-Time Job Offsetting</h2>
+      <div class="form-group">
+        <label for="ac-usage"><strong>⚡ Electricity & AC Usage (Per Person):</strong></label>
+        <select id="ac-usage" class="calc-select">
+          <option value="low">Low (Fans Only / Minimal Winter Heater) ~ €40</option>
+          <option value="moderate" selected>Moderate (AC 4-6 hrs daily in Summer/Winter) ~ €75</option>
+          <option value="high">Heavy (Heavy AC / Electric Water Heater continuous) ~ €125</option>
+        </select>
       </div>
 
-      <div class="input-group">
-        <div class="slider-header">
-          <label for="range-work" class="input-label">Weekly Legal Work Hours (Max 20 hrs)</label>
-          <span class="slider-val-badge"><span id="val-work-hours">20</span> hrs / week</span>
-        </div>
-        <input type="range" id="range-work" min="0" max="20" step="1" value="20" class="custom-range" />
-        <span class="field-hint">Legal limit for international students during academic semester is strictly 20 hrs/week.</span>
+      <div class="form-group">
+        <label for="transport-type"><strong>🚌 Public Transport & Commute:</strong></label>
+        <select id="transport-type" class="calc-select">
+          <option value="student_bus" selected>Motion Bus Student Card (~€20/month)</option>
+          <option value="intercity_bus">Intercity + Local Student Card (~€40/month)</option>
+          <option value="scooter_walk">Walk / E-Scooter / Bicycle (~€5/month charging)</option>
+        </select>
       </div>
 
-      <div class="input-group">
-        <label for="calc-wage" class="input-label">Estimated Net Hourly Pay</label>
-        <select id="calc-wage" class="custom-select">
-          <option value="5.50">€5.50 / hr (Entry Assistant / Kitchen Porter)</option>
-          <option value="6.50" selected>€6.50 / hr (Standard Hospitality / Delivery Service)</option>
-          <option value="8.00">€8.00 / hr (Experienced Barista / Technical Support)</option>
+      <div class="form-group">
+        <label for="misc-costs"><strong>📱 Phone SIM + Water + Personal Misc:</strong></label>
+        <select id="misc-costs" class="calc-select">
+          <option value="minimal" selected>Strict Minimum (SIM €15 + Water/Wifi €25) ~ €40</option>
+          <option value="standard">Standard (SIM €20 + Wifi/Water €30 + Misc €30) ~ €80</option>
+          <option value="social">Active Social Life + Shopping ~ €140</option>
         </select>
       </div>
     </div>
 
-    <div class="calc-summary-wrapper">
-      <div class="calc-summary-card">
-        <div class="summary-top-header">
-          <span class="summary-badge">Live Financial Breakdown</span>
-          <h3 class="summary-title">Estimated Monthly Summary</h3>
+    <!-- Output Section -->
+    <div class="calc-results-card">
+      <div class="result-box">
+        <span class="result-label">Estimated Monthly Expense</span>
+        <div class="result-amount">
+          <span class="currency">€</span><span id="total-cost">525</span><span class="period">/month</span>
         </div>
+        <div id="cost-category-pill" class="cost-pill budget-friendly">Manageable Student Budget</div>
+      </div>
 
-        <div class="total-expense-block">
-          <span class="exp-label">Total Monthly Expenses</span>
-          <div class="exp-amount-row">
-            <span class="currency-symbol">€</span>
-            <span id="total-monthly-expense" class="main-amount">595</span>
-            <span class="per-month-tag">/ month</span>
-          </div>
+      <div class="breakdown-list">
+        <div class="breakdown-item">
+          <span>🏠 Rent:</span>
+          <strong id="b-rent">€300</strong>
         </div>
-
-        <div class="breakdown-list">
-          <div class="breakdown-item">
-            <span class="item-name">🏠 Accommodation Rent</span>
-            <span class="item-price">€<span id="sum-rent">300</span></span>
-          </div>
-          <div class="breakdown-item">
-            <span class="item-name">🛒 Food & Groceries</span>
-            <span class="item-price">€<span id="sum-food">160</span></span>
-          </div>
-          <div class="breakdown-item">
-            <span class="item-name">⚡ Utilities (EAC, Water, Gas)</span>
-            <span class="item-price">€<span id="sum-utility">60</span></span>
-          </div>
-          <div class="breakdown-item">
-            <span class="item-name">🚌 Commute & Transport</span>
-            <span class="item-price">€<span id="sum-transport">20</span></span>
-          </div>
-          <div class="breakdown-item">
-            <span class="item-name">📱 SIM & Internet</span>
-            <span class="item-price">€<span id="sum-internet">25</span></span>
-          </div>
-          <div class="breakdown-item">
-            <span class="item-name">☕ Miscellaneous / Personal</span>
-            <span class="item-price">€<span id="sum-misc">50</span></span>
-          </div>
+        <div class="breakdown-item">
+          <span>🛒 Groceries:</span>
+          <strong id="b-food">€140</strong>
         </div>
-
-        <hr class="summary-inner-divider" />
-
-        <div class="income-balance-card">
-          <div class="income-row">
-            <span class="inc-label">💼 Legal Part-Time Income</span>
-            <span class="inc-val">+ €<span id="sum-income">520</span></span>
-          </div>
-
-          <div id="balance-status-box" class="balance-status-box status-deficit">
-            <div class="status-top">
-              <span class="status-indicator-dot"></span>
-              <span id="balance-heading" class="status-title">Monthly Deficit</span>
-            </div>
-            <div class="balance-number-row">
-              <span class="status-currency">€</span>
-              <span id="net-balance-amount" class="status-amount">75</span>
-            </div>
-            <p id="balance-description" class="status-explanation">
-              Your living costs exceed your legal 20-hour income. You will need external family support or prior savings for this gap.
-            </p>
-          </div>
+        <div class="breakdown-item">
+          <span>⚡ Utilities (Power/Water):</span>
+          <strong id="b-elec">€75</strong>
         </div>
+        <div class="breakdown-item">
+          <span>🚌 Mobility & Transport:</span>
+          <strong id="b-trans">€20</strong>
+        </div>
+        <div class="breakdown-item">
+          <span>📱 Internet & Misc:</span>
+          <strong id="b-misc">€40</strong>
+        </div>
+      </div>
 
-        <div class="taptap-referral-promo notranslate">
-          <div class="taptap-badge">⚡ ZERO-FEE REMITTANCE</div>
-          <h4 class="taptap-title">Need to Transfer Savings or Receive Tuition?</h4>
-          <p class="taptap-text">
-            Send money from Cyprus to Bangladesh, India, Pakistan, or Nepal with <strong>€0 transfer fees</strong> and verified real-time rates.
-          </p>
-          <div class="promo-code-container">
-            <span class="code-label">Use Code:</span>
-            <button type="button" id="copy-calc-promo" class="promo-code-click" title="Click to copy promo code">
-              MDSAIDUR240
-            </button>
-            <span class="bonus-pill">Get €10 Bonus</span>
-          </div>
-          <a href="/blog/how-to-send-money-from-cyprus-taptap-send-bonus-guide/" class="taptap-guide-link">
-            Read Full Taptap Send Transfer Guide ➔
-          </a>
+      <!-- Conversion Hook Box -->
+      <div class="taptap-calc-box">
+        <div class="taptap-badge">💡 Money Transfer Tip</div>
+        <p class="taptap-txt">Sending tuition fees or living funds from abroad? Use Taptap Send with <strong>zero transaction fees</strong> + get <strong>€10 bonus</strong> on your first transfer.</p>
+        <div class="taptap-action">
+          <span class="promo-code-calc">CODE: MDSAIDUR240</span>
+          <a href="/blog/how-to-send-money-from-cyprus-taptap-send-bonus-guide/" class="btn-claim-bonus">Claim €10 ➔</a>
         </div>
       </div>
     </div>
   </div>
-
-  <section class="calc-deep-dive notranslate">
-    <h2>Realistic Breakdown of Student Living Costs in Cyprus</h2>
-    
-    <div class="deep-dive-grid">
-      <div class="deep-card">
-        <h3>1. City Rent Variations</h3>
-        <p>
-          <strong>Limassol</strong> remains the most expensive city due to foreign commercial expansion, with shared rooms rarely falling below €280–€350. In contrast, <strong>Nicosia</strong> and <strong>Larnaca</strong> provide shared housing in the €200–€280 bracket.
-        </p>
-      </div>
-
-      <div class="deep-card">
-        <h3>2. The Electricity (EAC) Reality</h3>
-        <p>
-          Electricity bills in Cyprus are issued bi-monthly. Air conditioner usage during the scorching summer months (June to September) can easily double or triple energy consumption if left unmonitored.
-        </p>
-      </div>
-
-      <div class="deep-card">
-        <h3>3. The 20-Hour Part-Time Rule</h3>
-        <p>
-          Non-EU international students holding a valid Pink Slip / ARC are legally allowed to work a maximum of <strong>20 hours per week</strong> during semesters and <strong>38 hours per week</strong> during designated holiday breaks in government-permitted sectors.
-        </p>
-      </div>
-    </div>
-  </section>
 </BaseLayout>
 
 <script is:inline>
-  function initLivingCostCalculator() {
-    // City & Housing Base Rents Matrix
-    const rentMatrix = {
-      limassol: { shared: 300, single: 480, studio: 700 },
-      nicosia: { shared: 220, single: 360, studio: 520 },
-      larnaca: { shared: 200, single: 320, studio: 480 },
-      paphos: { shared: 190, single: 300, studio: 450 }
-    };
+  function calculateBudget() {
+    const city = document.getElementById('city-select').value;
+    const room = document.getElementById('room-type').value;
+    const food = document.getElementById('grocery-tier').value;
+    const ac = document.getElementById('ac-usage').value;
+    const trans = document.getElementById('transport-type').value;
+    const misc = document.getElementById('misc-costs').value;
 
-    // DOM References
-    const citySelect = document.getElementById('calc-city');
-    const housingRadios = document.querySelectorAll('input[name="housing"]');
-    const rangeFood = document.getElementById('range-food');
-    const rangeUtility = document.getElementById('range-utility');
-    const transportSelect = document.getElementById('calc-transport');
-    const internetSelect = document.getElementById('calc-internet');
-    const rangeMisc = document.getElementById('range-misc');
-    const rangeWorkHours = document.getElementById('range-work');
-    const wageSelect = document.getElementById('calc-wage');
+    // Base Rent Pricing Matrix
+    let rentCost = 280;
+    if (city === 'limassol') {
+      if (room === 'shared_room') rentCost = 350;
+      else if (room === 'private_room') rentCost = 480;
+      else if (room === 'studio') rentCost = 750;
+    } else if (city === 'nicosia') {
+      if (room === 'shared_room') rentCost = 270;
+      else if (room === 'private_room') rentCost = 380;
+      else if (room === 'studio') rentCost = 550;
+    } else if (city === 'larnaca') {
+      if (room === 'shared_room') rentCost = 240;
+      else if (room === 'private_room') rentCost = 340;
+      else if (room === 'studio') rentCost = 500;
+    } else if (city === 'paphos') {
+      if (room === 'shared_room') rentCost = 230;
+      else if (room === 'private_room') rentCost = 320;
+      else if (room === 'studio') rentCost = 480;
+    }
 
-    // Display Labels
-    const valFood = document.getElementById('val-food');
-    const valUtility = document.getElementById('val-utility');
-    const valMisc = document.getElementById('val-misc');
-    const valWorkHours = document.getElementById('val-work-hours');
+    // Grocery
+    let foodCost = 140;
+    if (food === 'standard') foodCost = 210;
+    if (food === 'premium') foodCost = 320;
 
-    // Summary Elements
-    const totalMonthlyExpenseEl = document.getElementById('total-monthly-expense');
-    const sumRent = document.getElementById('sum-rent');
-    const sumFood = document.getElementById('sum-food');
-    const sumUtility = document.getElementById('sum-utility');
-    const sumTransport = document.getElementById('sum-transport');
-    const sumInternet = document.getElementById('sum-internet');
-    const sumMisc = document.getElementById('sum-misc');
-    const sumIncome = document.getElementById('sum-income');
-    const netBalanceAmount = document.getElementById('net-balance-amount');
-    const balanceHeading = document.getElementById('balance-heading');
-    const balanceDescription = document.getElementById('balance-description');
-    const balanceStatusBox = document.getElementById('balance-status-box');
+    // AC / Electricity
+    let elecCost = 75;
+    if (ac === 'low') elecCost = 40;
+    if (ac === 'high') elecCost = 125;
 
-    function calculate() {
-      // 1. Get Values
-      const selectedCity = citySelect.value;
-      let selectedHousing = 'shared';
-      for (const radio of housingRadios) {
-        if (radio.checked) {
-          selectedHousing = radio.value;
-          break;
-        }
-      }
+    // Transport
+    let transCost = 20;
+    if (trans === 'intercity_bus') transCost = 40;
+    if (trans === 'scooter_walk') transCost = 5;
 
-      const rentCost = rentMatrix[selectedCity][selectedHousing] || 250;
-      const foodCost = parseInt(rangeFood.value, 10);
-      const utilityCost = parseInt(rangeUtility.value, 10);
-      const transportCost = parseInt(transportSelect.value, 10);
-      const internetCost = parseInt(internetSelect.value, 10);
-      const miscCost = parseInt(rangeMisc.value, 10);
-      const workHoursWeekly = parseInt(rangeWorkHours.value, 10);
-      const hourlyWage = parseFloat(wageSelect.value);
+    // Misc
+    let miscCost = 40;
+    if (misc === 'standard') miscCost = 80;
+    if (misc === 'social') miscCost = 140;
 
-      // 2. Update Label Badges
-      if (valFood) valFood.textContent = foodCost;
-      if (valUtility) valUtility.textContent = utilityCost;
-      if (valMisc) valMisc.textContent = miscCost;
-      if (valWorkHours) valWorkHours.textContent = workHoursWeekly;
+    const total = rentCost + foodCost + elecCost + transCost + miscCost;
 
-      // 3. Totals
-      const totalExpense = rentCost + foodCost + utilityCost + transportCost + internetCost + miscCost;
-      // Monthly income: 4.33 weeks per month on average
-      const monthlyIncome = Math.round(workHoursWeekly * hourlyWage * 4.33);
-      const netBalance = monthlyIncome - totalExpense;
+    // Update DOM
+    document.getElementById('total-cost').innerText = total;
+    document.getElementById('b-rent').innerText = '€' + rentCost;
+    document.getElementById('b-food').innerText = '€' + foodCost;
+    document.getElementById('b-elec').innerText = '€' + elecCost;
+    document.getElementById('b-trans').innerText = '€' + transCost;
+    document.getElementById('b-misc').innerText = '€' + miscCost;
 
-      // 4. Update Summary DOM
-      if (totalMonthlyExpenseEl) totalMonthlyExpenseEl.textContent = totalExpense;
-      if (sumRent) sumRent.textContent = rentCost;
-      if (sumFood) sumFood.textContent = foodCost;
-      if (sumUtility) sumUtility.textContent = utilityCost;
-      if (sumTransport) sumTransport.textContent = transportCost;
-      if (sumInternet) sumInternet.textContent = internetCost;
-      if (sumMisc) sumMisc.textContent = miscCost;
-      if (sumIncome) sumIncome.textContent = monthlyIncome;
+    const pill = document.getElementById('cost-category-pill');
+    if (total <= 550) {
+      pill.innerText = "Budget Friendly & Efficient";
+      pill.className = "cost-pill budget-friendly";
+    } else if (total <= 850) {
+      pill.innerText = "Standard Moderate Student Living";
+      pill.className = "cost-pill moderate";
+    } else {
+      pill.innerText = "High Comfort / Independent Living";
+      pill.className = "cost-pill high-cost";
+    }
+  }
 
-      if (netBalanceAmount && balanceStatusBox && balanceHeading && balanceDescription) {
-        netBalanceAmount.textContent = Math.abs(netBalance);
+  document.addEventListener('DOMContentLoaded', () => {
+    const selects = document.querySelectorAll('.calc-select');
+    selects.forEach(select => select.addEventListener('change', calculateBudget));
+    calculateBudget();
+  });
+</script>
 
-        if (netBalance >= 0) {
-          balanceStatusBox.className = 'balance-status-box status-surplus';
-          balanceHeading.textContent = '
+<style>
+  .calc-hero {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+  .calc-badge {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary-blue);
+    font-weight: 800;
+    font-size: 0.8rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 30px;
+    display: inline-block;
+    margin-bottom: 0.75rem;
+  }
+  .calc-title {
+    font-size: 2.35rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin: 0 0 0.75rem;
+    line-height: 1.25;
+  }
+  .calc-desc {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    max-width: 650px;
+    margin: 0 auto;
+  }
+
+  .calc-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .calc-inputs-card, .calc-results-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+  }
+
+  .form-group {
+    margin-bottom: 1.35rem;
+  }
+  .form-group:last-child {
+    margin-bottom: 0;
+  }
+  .form-group label {
+    display: block;
+    font-size: 0.92rem;
+    color: var(--text-main);
+    margin-bottom: 0.45rem;
+  }
+  .calc-select {
+    width: 100%;
+    background: var(--bg-color);
+    color: var(--text-main);
+    border: 1px solid var(--card-border);
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .calc-select:focus {
+    border-color: var(--primary-blue);
+  }
+
+  .result-box {
+    text-align: center;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(56, 189, 248, 0.04) 100%);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 1.75rem 1rem;
+    margin-bottom: 1.75rem;
+  }
+  .result-label {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .result-amount {
+    font-size: 3.25rem;
+    font-weight: 900;
+    color: var(--primary-blue);
+    line-height: 1.1;
+    margin: 0.35rem 0 0.65rem;
+  }
+  .result-amount .currency { font-size: 2rem; vertical-align: super; }
+  .result-amount .period { font-size: 1.1rem; color: var(--text-muted); font-weight: 600; }
+
+  .cost-pill {
+    display: inline-block;
+    padding: 0.3rem 0.85rem;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    font-weight: 800;
+  }
+  .budget-friendly { background: #dcfce7; color: #15803d; }
+  .moderate { background: #e0f2fe; color: #0369a1; }
+  .high-cost { background: #fee2e2; color: #b91c1c; }
+
+  .breakdown-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.75rem;
+  }
+  .breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--card-border);
+    color: var(--text-main);
+  }
+
+  .taptap-calc-box {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 1.25rem;
+    color: #f8fafc;
+  }
+  .taptap-badge {
+    color: #facc15;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.4rem;
+  }
+  .taptap-txt {
+    font-size: 0.86rem;
+    color: #cbd5e1;
+    line-height: 1.5;
+    margin: 0 0 1rem;
+  }
+  .taptap-action {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .promo-code-calc {
+    font-family: var(--font-mono);
+    background: #1e293b;
+    border: 1px dashed #facc15;
+    color: #facc15;
+    font-size: 0.82rem;
+    font-weight: 800;
+    padding: 0.35rem 0.65rem;
+    border-radius: 6px;
+  }
+  .btn-claim-bonus {
+    background: #2563eb;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 800;
+    padding: 0.4rem 0.85rem;
+    border-radius: 6px;
+  }
+
+  @media (max-width: 820px) {
+    .calc-container {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
