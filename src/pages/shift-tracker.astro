@@ -1,0 +1,943 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const title = "Cyprus Student Work Shift & Delivery Split Tracker | Excel Backup Tool 2026";
+const description = "Track daily student work hours, hourly rates, and multi-rider delivery earnings splits in Cyprus. Auto-saves offline with one-click Excel (.CSV) and JSON backup & restore.";
+const permalink = "https://cyprusstudentguide.com/shift-tracker/";
+
+const trackerSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Cyprus Student Work Shift & Split Tracker",
+  "url": permalink,
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "All",
+  "browserRequirements": "Requires JavaScript and LocalStorage",
+  "description": description
+};
+---
+
+<BaseLayout title={title} description={description} permalink={permalink} current="tracker">
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(trackerSchema)} />
+
+  <section class="tracker-hero">
+    <span class="tracker-badge">🔒 100% Private • Local Auto-Save • Excel Backup</span>
+    <h1 class="tracker-title">Student Work Shift & Delivery Split Log</h1>
+    <p class="tracker-desc">Keep accurate records of your working hours, calculate hourly earnings, or split shared delivery shifts with fuel deductions. Your data stays safely saved in your browser and can be exported to Excel anytime.</p>
+  </section>
+
+  <!-- Backup & Restore Control Center Bar -->
+  <div class="backup-toolbar notranslate">
+    <div class="backup-status">
+      <span class="status-indicator"></span>
+      <span id="save-status-text">All changes auto-saved to browser</span>
+    </div>
+    <div class="backup-buttons">
+      <button type="button" id="btn-export-csv" class="tool-btn btn-excel">
+        📊 Download Excel (.CSV)
+      </button>
+      <button type="button" id="btn-export-json" class="tool-btn btn-json">
+        💾 Save Backup File (.json)
+      </button>
+      <label class="tool-btn btn-restore">
+        📂 Restore File
+        <input type="file" id="file-restore-input" accept=".json,.csv" style="display: none;" />
+      </label>
+      <button type="button" id="btn-clear-all" class="tool-btn btn-danger" title="Clear all local data">
+        🗑️ Clear Data
+      </button>
+    </div>
+  </div>
+
+  <!-- Mode Switcher Tabs -->
+  <div class="mode-tabs-container notranslate">
+    <button type="button" class="tab-btn active" id="tab-daily-log">
+      📝 Daily Shift & Wage Log
+    </button>
+    <button type="button" class="tab-btn" id="tab-delivery-split">
+      🛵 Multi-Rider Delivery Splitter
+    </button>
+  </div>
+
+  <div class="tracker-body notranslate">
+    
+    <!-- ================= MODE 1: DAILY WORK & WAGE LOG ================= -->
+    <div id="view-daily-log" class="tracker-view active-view">
+      
+      <!-- Summary Dashboard Bar -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-label">Total Hours Recorded</span>
+          <div class="stat-val"><span id="stat-total-hours">0.0</span> hrs</div>
+          <span class="stat-sub">Tracked shifts</span>
+        </div>
+        <div class="stat-card stat-green">
+          <span class="stat-label">Total Earned Wages</span>
+          <div class="stat-val">€<span id="stat-total-earned">0.00</span></div>
+          <span class="stat-sub">Including recorded tips</span>
+        </div>
+        <div class="stat-card stat-blue">
+          <span class="stat-label">Average Hourly Rate</span>
+          <div class="stat-val">€<span id="stat-avg-rate">0.00</span>/hr</div>
+          <span class="stat-sub">Across all entries</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Legal 20h Weekly Status</span>
+          <div class="stat-val" id="stat-legal-status">In Compliance</div>
+          <span class="stat-sub">Non-EU Student Law</span>
+        </div>
+      </div>
+
+      <!-- Add New Shift Entry Form -->
+      <div class="entry-form-card">
+        <h3 class="form-title">➕ Add New Work Shift Entry</h3>
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="shift-date"><strong>📅 Date:</strong></label>
+            <input type="date" id="shift-date" class="t-input" />
+          </div>
+          <div class="form-field">
+            <label for="shift-job"><strong>🏢 Workplace / Category:</strong></label>
+            <input type="text" id="shift-job" class="t-input" placeholder="e.g. Restaurant / Delivery / Hotel" />
+          </div>
+          <div class="form-field">
+            <label for="shift-hours"><strong>⌛ Hours Worked:</strong></label>
+            <input type="number" id="shift-hours" class="t-input" step="0.5" min="0" placeholder="e.g. 5.5" />
+          </div>
+          <div class="form-field">
+            <label for="shift-rate"><strong>💶 Hourly Rate (€/hr):</strong></label>
+            <input type="number" id="shift-rate" class="t-input" step="0.5" min="0" value="6.50" placeholder="e.g. 6.50" />
+          </div>
+          <div class="form-field">
+            <label for="shift-tips"><strong>🎁 Extra Tips (€):</strong></label>
+            <input type="number" id="shift-tips" class="t-input" step="1" min="0" value="0" placeholder="e.g. 10" />
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="button" id="btn-save-shift" class="btn-primary">
+            + Save Shift to Local Log
+          </button>
+        </div>
+      </div>
+
+      <!-- Log Table View -->
+      <div class="table-card">
+        <div class="table-header-row">
+          <h3 class="table-title">📋 Recorded Shift History</h3>
+          <span class="table-count" id="log-count-badge">0 Shifts</span>
+        </div>
+        
+        <div class="table-responsive">
+          <table class="data-table" id="shifts-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Workplace</th>
+                <th>Hours</th>
+                <th>Rate</th>
+                <th>Tips</th>
+                <th>Total Earned</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="shifts-tbody">
+              <!-- Dynamically rendered -->
+            </tbody>
+          </table>
+        </div>
+        <div id="no-data-msg" class="empty-state">
+          <p>No work shifts recorded yet. Add your first entry above to start tracking your wages!</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= MODE 2: MULTI-RIDER DELIVERY SPLITTER ================= -->
+    <div id="view-delivery-split" class="tracker-view">
+      
+      <div class="split-calculator-card">
+        <div class="split-header">
+          <h2>🛵 Food Delivery Shift Earnings & Fuel Splitter</h2>
+          <p class="split-sub">Accurately divide total platform earnings (Wolt/Foody) between delivery partners according to hours worked, with fuel/scooter expenses deducted fairly.</p>
+        </div>
+
+        <!-- Shift Overview Inputs -->
+        <div class="split-inputs-row">
+          <div class="form-field">
+            <label for="split-total-earnings"><strong>💰 Total Gross App Earnings (€):</strong></label>
+            <input type="number" id="split-total-earnings" class="t-input calc-split-input" placeholder="Total € earned" value="180" />
+          </div>
+          <div class="form-field">
+            <label for="split-fuel-cost"><strong>⛽ Shared Fuel / Scooter Expense (€):</strong></label>
+            <input type="number" id="split-fuel-cost" class="t-input calc-split-input" placeholder="Fuel cost to deduct" value="20" />
+          </div>
+          <div class="form-field">
+            <label for="split-deduct-mode"><strong>⚙️ Expense Deduction Method:</strong></label>
+            <select id="split-deduct-mode" class="t-select calc-split-input">
+              <option value="proportional" selected>Deduct by Hours Worked (Fair Proportion)</option>
+              <option value="equal">Deduct Fuel 50/50 Equally</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Riders List & Hours -->
+        <div class="riders-section">
+          <h4 class="riders-heading">👥 Riders on This Shift</h4>
+          <div id="riders-list" class="riders-list">
+            <!-- Dynamically populated rider rows -->
+          </div>
+          <button type="button" id="btn-add-rider" class="btn-add-sub">+ Add Another Rider</button>
+        </div>
+
+        <!-- Split Result Calculation Summary -->
+        <div class="split-result-box">
+          <div class="result-summary-grid">
+            <div class="res-item">
+              <span>Gross Earnings:</span>
+              <strong id="res-gross">€180.00</strong>
+            </div>
+            <div class="res-item">
+              <span>Fuel Deduction:</span>
+              <strong id="res-fuel" style="color: #ef4444;">-€20.00</strong>
+            </div>
+            <div class="res-item res-net">
+              <span>Net Distributable:</span>
+              <strong id="res-net" style="color: #10b981;">€160.00</strong>
+            </div>
+          </div>
+
+          <h4 class="payout-title">💵 Payout Breakdown per Rider:</h4>
+          <div id="payout-breakdown-list" class="payout-list">
+            <!-- Dynamically calculated payouts -->
+          </div>
+        </div>
+
+        <!-- Copy / WhatsApp Share Summary -->
+        <div class="split-share-actions">
+          <button type="button" id="btn-copy-split-summary" class="btn-primary btn-copy-summary">
+            📋 Copy Shift Breakdown for WhatsApp
+          </button>
+          <span id="copy-feedback" class="copy-hint" style="display: none;">✅ Copied to clipboard!</span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Monetization / Safe Remittance Box -->
+  <div class="taptap-banner-card notranslate">
+    <div class="taptap-left">
+      <span class="taptap-tag">💡 Remittance & Tuition Fee Tip</span>
+      <h3 class="taptap-h">Sending Earned Wages Home or Paying Tuition?</h3>
+      <p class="taptap-p">Use Taptap Send from Cyprus with <strong>0% transfer fee</strong> and receive an extra <strong>€10 bonus</strong> on your first transfer using the student code below.</p>
+    </div>
+    <div class="taptap-right">
+      <span class="promo-box">CODE: MDSAIDUR240</span>
+      <a href="/blog/how-to-send-money-from-cyprus-taptap-send-bonus-guide/" class="btn-claim-taptap">Claim €10 ➔</a>
+    </div>
+  </div>
+</BaseLayout>
+
+<script is:inline>
+  // State Storage Keys
+  const STORAGE_KEY_SHIFTS = 'csg_student_shifts_data';
+  const STORAGE_KEY_RIDERS = 'csg_delivery_split_data';
+
+  // State
+  let shiftRecords = [];
+  let riderList = [
+    { name: 'Rider 1 (You)', hours: 6 },
+    { name: 'Rider 2 (Partner)', hours: 4 }
+  ];
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', () => {
+    // Set default date to today
+    const dateInput = document.getElementById('shift-date');
+    if (dateInput) {
+      dateInput.value = new Date().toISOString().split('T')[0];
+    }
+
+    loadLocalData();
+    initTabSwitching();
+    initDailyLogEvents();
+    initSplitterEvents();
+    initBackupEvents();
+    renderAll();
+  });
+
+  // Load from localStorage
+  function loadLocalData() {
+    try {
+      const savedShifts = localStorage.getItem(STORAGE_KEY_SHIFTS);
+      if (savedShifts) shiftRecords = JSON.parse(savedShifts);
+
+      const savedRiders = localStorage.getItem(STORAGE_KEY_RIDERS);
+      if (savedRiders) riderList = JSON.parse(savedRiders);
+    } catch (e) {
+      console.warn('Could not parse local data', e);
+    }
+  }
+
+  function saveLocalData() {
+    localStorage.setItem(STORAGE_KEY_SHIFTS, JSON.stringify(shiftRecords));
+    localStorage.setItem(STORAGE_KEY_RIDERS, JSON.stringify(riderList));
+    showSaveStatus();
+  }
+
+  function showSaveStatus() {
+    const el = document.getElementById('save-status-text');
+    if (el) {
+      el.innerText = 'Saved to browser at ' + new Date().toLocaleTimeString();
+      setTimeout(() => {
+        el.innerText = 'All changes auto-saved to browser';
+      }, 3000);
+    }
+  }
+
+  // Tab Switching
+  function initTabSwitching() {
+    const tabLog = document.getElementById('tab-daily-log');
+    const tabSplit = document.getElementById('tab-delivery-split');
+    const viewLog = document.getElementById('view-daily-log');
+    const viewSplit = document.getElementById('view-delivery-split');
+
+    tabLog.addEventListener('click', () => {
+      tabLog.classList.add('active');
+      tabSplit.classList.remove('active');
+      viewLog.classList.add('active-view');
+      viewSplit.classList.remove('active-view');
+    });
+
+    tabSplit.addEventListener('click', () => {
+      tabSplit.classList.add('active');
+      tabLog.classList.remove('active');
+      viewSplit.classList.add('active-view');
+      viewLog.classList.remove('active-view');
+      calculateDeliverySplit();
+    });
+  }
+
+  // --- DAILY LOG LOGIC ---
+  function initDailyLogEvents() {
+    const btnSave = document.getElementById('btn-save-shift');
+    btnSave.addEventListener('click', () => {
+      const date = document.getElementById('shift-date').value;
+      const job = document.getElementById('shift-job').value.trim() || 'General Shift';
+      const hours = parseFloat(document.getElementById('shift-hours').value) || 0;
+      const rate = parseFloat(document.getElementById('shift-rate').value) || 0;
+      const tips = parseFloat(document.getElementById('shift-tips').value) || 0;
+
+      if (hours <= 0) {
+        alert('Please enter valid working hours.');
+        return;
+      }
+
+      const totalEarned = (hours * rate) + tips;
+
+      const entry = {
+        id: 'shift_' + Date.now(),
+        date,
+        job,
+        hours,
+        rate,
+        tips,
+        totalEarned
+      };
+
+      shiftRecords.unshift(entry);
+      saveLocalData();
+      renderShiftsTable();
+
+      // Clear hours input
+      document.getElementById('shift-hours').value = '';
+      document.getElementById('shift-tips').value = '0';
+    });
+  }
+
+  function renderShiftsTable() {
+    const tbody = document.getElementById('shifts-tbody');
+    const emptyMsg = document.getElementById('no-data-msg');
+    const countBadge = document.getElementById('log-count-badge');
+
+    tbody.innerHTML = '';
+    countBadge.innerText = `${shiftRecords.length} Shifts`;
+
+    if (shiftRecords.length === 0) {
+      emptyMsg.style.display = 'block';
+    } else {
+      emptyMsg.style.display = 'none';
+      shiftRecords.forEach((item, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${item.date}</strong></td>
+          <td>${item.job}</td>
+          <td>${item.hours} hrs</td>
+          <td>€${item.rate.toFixed(2)}/hr</td>
+          <td>€${item.tips.toFixed(2)}</td>
+          <td class="earned-col">€${item.totalEarned.toFixed(2)}</td>
+          <td>
+            <button type="button" class="btn-delete" data-id="${item.id}" title="Delete shift">✕</button>
+          </td>
+        `;
+
+        tr.querySelector('.btn-delete').addEventListener('click', () => {
+          if (confirm('Delete this shift entry?')) {
+            shiftRecords.splice(index, 1);
+            saveLocalData();
+            renderShiftsTable();
+          }
+        });
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    updateDashboardStats();
+  }
+
+  function updateDashboardStats() {
+    let totalHours = 0;
+    let totalEarned = 0;
+
+    shiftRecords.forEach(s => {
+      totalHours += s.hours;
+      totalEarned += s.totalEarned;
+    });
+
+    const avgRate = totalHours > 0 ? (totalEarned / totalHours) : 0;
+
+    document.getElementById('stat-total-hours').innerText = totalHours.toFixed(1);
+    document.getElementById('stat-total-earned').innerText = totalEarned.toFixed(2);
+    document.getElementById('stat-avg-rate').innerText = avgRate.toFixed(2);
+
+    const legalStatus = document.getElementById('stat-legal-status');
+    if (totalHours > 20) {
+      legalStatus.innerText = 'Verify Multi-Week Avg';
+      legalStatus.style.color = '#f59e0b';
+    } else {
+      legalStatus.innerText = 'Legal Limit OK (≤20h)';
+      legalStatus.style.color = '#10b981';
+    }
+  }
+
+  // --- DELIVERY SPLITTER LOGIC ---
+  function initSplitterEvents() {
+    const addRiderBtn = document.getElementById('btn-add-rider');
+    addRiderBtn.addEventListener('click', () => {
+      riderList.push({ name: `Rider ${riderList.length + 1}`, hours: 4 });
+      renderRidersInputs();
+      calculateDeliverySplit();
+      saveLocalData();
+    });
+
+    const splitInputs = document.querySelectorAll('.calc-split-input');
+    splitInputs.forEach(i => i.addEventListener('input', calculateDeliverySplit));
+
+    // WhatsApp Summary Copy
+    document.getElementById('btn-copy-split-summary').addEventListener('click', copySplitSummary);
+
+    renderRidersInputs();
+    calculateDeliverySplit();
+  }
+
+  function renderRidersInputs() {
+    const container = document.getElementById('riders-list');
+    container.innerHTML = '';
+
+    riderList.forEach((rider, idx) => {
+      const row = document.createElement('div');
+      row.className = 'rider-input-row';
+      row.innerHTML = `
+        <input type="text" class="t-input rider-name" value="${rider.name}" placeholder="Rider name" />
+        <div class="rider-hrs-wrap">
+          <input type="number" class="t-input rider-hours" value="${rider.hours}" min="0" step="0.5" placeholder="Hours" />
+          <span class="hrs-label">hrs</span>
+        </div>
+        ${riderList.length > 1 ? `<button type="button" class="btn-del-rider" title="Remove rider">✕</button>` : ''}
+      `;
+
+      row.querySelector('.rider-name').addEventListener('input', (e) => {
+        riderList[idx].name = e.target.value;
+        calculateDeliverySplit();
+        saveLocalData();
+      });
+
+      row.querySelector('.rider-hours').addEventListener('input', (e) => {
+        riderList[idx].hours = parseFloat(e.target.value) || 0;
+        calculateDeliverySplit();
+        saveLocalData();
+      });
+
+      const delBtn = row.querySelector('.btn-del-rider');
+      if (delBtn) {
+        delBtn.addEventListener('click', () => {
+          riderList.splice(idx, 1);
+          renderRidersInputs();
+          calculateDeliverySplit();
+          saveLocalData();
+        });
+      }
+
+      container.appendChild(row);
+    });
+  }
+
+  function calculateDeliverySplit() {
+    const gross = parseFloat(document.getElementById('split-total-earnings').value) || 0;
+    const fuel = parseFloat(document.getElementById('split-fuel-cost').value) || 0;
+    const mode = document.getElementById('split-deduct-mode').value;
+    const net = Math.max(0, gross - fuel);
+
+    document.getElementById('res-gross').innerText = '€' + gross.toFixed(2);
+    document.getElementById('res-fuel').innerText = '-€' + fuel.toFixed(2);
+    document.getElementById('res-net').innerText = '€' + net.toFixed(2);
+
+    let totalRiderHours = 0;
+    riderList.forEach(r => totalRiderHours += r.hours);
+
+    const breakdownList = document.getElementById('payout-breakdown-list');
+    breakdownList.innerHTML = '';
+
+    riderList.forEach(rider => {
+      let riderPayout = 0;
+      let riderFuelShare = 0;
+
+      if (totalRiderHours > 0) {
+        const ratio = rider.hours / totalRiderHours;
+        if (mode === 'proportional') {
+          riderPayout = net * ratio;
+          riderFuelShare = fuel * ratio;
+        } else {
+          // Equal fuel split
+          const riderGross = gross * ratio;
+          riderFuelShare = fuel / riderList.length;
+          riderPayout = Math.max(0, riderGross - riderFuelShare);
+        }
+      }
+
+      const item = document.createElement('div');
+      item.className = 'payout-row';
+      item.innerHTML = `
+        <div class="p-name">
+          <strong>${rider.name || 'Rider'}</strong>
+          <span>(${rider.hours} hrs • Fuel Share: €${riderFuelShare.toFixed(2)})</span>
+        </div>
+        <div class="p-amount">
+          €${riderPayout.toFixed(2)}
+        </div>
+      `;
+      breakdownList.appendChild(item);
+    });
+  }
+
+  function copySplitSummary() {
+    const gross = parseFloat(document.getElementById('split-total-earnings').value) || 0;
+    const fuel = parseFloat(document.getElementById('split-fuel-cost').value) || 0;
+    const net = Math.max(0, gross - fuel);
+    let totalRiderHours = 0;
+    riderList.forEach(r => totalRiderHours += r.hours);
+
+    let text = `🛵 *Cyprus Food Delivery Shift Split Summary*\n`;
+    text += `📅 Date: ${new Date().toLocaleDateString()}\n`;
+    text += `💰 Gross Total: €${gross.toFixed(2)}\n`;
+    text += `⛽ Fuel Deducted: -€${fuel.toFixed(2)}\n`;
+    text += `💵 Net Total: €${net.toFixed(2)}\n`;
+    text += `--------------------------\n`;
+
+    riderList.forEach(rider => {
+      const ratio = totalRiderHours > 0 ? (rider.hours / totalRiderHours) : 0;
+      const payout = net * ratio;
+      text += `👤 *${rider.name}*: €${payout.toFixed(2)} (${rider.hours} hrs)\n`;
+    });
+
+    text += `--------------------------\nCalculated with CyprusStudentGuide.com`;
+
+    navigator.clipboard.writeText(text).then(() => {
+      const hint = document.getElementById('copy-feedback');
+      hint.style.display = 'inline';
+      setTimeout(() => hint.style.display = 'none', 3000);
+    });
+  }
+
+  // --- BACKUP & RESTORE / EXCEL EXPORT ---
+  function initBackupEvents() {
+    // Export CSV (Excel format)
+    document.getElementById('btn-export-csv').addEventListener('click', exportToCSV);
+
+    // Export JSON
+    document.getElementById('btn-export-json').addEventListener('click', exportToJSON);
+
+    // Restore File
+    const fileInput = document.getElementById('file-restore-input');
+    fileInput.addEventListener('change', handleFileRestore);
+
+    // Clear Data
+    document.getElementById('btn-clear-all').addEventListener('click', () => {
+      if (confirm('Are you sure you want to clear all recorded shifts and split data? Please make sure you have saved an Excel or Backup file first!')) {
+        shiftRecords = [];
+        riderList = [
+          { name: 'Rider 1 (You)', hours: 6 },
+          { name: 'Rider 2 (Partner)', hours: 4 }
+        ];
+        saveLocalData();
+        renderAll();
+      }
+    });
+  }
+
+  function exportToCSV() {
+    if (shiftRecords.length === 0) {
+      alert('No recorded shifts to export yet. Please add shift entries first!');
+      return;
+    }
+
+    let csv = "Date,Workplace,Hours,Hourly Rate (EUR),Tips (EUR),Total Earned (EUR)\n";
+    shiftRecords.forEach(s => {
+      csv += `"${s.date}","${s.job.replace(/"/g, '""')}",${s.hours},${s.rate},${s.tips},${s.totalEarned}\n`;
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Cyprus_Student_Work_Log_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function exportToJSON() {
+    const backupData = {
+      version: "1.0",
+      exportDate: new Date().toISOString(),
+      shifts: shiftRecords,
+      riders: riderList
+    };
+
+    const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Cyprus_Student_Tracker_Backup_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function handleFileRestore(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      try {
+        const content = evt.target.result;
+        if (file.name.endsWith('.json')) {
+          const parsed = JSON.parse(content);
+          if (parsed.shifts && Array.isArray(parsed.shifts)) {
+            shiftRecords = parsed.shifts;
+            if (parsed.riders && Array.isArray(parsed.riders)) riderList = parsed.riders;
+            saveLocalData();
+            renderAll();
+            alert('✅ Backup restored successfully!');
+          } else {
+            alert('Invalid backup JSON format.');
+          }
+        } else if (file.name.endsWith('.csv')) {
+          // Parse CSV
+          const lines = content.split('\n');
+          const imported = [];
+          for (let i = 1; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (!line) continue;
+            const parts = line.split(',');
+            if (parts.length >= 6) {
+              imported.push({
+                id: 'shift_' + Date.now() + '_' + i,
+                date: parts[0].replace(/"/g, ''),
+                job: parts[1].replace(/"/g, ''),
+                hours: parseFloat(parts[2]) || 0,
+                rate: parseFloat(parts[3]) || 0,
+                tips: parseFloat(parts[4]) || 0,
+                totalEarned: parseFloat(parts[5]) || 0
+              });
+            }
+          }
+          if (imported.length > 0) {
+            shiftRecords = imported;
+            saveLocalData();
+            renderAll();
+            alert(`✅ Restored ${imported.length} shift entries from CSV!`);
+          }
+        }
+      } catch (err) {
+        alert('Could not parse file. Error: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function renderAll() {
+    renderShiftsTable();
+    renderRidersInputs();
+    calculateDeliverySplit();
+  }
+</script>
+
+<style>
+  .tracker-hero {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .tracker-badge {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+    font-weight: 800;
+    font-size: 0.8rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 30px;
+    display: inline-block;
+    margin-bottom: 0.75rem;
+  }
+  html.dark .tracker-badge { color: #34d399; }
+  .tracker-title {
+    font-size: 2.3rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin: 0 0 0.75rem;
+    line-height: 1.25;
+  }
+  .tracker-desc {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  /* Backup Toolbar */
+  .backup-toolbar {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 0.85rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1.75rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+  }
+  .backup-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+  .status-indicator {
+    width: 9px;
+    height: 9px;
+    background: #10b981;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 8px #10b981;
+  }
+  .backup-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .tool-btn {
+    border: 1px solid var(--card-border);
+    background: var(--bg-color);
+    color: var(--text-main);
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.45rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .tool-btn:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
+  .btn-excel { background: rgba(16, 185, 129, 0.08); color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
+  .btn-excel:hover { background: #10b981; color: #fff !important; }
+  .btn-danger { color: #ef4444; }
+  .btn-danger:hover { background: #ef4444; color: #fff !important; }
+
+  /* Mode Switcher Tabs */
+  .mode-tabs-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+    background: rgba(150, 150, 150, 0.08);
+    padding: 0.4rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+  }
+  .tab-btn {
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .tab-btn.active {
+    background: var(--card-bg);
+    color: var(--primary-blue);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .tracker-view { display: none; }
+  .active-view { display: block; }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+  }
+  .stat-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 1.25rem 1rem;
+    text-align: center;
+  }
+  .stat-label { font-size: 0.76rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; }
+  .stat-val { font-size: 1.75rem; font-weight: 900; margin: 0.25rem 0; color: var(--text-main); }
+  .stat-sub { font-size: 0.75rem; color: var(--text-muted); }
+  .stat-green .stat-val { color: #10b981; }
+  .stat-blue .stat-val { color: var(--primary-blue); }
+
+  /* Entry Form Card */
+  .entry-form-card, .table-card, .split-calculator-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin-bottom: 1.75rem;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.02);
+  }
+  .form-title, .table-title { font-size: 1.15rem; font-weight: 800; margin: 0 0 1.25rem; color: var(--text-main); }
+  
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  .form-field label { font-size: 0.85rem; color: var(--text-main); display: block; margin-bottom: 0.35rem; }
+  .t-input, .t-select {
+    width: 100%;
+    background: var(--bg-color);
+    color: var(--text-main);
+    border: 1px solid var(--card-border);
+    padding: 0.65rem 0.85rem;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.92rem;
+    font-weight: 600;
+    outline: none;
+  }
+  .t-input:focus, .t-select:focus { border-color: var(--primary-blue); }
+  .btn-primary {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-primary:hover { background: #1d4ed8; }
+
+  /* Table View */
+  .table-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+  .table-count { font-size: 0.8rem; font-weight: 700; background: rgba(150,150,150,0.1); padding: 0.2rem 0.55rem; border-radius: 20px; color: var(--text-muted); }
+  .table-responsive { overflow-x: auto; }
+  .data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+  .data-table th, .data-table td { padding: 0.75rem 0.85rem; border-bottom: 1px solid var(--card-border); }
+  .data-table th { font-weight: 800; font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); }
+  .earned-col { font-weight: 800; color: #10b981; font-family: var(--font-mono); }
+  .btn-delete { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); border-radius: 6px; padding: 0.25rem 0.5rem; cursor: pointer; }
+  .btn-delete:hover { background: #ef4444; color: #fff; }
+  .empty-state { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.92rem; }
+
+  /* Delivery Split Section */
+  .split-header { margin-bottom: 1.5rem; }
+  .split-header h2 { font-size: 1.35rem; font-weight: 800; margin: 0 0 0.4rem; color: var(--text-main); }
+  .split-sub { font-size: 0.88rem; color: var(--text-muted); margin: 0; }
+  
+  .split-inputs-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .riders-section { background: rgba(150,150,150,0.04); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; }
+  .riders-heading { font-size: 0.95rem; font-weight: 800; margin: 0 0 0.85rem; color: var(--text-main); }
+  .riders-list { display: flex; flex-direction: column; gap: 0.65rem; margin-bottom: 0.85rem; }
+  .rider-input-row { display: flex; gap: 0.6rem; align-items: center; }
+  .rider-name { flex: 1.8; }
+  .rider-hrs-wrap { flex: 1; display: flex; align-items: center; position: relative; }
+  .hrs-label { position: absolute; right: 10px; font-size: 0.8rem; color: var(--text-muted); font-weight: 700; pointer-events: none; }
+  .btn-del-rider { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); border-radius: 6px; padding: 0.55rem 0.75rem; cursor: pointer; }
+  .btn-add-sub { background: var(--bg-color); border: 1px dashed var(--primary-blue); color: var(--primary-blue); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; width: 100%; }
+
+  .split-result-box {
+    background: linear-gradient(135deg, rgba(37,99,235,0.05) 0%, rgba(16,185,129,0.05) 100%);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .result-summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; padding-bottom: 1rem; border-bottom: 1px dashed var(--card-border); margin-bottom: 1rem; }
+  .res-item span { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; }
+  .res-item strong { font-size: 1.35rem; font-weight: 900; }
+  .payout-title { font-size: 0.95rem; font-weight: 800; margin: 0 0 0.75rem; color: var(--text-main); }
+  .payout-list { display: flex; flex-direction: column; gap: 0.5rem; }
+  .payout-row { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--card-border); }
+  .p-name strong { display: block; font-size: 0.95rem; }
+  .p-name span { font-size: 0.78rem; color: var(--text-muted); }
+  .p-amount { font-size: 1.35rem; font-weight: 900; color: #10b981; font-family: var(--font-mono); }
+
+  .split-share-actions { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .btn-copy-summary { background: #059669; }
+  .btn-copy-summary:hover { background: #047857; }
+  .copy-hint { font-size: 0.85rem; font-weight: 800; color: #10b981; }
+
+  /* Taptap Banner */
+  .taptap-banner-card {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 14px;
+    padding: 1.5rem;
+    color: #f8fafc;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+  }
+  .taptap-left { flex: 1.5; }
+  .taptap-tag { color: #facc15; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.35rem; }
+  .taptap-h { font-size: 1.15rem; font-weight: 800; margin: 0 0 0.4rem; color: #f8fafc; }
+  .taptap-p { font-size: 0.85rem; color: #cbd5e1; margin: 0; line-height: 1.5; }
+  .taptap-right { display: flex; align-items: center; gap: 0.75rem; }
+  .promo-box { font-family: var(--font-mono); background: #1e293b; border: 1px dashed #facc15; color: #facc15; font-size: 0.85rem; font-weight: 800; padding: 0.45rem 0.75rem; border-radius: 6px; }
+  .btn-claim-taptap { background: #2563eb; color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 800; padding: 0.5rem 1rem; border-radius: 6px; }
+
+  @media (max-width: 820px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .result-summary-grid { grid-template-columns: 1fr; gap: 0.5rem; }
+    .taptap-banner-card { flex-direction: column; align-items: flex-start; }
+    .tracker-title { font-size: 1.85rem; }
+  }
+</style>
