@@ -67,21 +67,15 @@ const { title, description, permalink, current = '' } = Astro.props;
     <!-- Responsive Navigation Header -->
     <header class="site-header notranslate">
       <div class="header-container">
-        <a href="/" class="site-logo">
-          <span class="logo-badge">CY</span>
-          <span class="logo-text">Cyprus <strong>Student Guide</strong></span>
-        </a>
         
-        <div class="header-right">
-          <nav class="site-nav">
-            <a href="/" class={current === 'home' ? 'active' : ''}>Home</a>
-            <a href="/blog/" class={current === 'blog' ? 'active' : ''}>All Guides</a>
-            <a href="/calculator/" class={current === 'calculator' ? 'active nav-highlight' : 'nav-highlight'}>🧮 Cost Calculator</a>
-            <a href="/about/" class={current === 'about' ? 'active' : ''}>About</a>
-          </nav>
+        <!-- Top Row on Mobile: Logo on Left, Controls (Lang + Theme) on Right -->
+        <div class="header-top-row">
+          <a href="/" class="site-logo">
+            <span class="logo-badge">CY</span>
+            <span class="logo-text">Cyprus <strong>Student Guide</strong></span>
+          </a>
 
           <div class="header-controls">
-            <!-- International Student Language Selector -->
             <div class="lang-dropdown">
               <select id="custom-language-select" aria-label="Select Language">
                 <option value="en">🇬🇧 EN</option>
@@ -95,15 +89,23 @@ const { title, description, permalink, current = '' } = Astro.props;
               </select>
             </div>
 
-            <!-- Theme Toggle Button -->
             <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">
               <span class="sun-icon">☀️</span>
               <span class="moon-icon">🌙</span>
             </button>
           </div>
         </div>
+        
+        <!-- Nav Links (Compact & Grid on Mobile to prevent horizontal scroll) -->
+        <nav class="site-nav">
+          <a href="/" class={current === 'home' ? 'active' : ''}>Home</a>
+          <a href="/blog/" class={current === 'blog' ? 'active' : ''}>All Guides</a>
+          <a href="/calculator/" class={current === 'calculator' ? 'active nav-highlight' : 'nav-highlight'}>🧮 Calculator</a>
+          <a href="/about/" class={current === 'about' ? 'active' : ''}>About</a>
+        </nav>
       </div>
-      <!-- Global Sticky Reading Progress Bar Container -->
+
+      <!-- Global Sticky Reading Progress Bar -->
       <div id="site-reading-progress" class="site-reading-progress"></div>
     </header>
 
@@ -275,14 +277,14 @@ const { title, description, permalink, current = '' } = Astro.props;
         position: sticky;
         top: 0;
         z-index: 100;
-        background: rgba(255, 255, 255, 0.92);
+        background: rgba(255, 255, 255, 0.94);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         border-bottom: 1px solid var(--card-border);
       }
 
       html.dark .site-header {
-        background: rgba(8, 13, 26, 0.9);
+        background: rgba(8, 13, 26, 0.92);
       }
 
       .site-reading-progress {
@@ -299,17 +301,23 @@ const { title, description, permalink, current = '' } = Astro.props;
       .header-container {
         max-width: 1100px;
         margin: 0 auto;
-        padding: 0.75rem 1rem;
+        padding: 0.65rem 1rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 0.75rem;
+        gap: 1rem;
+      }
+
+      .header-top-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
       }
 
       .site-logo {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.45rem;
         text-decoration: none;
         color: var(--text-main);
         font-size: 1.15rem;
@@ -329,16 +337,10 @@ const { title, description, permalink, current = '' } = Astro.props;
 
       .site-logo strong { color: var(--primary-blue); }
 
-      .header-right {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-      }
-
       .site-nav {
         display: flex;
         align-items: center;
-        gap: 0.85rem;
+        gap: 0.75rem;
       }
 
       .site-nav a {
@@ -346,25 +348,27 @@ const { title, description, permalink, current = '' } = Astro.props;
         color: var(--text-muted);
         font-size: 0.88rem;
         font-weight: 600;
-        transition: color 0.15s ease;
+        padding: 0.3rem 0.55rem;
+        border-radius: 6px;
+        transition: all 0.15s ease;
         white-space: nowrap;
       }
 
       .site-nav a:hover,
-      .site-nav a.active { color: var(--primary-blue); }
+      .site-nav a.active {
+        color: var(--primary-blue);
+        background: rgba(37, 99, 235, 0.08);
+      }
 
       .nav-highlight {
-        color: #2563eb !important;
+        color: var(--primary-blue) !important;
         font-weight: 700 !important;
-      }
-      html.dark .nav-highlight {
-        color: #38bdf8 !important;
       }
 
       .header-controls {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.45rem;
       }
 
       .lang-dropdown select {
@@ -373,7 +377,7 @@ const { title, description, permalink, current = '' } = Astro.props;
         border: 1px solid var(--card-border);
         padding: 0.3rem 0.45rem;
         border-radius: 6px;
-        font-size: 0.8rem;
+        font-size: 0.78rem;
         font-weight: 600;
         cursor: pointer;
         outline: none;
@@ -382,7 +386,7 @@ const { title, description, permalink, current = '' } = Astro.props;
       .theme-btn {
         background: rgba(150, 150, 150, 0.1);
         border: 1px solid var(--card-border);
-        padding: 0.3rem 0.5rem;
+        padding: 0.3rem 0.45rem;
         border-radius: 6px;
         cursor: pointer;
         display: flex;
@@ -459,38 +463,43 @@ const { title, description, permalink, current = '' } = Astro.props;
 
       .footer-bottom { padding-top: 1.25rem; border-top: 1px solid var(--card-border); font-size: 0.82rem; color: var(--text-muted); }
 
+      /* Mobile 2-Row Optimized Header Layout */
       @media (max-width: 768px) {
         .header-container {
           flex-direction: column;
           align-items: stretch;
-          gap: 0.6rem;
-          padding: 0.6rem 0.85rem;
+          padding: 0.5rem 0.75rem;
+          gap: 0.45rem;
         }
 
-        .header-right {
+        .header-top-row {
+          display: flex;
           justify-content: space-between;
+          align-items: center;
           width: 100%;
-          gap: 0.5rem;
         }
 
         .site-logo {
-          justify-content: center;
-          font-size: 1.1rem;
+          font-size: 1.05rem;
         }
 
         .site-nav {
-          gap: 0.6rem;
-          overflow-x: auto;
-          white-space: nowrap;
-          padding-bottom: 2px;
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 0.35rem;
+          width: 100%;
+          text-align: center;
         }
 
         .site-nav a {
-          font-size: 0.82rem;
+          font-size: 0.78rem;
+          padding: 0.35rem 0.2rem;
+          background: rgba(150, 150, 150, 0.06);
+          border-radius: 6px;
         }
 
         .main-content {
-          padding: 1.5rem 0.85rem 3.5rem;
+          padding: 1.25rem 0.75rem 3.5rem;
         }
       }
     </style>
