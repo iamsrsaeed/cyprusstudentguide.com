@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const title = "Cyprus Student Delivery Shift Settlement, Money Ledger & Work Tracker 2026";
-const description = "Track individual food delivery shifts (Wolt, Foody), manage daily income & expenses, log hourly student shifts, and export clean audit sheets to Excel.";
+const description = "Track individual food delivery shifts (Wolt, Foody), live sync across multi-devices with 6-digit room codes or Google Login, and export clean audit sheets to Excel.";
 const permalink = "https://cyprusstudentguide.com/shift-tracker/";
 
 const trackerSchema = {
@@ -23,9 +23,35 @@ const trackerSchema = {
   <div class="st-wrapper notranslate">
     <!-- Header Hero -->
     <div class="st-hero">
-      <span class="st-badge">🛵 Multi-Rider Slot Tracker • Isolated Tab Storage • Excel Export</span>
-      <h1 class="st-title">Student Work Shift & Money Tracker Hub</h1>
-      <p class="st-desc">Log delivery shift sessions with time slots, record daily personal finances, track hourly wages, and export complete audit settlement sheets for Excel.</p>
+      <span class="st-badge">🛵 Realtime Multi-Device Sync • 6-Digit Room Code • Excel Export</span>
+      <h1 class="st-title">Student Work Shift & Live Money Tracker Hub</h1>
+      <p class="st-desc">Track delivery shifts across multiple riders via instant live sync room codes, log personal finances, and export verified settlement sheets.</p>
+    </div>
+
+    <!-- Live Cloud Sync Hub Widget -->
+    <div class="st-sync-hub">
+      <div class="st-sync-left">
+        <div class="st-sync-status-indicator">
+          <span class="st-pulse-dot" id="sync-dot"></span>
+          <span id="sync-status-title" class="st-sync-title">Mode: Local Offline Storage</span>
+        </div>
+        <span id="sync-status-desc" class="st-sync-sub">Data is saved locally in this browser. Connect a room or Google account to sync live across devices.</span>
+      </div>
+
+      <div class="st-sync-actions">
+        <!-- Room Sync Modal Triggers -->
+        <button type="button" id="btn-open-room-modal" class="st-btn st-btn-room">
+          📡 Live Room Code
+        </button>
+        <!-- Google Sign-In Trigger -->
+        <button type="button" id="btn-google-auth" class="st-btn st-btn-google">
+          <svg width="14" height="14" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+          <span id="google-btn-text">Google Cloud Sync</span>
+        </button>
+        <button type="button" id="btn-disconnect-sync" class="st-btn st-btn-red-soft" style="display: none;">
+          Disconnect
+        </button>
+      </div>
     </div>
 
     <!-- Top Toolbar: Global Currency & Multi-Layer Backup Controls -->
@@ -101,9 +127,7 @@ const trackerSchema = {
             <span class="st-tag">Total: <span class="curr-sym">€</span><span id="label-total-expenses">0.00</span></span>
           </div>
 
-          <div id="delivery-expenses-container" class="st-expenses-list">
-            <!-- Dynamically populated expense rows -->
-          </div>
+          <div id="delivery-expenses-container" class="st-expenses-list"></div>
 
           <button type="button" id="btn-add-expense-row" class="st-btn-outline">
             + Add Another Custom Shared Expense (Rent, SIM, Petrol, Repairs)
@@ -119,15 +143,13 @@ const trackerSchema = {
         <!-- Rider Quick Selection Chips -->
         <div class="st-rider-chips-wrap">
           <span class="st-chip-label">Quick Select Rider:</span>
-          <div id="rider-chips-container" class="st-chips-list">
-            <!-- Dynamically populated name chips -->
-          </div>
+          <div id="rider-chips-container" class="st-chips-list"></div>
         </div>
 
         <div class="st-grid-session-form">
           <div class="st-field">
             <label>Rider Name:</label>
-            <input type="text" id="sess-rider-name" list="rider-datalist" class="st-input" placeholder="e.g. Rider 1, Tanvir" />
+            <input type="text" id="sess-rider-name" list="rider-datalist" class="st-input" placeholder="e.g. Saidur, Tanvir" />
             <datalist id="rider-datalist"></datalist>
           </div>
 
@@ -216,9 +238,7 @@ const trackerSchema = {
           </button>
         </div>
 
-        <div id="cycle-rider-settlement-list" class="st-rider-settlement-cards">
-          <!-- Dynamically populated rider settlement summary cards -->
-        </div>
+        <div id="cycle-rider-settlement-list" class="st-rider-settlement-cards"></div>
 
         <div class="st-foot-actions" style="margin-top: 1.5rem;">
           <button type="button" id="btn-copy-delivery-summary" class="st-btn st-btn-primary">
@@ -474,9 +494,63 @@ const trackerSchema = {
       </div>
     </div>
   </div>
+
+  <!-- Room Code Modal -->
+  <div id="room-sync-modal" class="st-modal-overlay">
+    <div class="st-modal-box">
+      <div class="st-modal-head">
+        <h3>📡 Multi-Device Room Sync</h3>
+        <button type="button" id="btn-close-modal" class="st-modal-close">✕</button>
+      </div>
+      <p class="st-modal-desc">Collaborate with delivery partners on the same shifts sheet in realtime without registration.</p>
+
+      <div class="st-modal-body">
+        <div class="st-card-mini">
+          <h4>Create a New Room</h4>
+          <p>Generate a 6-digit sync code and share with your riders.</p>
+          <button type="button" id="btn-create-room" class="st-btn st-btn-primary" style="width: 100%;">
+            ⚡ Generate 6-Digit Room Code
+          </button>
+        </div>
+
+        <div style="text-align: center; margin: 0.75rem 0; font-weight: 800; color: var(--text-muted); font-size: 0.8rem;">— OR JOIN EXISTING —</div>
+
+        <div class="st-card-mini">
+          <h4>Join Partner's Room</h4>
+          <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+            <input type="text" id="join-room-input" class="st-input" placeholder="e.g. CY-8824" style="text-transform: uppercase; font-family: var(--font-mono); font-weight: 800;" />
+            <button type="button" id="btn-join-room" class="st-btn st-btn-green" style="white-space: nowrap;">
+              Connect ➔
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </BaseLayout>
 
-<script is:inline>
+<!-- Firebase SDKs for Browser Bundle -->
+<script is:inline type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+  // Production Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyBnLArPDFIG6Kr9OtkoCzhdFBHMbgzK8k0",
+    authDomain: "cyprusstudentguidelogin.firebaseapp.com",
+    projectId: "cyprusstudentguidelogin",
+    storageBucket: "cyprusstudentguidelogin.firebasestorage.app",
+    messagingSenderId: "215797465320",
+    appId: "1:215797465320:web:afad34a9c5aa686772c95d",
+    measurementId: "G-1RWQEC5L8D"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
   // Storage Keys
   const STORAGE_KEY_CURRENCY = 'csg_user_currency';
   const STORAGE_KEY_LEDGER = 'csg_daily_ledger_data';
@@ -484,8 +558,9 @@ const trackerSchema = {
   const STORAGE_KEY_SESSIONS = 'csg_delivery_sessions_data';
   const STORAGE_KEY_CONFIG = 'csg_delivery_config_data';
   const STORAGE_KEY_EXPENSES = 'csg_delivery_custom_expenses_data';
+  const STORAGE_KEY_ACTIVE_ROOM = 'csg_active_sync_room';
 
-  // App State - Starts 100% clean and empty for new users
+  // App State
   let currentCurrency = '€';
   let currentTransType = 'expense';
   let currentActiveTab = 'view-delivery-sessions';
@@ -493,10 +568,13 @@ const trackerSchema = {
   let shiftRecords = [];
   let deliverySessions = [];
   let deliveryCustomExpenses = [];
+  let deliveryConfig = { fleetPercent: 18.0 };
 
-  let deliveryConfig = {
-    fleetPercent: 18.0
-  };
+  // Realtime Cloud State
+  let activeSyncRoom = null;
+  let currentUser = null;
+  let unsubscribeSnapshot = null;
+  let isReceivingRemoteUpdate = false;
 
   document.addEventListener('DOMContentLoaded', () => {
     const today = new Date().toISOString().split('T')[0];
@@ -528,7 +606,15 @@ const trackerSchema = {
     initShiftsEngine();
     initBackupEngine();
     initIsolatedTabClearing();
+    initRealtimeSyncHub();
     renderAll();
+
+    // Check URL parameters for Room Code: ?room=CY-XXXX
+    const urlParams = new URLSearchParams(window.location.search);
+    const roomParam = urlParams.get('room');
+    if (roomParam) {
+      connectToRoom(roomParam.toUpperCase());
+    }
   });
 
   function loadData() {
@@ -550,12 +636,15 @@ const trackerSchema = {
 
       const cfg = localStorage.getItem(STORAGE_KEY_CONFIG);
       if (cfg) deliveryConfig = JSON.parse(cfg);
+
+      const room = localStorage.getItem(STORAGE_KEY_ACTIVE_ROOM);
+      if (room) activeSyncRoom = room;
     } catch (e) {
       console.warn('Storage read error:', e);
     }
   }
 
-  function saveData() {
+  function saveData(pushToCloud = true) {
     localStorage.setItem(STORAGE_KEY_CURRENCY, currentCurrency);
     localStorage.setItem(STORAGE_KEY_LEDGER, JSON.stringify(ledgerRecords));
     localStorage.setItem(STORAGE_KEY_SHIFTS, JSON.stringify(shiftRecords));
@@ -568,9 +657,208 @@ const trackerSchema = {
       txt.innerText = 'Saved ' + new Date().toLocaleTimeString();
       setTimeout(() => txt.innerText = 'Auto-saved to browser', 2500);
     }
+
+    if (pushToCloud && !isReceivingRemoteUpdate) {
+      syncStateToCloud();
+    }
   }
 
-  // Load Demo Data Helper
+  // ================= REALTIME CLOUD & ROOM ENGINE =================
+  function initRealtimeSyncHub() {
+    const modal = document.getElementById('room-sync-modal');
+    const openModalBtn = document.getElementById('btn-open-room-modal');
+    const closeModalBtn = document.getElementById('btn-close-modal');
+    const createRoomBtn = document.getElementById('btn-create-room');
+    const joinRoomBtn = document.getElementById('btn-join-room');
+    const joinRoomInput = document.getElementById('join-room-input');
+    const googleAuthBtn = document.getElementById('btn-google-auth');
+    const disconnectBtn = document.getElementById('btn-disconnect-sync');
+
+    if (openModalBtn) openModalBtn.addEventListener('click', () => modal.classList.add('active'));
+    if (closeModalBtn) closeModalBtn.addEventListener('click', () => modal.classList.remove('active'));
+
+    // Create Room (CY-XXXX)
+    if (createRoomBtn) {
+      createRoomBtn.addEventListener('click', () => {
+        const randCode = 'CY-' + Math.floor(1000 + Math.random() * 9000);
+        modal.classList.remove('active');
+        connectToRoom(randCode);
+      });
+    }
+
+    // Join Room
+    if (joinRoomBtn) {
+      joinRoomBtn.addEventListener('click', () => {
+        const code = joinRoomInput.value.trim().toUpperCase();
+        if (!code || code.length < 4) {
+          alert('Please enter a valid room code (e.g. CY-8824)');
+          return;
+        }
+        modal.classList.remove('active');
+        connectToRoom(code);
+      });
+    }
+
+    // Google Sign-In
+    if (googleAuthBtn) {
+      googleAuthBtn.addEventListener('click', async () => {
+        if (currentUser) return;
+        try {
+          const res = await signInWithPopup(auth, provider);
+          currentUser = res.user;
+          setupUserCloudSync(currentUser.uid, currentUser.displayName || currentUser.email);
+        } catch (err) {
+          console.error(err);
+          alert('Google Sign-In failed or was cancelled.');
+        }
+      });
+    }
+
+    // Disconnect
+    if (disconnectBtn) {
+      disconnectBtn.addEventListener('click', async () => {
+        if (confirm('Disconnect live sync and return to local offline mode?')) {
+          if (unsubscribeSnapshot) unsubscribeSnapshot();
+          activeSyncRoom = null;
+          currentUser = null;
+          localStorage.removeItem(STORAGE_KEY_ACTIVE_ROOM);
+          try { await signOut(auth); } catch(e){}
+          updateSyncUI();
+          renderAll();
+        }
+      });
+    }
+
+    // Auth State Listener
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUser = user;
+        setupUserCloudSync(user.uid, user.displayName || user.email);
+      } else if (activeSyncRoom) {
+        connectToRoom(activeSyncRoom);
+      } else {
+        updateSyncUI();
+      }
+    });
+  }
+
+  function connectToRoom(roomCode) {
+    if (unsubscribeSnapshot) unsubscribeSnapshot();
+    activeSyncRoom = roomCode;
+    localStorage.setItem(STORAGE_KEY_ACTIVE_ROOM, roomCode);
+
+    const docRef = doc(db, "sync_rooms", roomCode);
+
+    // Initial Push if new
+    syncStateToCloud();
+
+    // Listen to live updates from peers
+    unsubscribeSnapshot = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const remote = docSnap.data();
+        applyRemoteData(remote);
+      }
+    }, (err) => {
+      console.warn("Room listener:", err);
+    });
+
+    updateSyncUI();
+  }
+
+  function setupUserCloudSync(uid, displayName) {
+    if (unsubscribeSnapshot) unsubscribeSnapshot();
+    activeSyncRoom = null;
+    localStorage.removeItem(STORAGE_KEY_ACTIVE_ROOM);
+
+    const docRef = doc(db, "user_profiles", uid);
+    syncStateToCloud();
+
+    unsubscribeSnapshot = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const remote = docSnap.data();
+        applyRemoteData(remote);
+      }
+    }, (err) => {
+      console.warn("User listener:", err);
+    });
+
+    updateSyncUI();
+  }
+
+  function syncStateToCloud() {
+    if (!activeSyncRoom && !currentUser) return;
+
+    const payload = {
+      updatedAt: Date.now(),
+      currency: currentCurrency,
+      deliverySessions,
+      deliveryCustomExpenses,
+      deliveryConfig,
+      ledgerRecords,
+      shiftRecords
+    };
+
+    if (activeSyncRoom) {
+      setDoc(doc(db, "sync_rooms", activeSyncRoom), payload, { merge: true }).catch(console.warn);
+    } else if (currentUser) {
+      setDoc(doc(db, "user_profiles", currentUser.uid), payload, { merge: true }).catch(console.warn);
+    }
+  }
+
+  function applyRemoteData(remote) {
+    if (!remote) return;
+    isReceivingRemoteUpdate = true;
+
+    if (remote.currency) currentCurrency = remote.currency;
+    if (remote.deliverySessions) deliverySessions = remote.deliverySessions;
+    if (remote.deliveryCustomExpenses) deliveryCustomExpenses = remote.deliveryCustomExpenses;
+    if (remote.deliveryConfig) deliveryConfig = remote.deliveryConfig;
+    if (remote.ledgerRecords) ledgerRecords = remote.ledgerRecords;
+    if (remote.shiftRecords) shiftRecords = remote.shiftRecords;
+
+    saveData(false);
+    initCurrency();
+    renderAll();
+
+    isReceivingRemoteUpdate = false;
+  }
+
+  function updateSyncUI() {
+    const titleEl = document.getElementById('sync-status-title');
+    const descEl = document.getElementById('sync-status-desc');
+    const dotEl = document.getElementById('sync-dot');
+    const googleBtn = document.getElementById('btn-google-auth');
+    const googleTxt = document.getElementById('google-btn-text');
+    const roomBtn = document.getElementById('btn-open-room-modal');
+    const disBtn = document.getElementById('btn-disconnect-sync');
+
+    if (activeSyncRoom) {
+      dotEl.className = 'st-pulse-dot dot-live';
+      titleEl.innerHTML = `🟢 Live Room Connected: <strong>${activeSyncRoom}</strong>`;
+      descEl.innerHTML = `Multi-device live sync active. Share code <strong>${activeSyncRoom}</strong> or link: <a href="?room=${activeSyncRoom}" target="_blank" style="color:var(--primary-blue); font-weight:700;">Invite Link</a>`;
+      roomBtn.innerText = `Room: ${activeSyncRoom}`;
+      disBtn.style.display = 'inline-flex';
+      googleBtn.style.display = 'none';
+    } else if (currentUser) {
+      dotEl.className = 'st-pulse-dot dot-live';
+      titleEl.innerHTML = `🟢 Google Cloud Synced: <strong>${currentUser.displayName || currentUser.email}</strong>`;
+      descEl.innerText = `Personal cloud backup active across all your logged-in phones and laptops.`;
+      googleTxt.innerText = `Account: ${currentUser.displayName ? currentUser.displayName.split(' ')[0] : 'Connected'}`;
+      disBtn.style.display = 'inline-flex';
+      roomBtn.style.display = 'none';
+    } else {
+      dotEl.className = 'st-pulse-dot dot-offline';
+      titleEl.innerText = 'Mode: Local Offline Storage';
+      descEl.innerText = 'Data is saved locally in this browser. Connect a room or Google account to sync live across devices.';
+      googleTxt.innerText = 'Google Cloud Sync';
+      roomBtn.innerText = '📡 Live Room Code';
+      disBtn.style.display = 'none';
+      googleBtn.style.display = 'inline-flex';
+      roomBtn.style.display = 'inline-flex';
+    }
+  }
+
+  // Demo loader
   function loadDemoData() {
     const today = new Date().toISOString().split('T')[0];
     deliverySessions = [
@@ -631,7 +919,6 @@ const trackerSchema = {
 
   // ================= 3. ISOLATED TAB RESET ENGINE =================
   function initIsolatedTabClearing() {
-    // 1. Clear Delivery Data Only
     const clearDelBtn = document.getElementById('btn-clear-delivery-tab');
     if (clearDelBtn) {
       clearDelBtn.addEventListener('click', () => {
@@ -646,7 +933,6 @@ const trackerSchema = {
       });
     }
 
-    // 2. Clear Money Ledger Data Only
     const clearLedgerBtn = document.getElementById('btn-clear-ledger-tab');
     if (clearLedgerBtn) {
       clearLedgerBtn.addEventListener('click', () => {
@@ -659,7 +945,6 @@ const trackerSchema = {
       });
     }
 
-    // 3. Clear Hourly Work Shifts Only
     const clearShiftsBtn = document.getElementById('btn-clear-shifts-tab');
     if (clearShiftsBtn) {
       clearShiftsBtn.addEventListener('click', () => {
@@ -685,7 +970,6 @@ const trackerSchema = {
       });
     }
 
-    // Demo loader buttons
     const demoBtnTop = document.getElementById('btn-load-demo-top');
     const demoBtnInline = document.getElementById('btn-load-demo-inline');
     if (demoBtnTop) demoBtnTop.addEventListener('click', loadDemoData);
@@ -1435,7 +1719,7 @@ const trackerSchema = {
 
     document.getElementById('btn-export-json').addEventListener('click', () => {
       const backup = {
-        version: "9.5",
+        version: "10.0",
         currency: currentCurrency,
         ledger: ledgerRecords,
         shifts: shiftRecords,
@@ -1526,6 +1810,36 @@ const trackerSchema = {
     max-width: 720px;
     margin: 0 auto;
   }
+
+  /* Live Sync Hub Card */
+  .st-sync-hub {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-left: 4px solid var(--primary-blue);
+    border-radius: 12px;
+    padding: 0.85rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+  }
+  .st-sync-left { flex: 1; min-width: 260px; }
+  .st-sync-status-indicator { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.2rem; }
+  .st-sync-title { font-size: 0.92rem; font-weight: 800; color: var(--text-main); }
+  .st-sync-sub { font-size: 0.78rem; color: var(--text-muted); display: block; line-height: 1.4; }
+  .st-sync-actions { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+  .st-btn-room { background: rgba(37, 99, 235, 0.1); color: var(--primary-blue); border-color: rgba(37, 99, 235, 0.25); font-weight: 800; }
+  .st-btn-room:hover { background: var(--primary-blue); color: #fff; }
+  .st-btn-google { background: #fff; color: #374151; border: 1px solid #d1d5db; font-weight: 700; gap: 0.4rem; }
+  html.dark .st-btn-google { background: #1e293b; color: #f8fafc; border-color: #334155; }
+  .st-btn-google:hover { border-color: #9ca3af; }
+
+  .st-pulse-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+  .dot-offline { background: #94a3b8; }
+  .dot-live { background: #10b981; box-shadow: 0 0 8px #10b981; }
 
   /* Toolbar */
   .st-toolbar {
@@ -1838,6 +2152,18 @@ const trackerSchema = {
   .st-foot-actions { display: flex; align-items: center; gap: 1rem; }
   .st-feedback-msg { font-size: 0.85rem; font-weight: 800; color: #10b981; }
 
+  /* Room Modal */
+  .st-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 1rem; }
+  .st-modal-overlay.active { display: flex; }
+  .st-modal-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.5rem; max-width: 440px; width: 100%; box-shadow: 0 20px 40px rgba(0,0,0,0.25); }
+  .st-modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+  .st-modal-head h3 { font-size: 1.15rem; font-weight: 800; margin: 0; color: var(--text-main); }
+  .st-modal-close { border: none; background: transparent; color: var(--text-muted); font-size: 1.25rem; cursor: pointer; }
+  .st-modal-desc { font-size: 0.82rem; color: var(--text-muted); margin: 0 0 1.25rem; line-height: 1.4; }
+  .st-card-mini { background: rgba(150,150,150,0.05); border: 1px solid var(--card-border); border-radius: 10px; padding: 1rem; }
+  .st-card-mini h4 { margin: 0 0 0.25rem; font-size: 0.9rem; font-weight: 800; color: var(--text-main); }
+  .st-card-mini p { margin: 0 0 0.75rem; font-size: 0.75rem; color: var(--text-muted); }
+
   /* Taptap Box */
   .st-taptap-card {
     background: #0f172a;
@@ -1868,5 +2194,6 @@ const trackerSchema = {
     .sr-total-col { border-left: none; border-top: 1px solid var(--card-border); padding-left: 0; padding-top: 0.5rem; grid-column: span 2; }
     .st-taptap-card { flex-direction: column; align-items: flex-start; }
     .st-title { font-size: 1.85rem; }
+    .st-sync-hub { flex-direction: column; align-items: flex-start; }
   }
 </style>
