@@ -1,14 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-const title = "Cyprus Student Delivery Shift Settlement & Progress Tracker 2026";
-const description = "Track individual food delivery shifts (Wolt, Foody), log multiple shift slots per rider, add custom shared expenses (Scooter rent, SIM, fuel), and settle payouts easily with complete Excel export.";
+const title = "Cyprus Student Delivery Shift Settlement, Money Ledger & Work Tracker 2026";
+const description = "Track individual food delivery shifts (Wolt, Foody), manage daily income & expenses, log hourly student shifts, and export clean audit sheets to Excel.";
 const permalink = "https://cyprusstudentguide.com/shift-tracker/";
 
 const trackerSchema = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "Cyprus Student Delivery Shift Settlement Tracker",
+  "name": "Cyprus Student Delivery Shift & Financial Tracker",
   "url": permalink,
   "applicationCategory": "FinanceApplication",
   "operatingSystem": "All",
@@ -23,12 +23,12 @@ const trackerSchema = {
   <div class="st-wrapper notranslate">
     <!-- Header Hero -->
     <div class="st-hero">
-      <span class="st-badge">🛵 Multi-Rider Slot Tracker • Complete Settlement Reports • Excel Export</span>
-      <h1 class="st-title">Delivery Shift Settlement & Progress Tracker</h1>
-      <p class="st-desc">Log delivery shift sessions, pick rider names via quick suggestion chips, add custom vehicle & operating expenses, and export complete audit settlement sheets for Excel.</p>
+      <span class="st-badge">🛵 Multi-Rider Slot Tracker • Isolated Tab Storage • Excel Export</span>
+      <h1 class="st-title">Student Work Shift & Money Tracker Hub</h1>
+      <p class="st-desc">Log delivery shift sessions with time slots, record daily personal finances, track hourly wages, and export complete audit settlement sheets for Excel.</p>
     </div>
 
-    <!-- Top Toolbar -->
+    <!-- Top Toolbar: Global Currency & Multi-Layer Backup Controls -->
     <div class="st-toolbar">
       <div class="st-tool-group">
         <label for="global-currency-select" class="st-tool-label">Currency:</label>
@@ -48,22 +48,22 @@ const trackerSchema = {
       </div>
 
       <div class="st-actions-group">
-        <button type="button" id="btn-export-csv" class="st-btn st-btn-green" title="Export complete settlement sheet to clean Excel format">
-          📊 Export Complete Excel (.CSV)
+        <button type="button" id="btn-export-csv" class="st-btn st-btn-green" title="Export current active tab to formatted Excel sheet">
+          📊 Export Active Tab (.CSV)
         </button>
-        <button type="button" id="btn-export-json" class="st-btn st-btn-gray">💾 Save Backup</button>
+        <button type="button" id="btn-export-json" class="st-btn st-btn-gray" title="Download complete JSON backup file">💾 Save Backup</button>
         <label class="st-btn st-btn-gray st-btn-file">
           📂 Restore
           <input type="file" id="file-restore-input" accept=".json,.csv" style="display: none;" />
         </label>
-        <button type="button" id="btn-clear-all" class="st-btn st-btn-red" title="Clear all local data">🗑️ Reset</button>
+        <button type="button" id="btn-load-demo-top" class="st-btn st-btn-demo" title="Load sample shift data for demo">✨ Load Demo</button>
       </div>
     </div>
 
     <!-- Navigation Tabs -->
     <div class="st-tabs">
       <button type="button" class="st-tab-btn active" data-target="view-delivery-sessions">
-        🛵 Delivery Shifts & Payment Progress
+        🛵 Food Delivery Shift Splitter
       </button>
       <button type="button" class="st-tab-btn" data-target="view-money-ledger">
         💰 Daily Income & Expenses
@@ -90,7 +90,7 @@ const trackerSchema = {
               <input type="number" id="cfg-fleet-percent" class="st-input cfg-input" value="18" min="0" max="100" step="0.5" />
               <span class="st-unit-tag-right">%</span>
             </div>
-            <span class="st-hint">Standard fleet fee (usually 15% - 20%)</span>
+            <span class="st-hint">Standard fleet cut (usually 15% - 20%)</span>
           </div>
         </div>
 
@@ -127,7 +127,7 @@ const trackerSchema = {
         <div class="st-grid-session-form">
           <div class="st-field">
             <label>Rider Name:</label>
-            <input type="text" id="sess-rider-name" list="rider-datalist" class="st-input" placeholder="e.g. Saidur, Tanvir, Rider 1" />
+            <input type="text" id="sess-rider-name" list="rider-datalist" class="st-input" placeholder="e.g. Rider 1, Tanvir" />
             <datalist id="rider-datalist"></datalist>
           </div>
 
@@ -228,11 +228,16 @@ const trackerSchema = {
         </div>
       </div>
 
-      <!-- Section D: Individual Shift Sessions History Table -->
+      <!-- Section D: Individual Shift Sessions History Table & Isolated Reset -->
       <div class="st-card">
         <div class="st-filter-row">
-          <h3 class="st-box-title" style="margin: 0;">📋 Individual Logged Sessions & Statuses</h3>
-          <span class="st-tag-blue" id="session-count-badge">0 Sessions</span>
+          <div>
+            <h3 class="st-box-title" style="margin: 0;">📋 Individual Logged Sessions & Statuses</h3>
+            <span class="st-tag-blue" id="session-count-badge">0 Sessions</span>
+          </div>
+          <button type="button" id="btn-clear-delivery-tab" class="st-btn st-btn-red-soft" title="Clear only food delivery data">
+            🗑️ Clear Delivery Data Only
+          </button>
         </div>
 
         <div class="st-table-wrapper">
@@ -253,7 +258,12 @@ const trackerSchema = {
             </thead>
             <tbody id="delivery-sessions-tbody"></tbody>
           </table>
-          <div id="no-sessions-msg" class="st-empty-msg">No delivery sessions match the selected filters.</div>
+          <div id="no-sessions-msg" class="st-empty-msg">
+            <p>No delivery sessions recorded yet. Enter your first shift above!</p>
+            <button type="button" id="btn-load-demo-inline" class="st-btn st-btn-demo" style="margin-top: 0.5rem;">
+              ✨ Load Sample Demo Data (Try Feature)
+            </button>
+          </div>
         </div>
       </div>
 
@@ -267,7 +277,12 @@ const trackerSchema = {
             <label for="ledger-month-filter"><strong>Select Month:</strong></label>
             <input type="month" id="ledger-month-filter" class="st-input-mini" />
           </div>
-          <span class="st-tag-blue" id="current-month-display">Monthly Report</span>
+          <div>
+            <span class="st-tag-blue" id="current-month-display">Monthly Report</span>
+            <button type="button" id="btn-clear-ledger-tab" class="st-btn st-btn-red-soft" style="margin-left: 0.5rem;" title="Clear only income & expense ledger">
+              🗑️ Clear Ledger Data Only
+            </button>
+          </div>
         </div>
 
         <div class="st-stats-grid">
@@ -366,6 +381,13 @@ const trackerSchema = {
     <!-- ================= TAB 3: HOURLY WORK SHIFTS ================= -->
     <div id="view-daily-log" class="st-tab-content">
       <div class="st-card">
+        <div class="st-filter-row" style="margin-bottom: 1rem;">
+          <h3 class="st-box-title" style="margin: 0;">Hourly Shift Metrics</h3>
+          <button type="button" id="btn-clear-shifts-tab" class="st-btn st-btn-red-soft" title="Clear only hourly shift log">
+            🗑️ Clear Hourly Shifts Only
+          </button>
+        </div>
+
         <div class="st-stats-grid">
           <div class="st-stat-card">
             <span class="st-stat-lbl">Hours Tracked</span>
@@ -463,25 +485,14 @@ const trackerSchema = {
   const STORAGE_KEY_CONFIG = 'csg_delivery_config_data';
   const STORAGE_KEY_EXPENSES = 'csg_delivery_custom_expenses_data';
 
-  // State
+  // App State - Starts 100% clean and empty for new users
   let currentCurrency = '€';
   let currentTransType = 'expense';
   let currentActiveTab = 'view-delivery-sessions';
   let ledgerRecords = [];
   let shiftRecords = [];
-
-  // Delivery Sessions & Custom Expenses State
-  let deliverySessions = [
-    { id: 'ds_1', name: 'said', date: '2026-08-27', startTime: '11:00', endTime: '14:00', appGross: 10.0, cashTips: 0.0, status: 'pending' },
-    { id: 'ds_2', name: 'azhar', date: '2026-08-27', startTime: '11:00', endTime: '14:00', appGross: 20.0, cashTips: 0.0, status: 'pending' },
-    { id: 'ds_3', name: 'said', date: '2026-08-27', startTime: '11:00', endTime: '14:00', appGross: 15.0, cashTips: 0.0, status: 'pending' },
-    { id: 'ds_4', name: 'said', date: '2026-08-28', startTime: '11:00', endTime: '14:00', appGross: 45.0, cashTips: 0.0, status: 'pending' }
-  ];
-
-  let deliveryCustomExpenses = [
-    { id: 'exp_1', name: 'Scooter / Bike Rent', amount: 15.0 },
-    { id: 'exp_2', name: 'Petrol / Fuel', amount: 10.0 }
-  ];
+  let deliverySessions = [];
+  let deliveryCustomExpenses = [];
 
   let deliveryConfig = {
     fleetPercent: 18.0
@@ -516,6 +527,7 @@ const trackerSchema = {
     initLedgerEngine();
     initShiftsEngine();
     initBackupEngine();
+    initIsolatedTabClearing();
     renderAll();
   });
 
@@ -558,7 +570,23 @@ const trackerSchema = {
     }
   }
 
-  // 1. Currency
+  // Load Demo Data Helper
+  function loadDemoData() {
+    const today = new Date().toISOString().split('T')[0];
+    deliverySessions = [
+      { id: 'ds_1', name: 'Saidur', date: today, startTime: '11:00', endTime: '14:00', appGross: 25.0, cashTips: 2.0, status: 'pending' },
+      { id: 'ds_2', name: 'Tanvir', date: today, startTime: '14:30', endTime: '17:30', appGross: 35.0, cashTips: 4.0, status: 'pending' },
+      { id: 'ds_3', name: 'Saidur', date: today, startTime: '18:30', endTime: '22:00', appGross: 45.0, cashTips: 5.0, status: 'pending' }
+    ];
+    deliveryCustomExpenses = [
+      { id: 'exp_1', name: 'Scooter / Bike Rent', amount: 15.0 },
+      { id: 'exp_2', name: 'Petrol / Fuel', amount: 10.0 }
+    ];
+    saveData();
+    renderAll();
+  }
+
+  // 1. Currency Picker
   function initCurrency() {
     const sel = document.getElementById('global-currency-select');
     if (sel) {
@@ -601,7 +629,51 @@ const trackerSchema = {
     });
   }
 
-  // ================= 3. DELIVERY SESSIONS & EXPENSES ENGINE =================
+  // ================= 3. ISOLATED TAB RESET ENGINE =================
+  function initIsolatedTabClearing() {
+    // 1. Clear Delivery Data Only
+    const clearDelBtn = document.getElementById('btn-clear-delivery-tab');
+    if (clearDelBtn) {
+      clearDelBtn.addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear all Food Delivery Shifts and Expenses only? (Your Daily Ledger and Work Shifts will stay safe)')) {
+          deliverySessions = [];
+          deliveryCustomExpenses = [];
+          saveData();
+          updateRiderSuggestions();
+          renderDeliverySessions();
+          alert('✅ Food Delivery data cleared successfully.');
+        }
+      });
+    }
+
+    // 2. Clear Money Ledger Data Only
+    const clearLedgerBtn = document.getElementById('btn-clear-ledger-tab');
+    if (clearLedgerBtn) {
+      clearLedgerBtn.addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear all Daily Income & Expenses records only? (Delivery and Work Shifts will stay safe)')) {
+          ledgerRecords = [];
+          saveData();
+          renderLedger();
+          alert('✅ Daily Income & Expenses data cleared successfully.');
+        }
+      });
+    }
+
+    // 3. Clear Hourly Work Shifts Only
+    const clearShiftsBtn = document.getElementById('btn-clear-shifts-tab');
+    if (clearShiftsBtn) {
+      clearShiftsBtn.addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear all Hourly Work Shifts records only?')) {
+          shiftRecords = [];
+          saveData();
+          renderShifts();
+          alert('✅ Hourly Work Shifts data cleared successfully.');
+        }
+      });
+    }
+  }
+
+  // ================= 4. DELIVERY SESSIONS & EXPENSES ENGINE =================
   function initDeliverySessionsEngine() {
     const fleetInp = document.getElementById('cfg-fleet-percent');
     if (fleetInp) {
@@ -612,6 +684,12 @@ const trackerSchema = {
         renderDeliverySessions();
       });
     }
+
+    // Demo loader buttons
+    const demoBtnTop = document.getElementById('btn-load-demo-top');
+    const demoBtnInline = document.getElementById('btn-load-demo-inline');
+    if (demoBtnTop) demoBtnTop.addEventListener('click', loadDemoData);
+    if (demoBtnInline) demoBtnInline.addEventListener('click', loadDemoData);
 
     const addExpBtn = document.getElementById('btn-add-expense-row');
     if (addExpBtn) {
@@ -677,7 +755,7 @@ const trackerSchema = {
         const pendingInView = filtered.filter(s => s.status !== 'paid');
 
         if (pendingInView.length === 0) {
-          alert('No pending shift sessions in this view.');
+          alert('No pending shift sessions in this view to settle.');
           return;
         }
 
@@ -1028,7 +1106,7 @@ const trackerSchema = {
     });
   }
 
-  // ================= 4. LEDGER & HOURLY SHIFTS =================
+  // ================= 5. LEDGER & HOURLY SHIFTS =================
   function initLedgerEngine() {
     const btnExp = document.getElementById('btn-type-expense');
     const btnInc = document.getElementById('btn-type-income');
@@ -1239,7 +1317,7 @@ const trackerSchema = {
     document.getElementById('stat-avg-rate').innerText = totalHours > 0 ? (totalEarned / totalHours).toFixed(2) : '0.00';
   }
 
-  // ================= 5. COMPLETE MULTI-SECTION AUDIT EXCEL EXPORT =================
+  // ================= 6. COMPLETE MULTI-SECTION AUDIT EXCEL EXPORT =================
   function initBackupEngine() {
     document.getElementById('btn-export-csv').addEventListener('click', () => {
       const todayStr = new Date().toISOString().split('T')[0];
@@ -1345,7 +1423,7 @@ const trackerSchema = {
         });
       }
 
-      // Prepend UTF-8 BOM so Excel opens currency symbols (€, ৳, ₹) perfectly
+      // Prepend UTF-8 BOM so Excel opens currency symbols perfectly without corruption
       const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -1357,7 +1435,7 @@ const trackerSchema = {
 
     document.getElementById('btn-export-json').addEventListener('click', () => {
       const backup = {
-        version: "8.5",
+        version: "9.5",
         currency: currentCurrency,
         ledger: ledgerRecords,
         shifts: shiftRecords,
@@ -1401,17 +1479,6 @@ const trackerSchema = {
         }
       };
       reader.readAsText(file);
-    });
-
-    document.getElementById('btn-clear-all').addEventListener('click', () => {
-      if (confirm('Are you sure you want to reset all data? Download an Excel or JSON backup first!')) {
-        ledgerRecords = [];
-        shiftRecords = [];
-        deliverySessions = [];
-        deliveryCustomExpenses = [];
-        saveData();
-        renderAll();
-      }
     });
   }
 
@@ -1533,8 +1600,10 @@ const trackerSchema = {
   .st-btn-green { background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
   .st-btn-green:hover { background: #10b981; color: #fff; }
   .st-btn-gray:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
-  .st-btn-red { color: #ef4444; }
-  .st-btn-red:hover { background: #ef4444; color: #fff; }
+  .st-btn-demo { background: rgba(37, 99, 235, 0.1); color: var(--primary-blue); border-color: rgba(37, 99, 235, 0.25); }
+  .st-btn-demo:hover { background: var(--primary-blue); color: #fff; }
+  .st-btn-red-soft { background: rgba(239, 68, 68, 0.08); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); font-size: 0.78rem; font-weight: 700; padding: 0.35rem 0.7rem; border-radius: 6px; cursor: pointer; }
+  .st-btn-red-soft:hover { background: #ef4444; color: #fff; }
   .st-btn-file { cursor: pointer; }
   .st-btn-primary { background: #2563eb; color: #fff; border: none; font-size: 0.9rem; padding: 0.65rem 1.25rem; font-weight: 800; border-radius: 8px; }
   .st-btn-primary:hover { background: #1d4ed8; }
