@@ -1,12 +1,25 @@
 ---
+import DisclaimerNotice from '../components/DisclaimerNotice.astro';
+
 export interface Props {
-  title: string;
-  description: string;
-  permalink: string;
+  title?: string;
+  description?: string;
+  permalink?: string;
   current?: string;
+  image?: string;
+  hideDisclaimer?: boolean;
 }
 
-const { title, description, permalink, current = '' } = Astro.props;
+const {
+  title = "Cyprus Student Guide - Complete Guide for International Students in Cyprus",
+  description = "Complete guide for international students in Cyprus covering study, jobs, student visa, living costs, and life in North and South Cyprus.",
+  permalink = "https://cyprusstudentguide.com",
+  current = "",
+  image = "/assets/banner.png",
+  hideDisclaimer = false,
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://cyprusstudentguide.com').href;
 ---
 
 <!DOCTYPE html>
@@ -16,341 +29,248 @@ const { title, description, permalink, current = '' } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={permalink} />
+    <link rel="canonical" href={canonicalURL} />
 
-    <!-- Cyprus Student Guide Custom Favicon & App Icons -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/favicon.svg" />
-    <meta name="theme-color" content="#2563eb" />
-
-    <!-- Google AdSense Verification & Auto Ads Script -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4089174887676363" crossorigin="anonymous"></script>
-
-    <!-- Open Graph / Social Meta Tags -->
+    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Cyprus Student Guide" />
+    <meta property="og:url" content={canonicalURL} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={permalink} />
-    <meta property="og:image" content="https://cyprusstudentguide.com/favicon.svg" />
+    <meta property="og:image" content={image} />
 
-    <!-- Twitter / X Cards -->
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content="https://cyprusstudentguide.com/favicon.svg" />
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalURL} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={image} />
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet" />
-
-    <!-- Theme Initialization Script -->
-    <script is:inline>
-      const theme = (() => {
-        if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
-          return localStorage.getItem('theme');
-        }
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-          return 'dark';
-        }
-        return 'light';
-      })();
-      if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    </script>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body>
-    <!-- Top Announcement Bar -->
-    <div class="csg-announcement-bar">
-      <span>🎁 <strong>TAPTAP SEND BONUS:</strong> Send money from Cyprus with 0% fee! Code: <code>MDSAIDUR240</code></span>
-      <a href="/blog/how-to-send-money-from-cyprus-taptap-send-bonus-guide/">Claim €10 Bonus ➔</a>
-    </div>
-
-    <!-- Header Navigation -->
-    <header class="csg-header">
-      <div class="csg-container csg-nav-inner">
-        <a href="/" class="csg-brand">
-          <span class="csg-logo-badge">CY</span>
-          <span class="csg-brand-text">Cyprus <span>Student Guide</span></span>
+    <header class="site-header">
+      <nav class="nav-container">
+        <a href="/" class="logo">
+          <span class="logo-badge">CY</span>
+          <strong>Cyprus Student Guide</strong>
         </a>
-
-        <nav class="csg-nav-links">
-          <a href="/" class={current === 'home' ? 'active' : ''}>Home</a>
-          <a href="/blog/" class={current === 'guides' ? 'active' : ''}>Guides</a>
-          <a href="/calculator/" class={current === 'calculator' ? 'active' : ''}>💶 Budget</a>
-          <a href="/shift-tracker/" class={current === 'tracker' ? 'active' : ''}>⏱️ Work Tracker</a>
-          <a href="/about/" class={current === 'about' ? 'active' : ''}>About</a>
-        </nav>
-
-        <div class="csg-nav-actions">
-          <button id="theme-toggle" type="button" aria-label="Toggle Dark Mode" class="csg-theme-btn">
-            🌙
-          </button>
+        <div class="nav-links">
+          <a href="/" class={current === "home" ? "active" : ""}>Home</a>
+          <a href="/guides/" class={current === "guides" ? "active" : ""}>Guides</a>
+          <a href="/calculator/" class={current === "calculator" ? "active" : ""}>📊 Budget</a>
+          <a href="/shift-tracker/" class={current === "tracker" ? "active" : ""}>⏱️ Work Tracker</a>
+          <a href="/about/" class={current === "about" ? "active" : ""}>About</a>
         </div>
-      </div>
+      </nav>
     </header>
 
-    <!-- Main Content Injection -->
-    <main class="csg-main">
-      <div class="csg-container">
-        <slot />
-      </div>
+    <main class="main-content">
+      <slot />
+
+      <!-- Automatic Site-Wide Legal Disclaimer Notice -->
+      {!hideDisclaimer && current !== "disclaimer" && (
+        <div class="layout-disclaimer-wrapper">
+          <DisclaimerNotice />
+        </div>
+      )}
     </main>
 
-    <!-- Footer -->
-    <footer class="csg-footer">
-      <div class="csg-container csg-footer-inner">
-        <div class="csg-footer-brand">
-          <div class="csg-brand">
-            <span class="csg-logo-badge">CY</span>
-            <span class="csg-brand-text">Cyprus <span>Student Guide</span></span>
+    <footer class="site-footer">
+      <div class="footer-container">
+        <div class="footer-grid">
+          <div class="footer-brand">
+            <h3>Cyprus Student Guide</h3>
+            <p>Independent educational and financial information portal supporting international students in Cyprus.</p>
           </div>
-          <p>The definitive lifestyle, university, job tracking, and legal living handbook for international students in Cyprus.</p>
-        </div>
-
-        <div class="csg-footer-links-grid">
-          <div class="csg-footer-col">
-            <h4>Quick Tools</h4>
+          <div class="footer-links">
+            <h4>Quick Links</h4>
             <ul>
-              <li><a href="/shift-tracker/">Delivery Shift Splitter</a></li>
-              <li><a href="/calculator/">Cost of Living Calculator</a></li>
-              <li><a href="/blog/">Student Visa & Work Guides</a></li>
-            </ul>
-          </div>
-          <div class="csg-footer-col">
-            <h4>Legal & Trust</h4>
-            <ul>
+              <li><a href="/guides/">Student Guides</a></li>
+              <li><a href="/shift-tracker/">Shift Tracker</a></li>
+              <li><a href="/calculator/">Cost Calculator</a></li>
               <li><a href="/about/">About Us</a></li>
               <li><a href="/contact/">Contact Us</a></li>
+            </ul>
+          </div>
+          <div class="footer-legal">
+            <h4>Legal & Policies</h4>
+            <ul>
               <li><a href="/privacy/">Privacy Policy</a></li>
               <li><a href="/terms/">Terms of Service</a></li>
-              <li><a href="/disclaimer/">Disclaimer</a></li>
+              <li><a href="/disclaimer/">Legal Disclaimer</a></li>
             </ul>
           </div>
         </div>
-      </div>
-
-      <div class="csg-container csg-footer-bottom">
-        <p>© 2026 Cyprus Student Guide. All rights reserved. Designed for international students.</p>
+        <div class="footer-bottom">
+          <p>© {new Date().getFullYear()} CyprusStudentGuide.com. All rights reserved.</p>
+        </div>
       </div>
     </footer>
-
-    <!-- Theme Toggle Handler -->
-    <script is:inline>
-      const themeToggleBtn = document.getElementById('theme-toggle');
-      if (themeToggleBtn) {
-        const isDark = document.documentElement.classList.contains('dark');
-        themeToggleBtn.innerText = isDark ? '☀️' : '🌙';
-
-        themeToggleBtn.addEventListener('click', () => {
-          const currentlyDark = document.documentElement.classList.toggle('dark');
-          localStorage.setItem('theme', currentlyDark ? 'dark' : 'light');
-          themeToggleBtn.innerText = currentlyDark ? '☀️' : '🌙';
-        });
-      }
-    </script>
   </body>
 </html>
 
 <style is:global>
   :root {
-    --bg-color: #f8fafc;
+    --primary-blue: #2563eb;
+    --primary-glow: rgba(37, 99, 235, 0.15);
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --bg-color: #ffffff;
     --card-bg: #ffffff;
     --card-border: #e2e8f0;
-    --text-main: #0f172a;
-    --text-muted: #64748b;
-    --primary-blue: #2563eb;
-    --primary-blue-hover: #1d4ed8;
-    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
 
   html.dark {
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
     --bg-color: #0b0f19;
     --card-bg: #111827;
     --card-border: #1f2937;
-    --text-main: #f8fafc;
-    --text-muted: #94a3b8;
-    --primary-blue: #3b82f6;
-    --primary-blue-hover: #60a5fa;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-main);
-    font-family: var(--font-sans);
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-    min-height: 100vh;
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
   }
 
-  .csg-container {
-    max-width: 1120px;
-    margin: 0 auto;
-    padding: 0 1.25rem;
+  .main-content {
+    flex: 1;
     width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
+    box-sizing: border-box;
   }
 
-  /* Announcement Bar */
-  .csg-announcement-bar {
-    background: #0f172a;
-    color: #f8fafc;
-    font-size: 0.82rem;
-    font-weight: 700;
-    padding: 0.5rem 1rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-    border-bottom: 1px solid #1e293b;
-    text-align: center;
+  .layout-disclaimer-wrapper {
+    max-width: 980px;
+    margin: 0 auto;
   }
-  .csg-announcement-bar code {
-    background: #1e293b;
-    color: #fbbf24;
-    padding: 0.15rem 0.4rem;
-    border-radius: 4px;
-    font-family: var(--font-mono);
-  }
-  .csg-announcement-bar a {
-    color: #60a5fa;
-    text-decoration: none;
-    font-weight: 800;
-  }
-  .csg-announcement-bar a:hover { text-decoration: underline; }
 
-  /* Header */
-  .csg-header {
+  /* Header & Navigation */
+  .site-header {
     background: var(--card-bg);
     border-bottom: 1px solid var(--card-border);
     position: sticky;
     top: 0;
-    z-index: 1000;
+    z-index: 50;
   }
-  .csg-nav-inner {
+  .nav-container {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0.85rem 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 64px;
   }
-
-  .csg-brand {
+  .logo {
     display: flex;
     align-items: center;
-    gap: 0.65rem;
+    gap: 0.5rem;
     text-decoration: none;
     color: var(--text-main);
-  }
-  .csg-logo-badge {
-    background: linear-gradient(135deg, #2563eb, #0284c7);
-    color: #ffffff;
-    font-size: 0.95rem;
-    font-weight: 900;
-    padding: 0.35rem 0.6rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
-  }
-  .csg-brand-text {
-    font-size: 1.15rem;
     font-weight: 800;
-    letter-spacing: -0.02em;
+    font-size: 1.1rem;
   }
-  .csg-brand-text span { color: var(--primary-blue); }
-
-  .csg-nav-links {
+  .logo-badge {
+    background: var(--primary-blue);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 900;
+    padding: 0.2rem 0.45rem;
+    border-radius: 6px;
+  }
+  .nav-links {
     display: flex;
-    align-items: center;
     gap: 1.25rem;
+    align-items: center;
   }
-  .csg-nav-links a {
+  .nav-links a {
     text-decoration: none;
     color: var(--text-muted);
-    font-size: 0.92rem;
     font-weight: 700;
+    font-size: 0.9rem;
     transition: color 0.15s ease;
   }
-  .csg-nav-links a:hover,
-  .csg-nav-links a.active {
+  .nav-links a:hover, .nav-links a.active {
     color: var(--primary-blue);
   }
 
-  .csg-theme-btn {
-    background: rgba(150, 150, 150, 0.1);
-    border: 1px solid var(--card-border);
-    font-size: 1rem;
-    padding: 0.4rem 0.65rem;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-
-  /* Main */
-  .csg-main {
-    flex: 1;
-    padding: 2rem 0 3rem;
-  }
-
   /* Footer */
-  .csg-footer {
+  .site-footer {
     background: var(--card-bg);
     border-top: 1px solid var(--card-border);
-    padding: 3.5rem 0 1.5rem;
+    padding: 3rem 1rem 1.5rem;
     margin-top: auto;
   }
-  .csg-footer-inner {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 2.5rem;
-    margin-bottom: 2.5rem;
+  .footer-container {
+    max-width: 1080px;
+    margin: 0 auto;
   }
-  .csg-footer-brand { max-width: 380px; }
-  .csg-footer-brand p {
-    color: var(--text-muted);
-    font-size: 0.88rem;
-    margin-top: 0.85rem;
-    line-height: 1.5;
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
   }
-  .csg-footer-links-grid {
-    display: flex;
-    gap: 3.5rem;
-    flex-wrap: wrap;
-  }
-  .csg-footer-col h4 {
-    font-size: 0.95rem;
-    font-weight: 800;
-    margin-bottom: 1rem;
+  .footer-brand h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.15rem;
     color: var(--text-main);
   }
-  .csg-footer-col ul { list-style: none; }
-  .csg-footer-col li { margin-bottom: 0.5rem; }
-  .csg-footer-col a {
+  .footer-brand p {
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .footer-links h4, .footer-legal h4 {
+    margin: 0 0 0.75rem;
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: var(--text-main);
+  }
+  .footer-links ul, .footer-legal ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .footer-links a, .footer-legal a {
     color: var(--text-muted);
     text-decoration: none;
     font-size: 0.86rem;
     font-weight: 600;
-    transition: color 0.15s;
+    transition: color 0.15s ease;
   }
-  .csg-footer-col a:hover { color: var(--primary-blue); }
-
-  .csg-footer-bottom {
-    border-top: 1px dashed var(--card-border);
+  .footer-links a:hover, .footer-legal a:hover {
+    color: var(--primary-blue);
+  }
+  .footer-bottom {
+    border-top: 1px solid var(--card-border);
     padding-top: 1.5rem;
     text-align: center;
     color: var(--text-muted);
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: 0.82rem;
   }
 
   @media (max-width: 768px) {
-    .csg-nav-links { display: none; }
-    .csg-footer-links-grid { gap: 2rem; }
+    .footer-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    .nav-links {
+      gap: 0.75rem;
+      font-size: 0.82rem;
+    }
   }
 </style>
