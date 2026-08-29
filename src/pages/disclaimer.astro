@@ -12,7 +12,118 @@ const permalink = 'https://cyprusstudentguide.com/disclaimer/';
       <span class="badge">LEGAL & EDITORIAL NOTICE</span>
       <h1>Disclaimer & Information Disclosure</h1>
       <p class="last-updated">Last Updated & Reviewed: August 2026</p>
-    </header>
+    </header>---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const title = "Legal Disclaimer & Regulatory Notice - Cyprus Student Guide";
+const description = "Official disclaimer regarding immigration laws, work hours, tax rules, and price changes for international students in Cyprus.";
+const permalink = "https://cyprusstudentguide.com/disclaimer/";
+---
+
+<BaseLayout title={title} description={description} permalink={permalink} current="disclaimer">
+  <div class="legal-container notranslate">
+    <div class="legal-header">
+      <span class="legal-tag">Regulatory Disclosure</span>
+      <h1>Legal Disclaimer & Regulatory Notice</h1>
+      <p class="last-updated">Last Updated: August 2026</p>
+    </div>
+
+    <div class="legal-content">
+      <section class="legal-card">
+        <h2>1. Information Purpose & Non-Official Status</h2>
+        <p>
+          CyprusStudentGuide.com is an independent educational and informational portal dedicated to assisting international students residing in the Republic of Cyprus. <strong>We are not affiliated with the Civil Registry and Migration Department (CRMD), the Ministry of Labour, the Tax Department, or any government authority.</strong>
+        </p>
+      </section>
+
+      <section class="legal-card">
+        <h2>2. Dynamic Rules, Regulations & Fee Structures</h2>
+        <p>
+          Immigration policies, student employment criteria (including the 20-hour weekly limit), statutory minimum wages, GESY healthcare contributions, and local service prices (e.g., bus fares, fuel, scooter rentals) are subject to periodic changes by the Republic of Cyprus authorities and private service operators without prior notice.
+        </p>
+        <p>
+          While our editorial team conducts regular audits to ensure 100% data integrity, information published on this platform should serve solely as an initial orientation guide. Users are strongly advised to verify critical data through official government channels (e.g., <em>migration.gov.cy</em> or <em>mlsi.gov.cy</em>) before taking financial or legal actions.
+        </p>
+      </section>
+
+      <section class="legal-card">
+        <h2>3. Work Tracker & Calculator Tools</h2>
+        <p>
+          All trackers, splitters, and financial calculators provided on this website are designed for personal record-keeping, estimation, and audit convenience. They do not constitute formal tax advice, legal employment contracts, or binding accounting statements. CyprusStudentGuide.com accepts no liability for disputes between users, employers, fleet managers, or third-party platforms.
+        </p>
+      </section>
+
+      <section class="legal-card">
+        <h2>4. Affiliate & Commercial Transparency</h2>
+        <p>
+          To maintain server hosting and ongoing development, CyprusStudentGuide.com participates in affiliate programs (such as remittance partners). We only recommend services that deliver tangible value to international students (e.g., fee waivers or promotional credits). These partnerships do not influence our independent editorial evaluations.
+        </p>
+      </section>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .legal-container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 2rem 1rem 4rem;
+  }
+  .legal-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+  .legal-tag {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary-blue);
+    font-size: 0.8rem;
+    font-weight: 800;
+    padding: 0.3rem 0.85rem;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 0.75rem;
+  }
+  .legal-header h1 {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--text-main);
+    margin: 0 0 0.5rem;
+  }
+  .last-updated {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  .legal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .legal-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 1.5rem 1.75rem;
+  }
+  .legal-card h2 {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin: 0 0 0.75rem;
+  }
+  .legal-card p {
+    font-size: 0.94rem;
+    color: var(--text-muted);
+    line-height: 1.65;
+    margin: 0 0 0.75rem;
+  }
+  .legal-card p:last-child {
+    margin-bottom: 0;
+  }
+  .legal-card strong {
+    color: var(--text-main);
+  }
+</style>
 
     <div class="legal-body">
       <section class="legal-section">
