@@ -28,6 +28,9 @@ const trackerSchema = {
       <p class="st-desc">Track delivery shifts across multiple riders via instant live sync room codes, log personal finances, and export verified settlement sheets.</p>
     </div>
 
+    <!-- Live Sync Alert Toast -->
+    <div id="sync-toast-alert" class="st-toast-banner" style="display: none;"></div>
+
     <!-- Live Cloud Sync Hub Widget -->
     <div class="st-sync-hub">
       <div class="st-sync-left">
@@ -35,7 +38,7 @@ const trackerSchema = {
           <span class="st-pulse-dot dot-offline" id="sync-dot"></span>
           <span id="sync-status-title" class="st-sync-title">Mode: Local Offline Storage</span>
         </div>
-        <span id="sync-status-desc" class="st-sync-sub">Data is saved locally in this browser. Connect a room or Google account to sync live across devices.</span>
+        <span id="sync-status-desc" class="st-sync-sub">Data is saved locally in this browser. Log in with Google anytime to safely merge and back up to the cloud.</span>
       </div>
 
       <div class="st-sync-actions">
@@ -101,6 +104,8 @@ const trackerSchema = {
 
     <!-- ================= TAB 1: DELIVERY SESSIONS & SETTLEMENT ================= -->
     <div id="view-delivery-sessions" class="st-tab-content active">
+      
+      <!-- Section A: Global Fleet Cut & Dynamic Custom Expenses -->
       <div class="st-card">
         <div class="st-card-head">
           <h2 class="st-card-title">⚙️ Fleet Commission & Shared Operating Expenses</h2>
@@ -132,6 +137,7 @@ const trackerSchema = {
         </div>
       </div>
 
+      <!-- Section B: Add Shift Session Form with Quick Name Chips -->
       <div class="st-card">
         <h3 class="st-box-title">➕ Add Delivery Shift Session</h3>
         <p class="st-card-sub" style="margin-top: -0.5rem; margin-bottom: 1rem;">Log each individual shift slot and exact app earnings.</p>
@@ -178,6 +184,7 @@ const trackerSchema = {
         </button>
       </div>
 
+      <!-- Section C: Pay Day Settlement & Progress Tracker -->
       <div class="st-card" style="border: 2px solid #2563eb;">
         <div class="st-card-head">
           <div class="st-filter-row" style="margin: 0;">
@@ -240,6 +247,7 @@ const trackerSchema = {
         </div>
       </div>
 
+      <!-- Section D: Shift Sessions History Table & Isolated Reset -->
       <div class="st-card">
         <div class="st-filter-row">
           <div>
@@ -277,6 +285,7 @@ const trackerSchema = {
           </div>
         </div>
       </div>
+
     </div>
 
     <!-- ================= TAB 2: DAILY INCOME & EXPENSE LEDGER ================= -->
@@ -617,6 +626,18 @@ const trackerSchema = {
     }
   });
 
+  function showToast(message, isSuccess = true) {
+    const toast = document.getElementById('sync-toast-alert');
+    if (toast) {
+      toast.innerText = message;
+      toast.style.background = isSuccess ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)';
+      toast.style.color = isSuccess ? '#10b981' : '#ef4444';
+      toast.style.borderColor = isSuccess ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)';
+      toast.style.display = 'block';
+      setTimeout(() => toast.style.display = 'none', 4500);
+    }
+  }
+
   function loadData() {
     try {
       const c = localStorage.getItem(STORAGE_KEY_CURRENCY);
@@ -661,6 +682,14 @@ const trackerSchema = {
     if (pushToCloud && !isReceivingRemoteUpdate) {
       syncStateToCloud();
     }
+  }
+
+  // Smart Merge Helper: Combine arrays by unique ID without duplicate entries
+  function mergeRecords(localArr, remoteArr) {
+    const map = new Map();
+    (remoteArr || []).forEach(item => { if (item && item.id) map.set(item.id, item); });
+    (localArr || []).forEach(item => { if (item && item.id) map.set(item.id, item); });
+    return Array.from(map.values());
   }
 
   // ================= REALTIME CLOUD & AUTH ENGINE =================
@@ -729,6 +758,7 @@ const trackerSchema = {
           try { await signOut(auth); } catch(e){}
           updateSyncUI();
           renderAll();
+          showToast('ℹ️ Disconnected from Cloud Sync. Working in Offline Mode.', false);
         }
       });
     }
@@ -753,13 +783,11 @@ const trackerSchema = {
 
     const docRef = doc(db, "sync_rooms", roomCode);
 
-    // FETCH REMOTE FIRST: Do NOT push local state until we check remote
     unsubscribeSnapshot = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
         const remote = docSnap.data();
         applyRemoteData(remote);
       } else {
-        // Room doesn't exist yet, initialize it with current data
         syncStateToCloud();
       }
     }, (err) => {
@@ -768,6 +796,7 @@ const trackerSchema = {
     });
 
     updateSyncUI();
+    showToast(`📡 Connected to Live Sync Room: ${roomCode}`, true);
   }
 
   function setupUserCloudSync(uid, displayName) {
@@ -777,16 +806,30 @@ const trackerSchema = {
 
     const docRef = doc(db, "user_profiles", uid);
 
-    // FETCH REMOTE FIRST: Visual Error Alert if permissions fail
     unsubscribeSnapshot = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
         const remote = docSnap.data();
-        console.log("📥 Remote cloud data received:", remote);
-        applyRemoteData(remote);
+        
+        // SMART MERGE: Seamlessly preserve both local entries & cloud history
+        deliverySessions = mergeRecords(deliverySessions, remote.deliverySessions);
+        deliveryCustomExpenses = mergeRecords(deliveryCustomExpenses, remote.deliveryCustomExpenses);
+        ledgerRecords = mergeRecords(ledgerRecords, remote.ledgerRecords);
+        shiftRecords = mergeRecords(shiftRecords, remote.shiftRecords);
+        
+        if (remote.currency) currentCurrency = remote.currency;
+        if (remote.deliveryConfig) deliveryConfig = remote.deliveryConfig;
+
+        saveData(false);
+        initCurrency();
+        renderAll();
+
+        // Push clean merged state back to cloud
+        syncStateToCloud();
       } else {
-        console.log("📤 Initializing new cloud profile for user...");
+        // Initial sync of current local entries
         syncStateToCloud();
       }
+      showToast(`🟢 Synced with Google Account (${displayName || 'Active'})`, true);
     }, (err) => {
       console.error("Firestore Listener Error:", err);
       alert("⚠️ Cloud Sync Error: " + err.message + "\nPlease verify Firestore Database & Rules in Firebase Console.");
@@ -813,7 +856,6 @@ const trackerSchema = {
         .catch(err => alert("Room Sync Error: " + err.message));
     } else if (currentUser) {
       setDoc(doc(db, "user_profiles", currentUser.uid), payload, { merge: true })
-        .then(() => console.log("✅ Cloud save successful"))
         .catch(err => alert("Cloud Save Error: " + err.message));
     }
   }
@@ -862,7 +904,7 @@ const trackerSchema = {
     } else {
       dotEl.className = 'st-pulse-dot dot-offline';
       titleEl.innerText = 'Mode: Local Offline Storage';
-      descEl.innerText = 'Data is saved locally in this browser. Connect a room or Google account to sync live across devices.';
+      descEl.innerText = 'Data is saved locally in this browser. Log in with Google anytime to safely merge and back up to the cloud.';
       googleTxt.innerText = 'Google Cloud Sync';
       roomBtn.innerText = '📡 Live Room Code';
       disBtn.style.display = 'none';
@@ -1785,11 +1827,24 @@ const trackerSchema = {
 
 <style is:global>
   .st-wrapper { max-width: 980px; margin: 0 auto; }
-  .st-hero { text-align: center; margin-bottom: 2rem; }
+  .st-hero { text-align: center; margin-bottom: 1.5rem; }
   .st-badge { background: rgba(16, 185, 129, 0.12); color: #10b981; font-weight: 800; font-size: 0.8rem; padding: 0.35rem 0.85rem; border-radius: 30px; display: inline-block; margin-bottom: 0.75rem; }
   html.dark .st-badge { color: #34d399; }
   .st-title { font-size: 2.25rem; font-weight: 800; color: var(--text-main); margin: 0 0 0.65rem; line-height: 1.25; }
   .st-desc { color: var(--text-muted); font-size: 1.02rem; max-width: 720px; margin: 0 auto; }
+
+  /* Toast Banner */
+  .st-toast-banner {
+    border: 1px solid;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 1.25rem;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
   .st-sync-hub { background: var(--card-bg); border: 1px solid var(--card-border); border-left: 4px solid #2563eb; border-radius: 12px; padding: 0.85rem 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
   .st-sync-left { flex: 1; min-width: 260px; }
