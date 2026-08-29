@@ -84,8 +84,9 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
         <nav class="csg-nav-links">
           <a href="/" class={current === 'home' ? 'active' : ''}>Home</a>
           <a href="/blog/" class={current === 'guides' ? 'active' : ''}>Guides</a>
+          <a href="/pink-slip-tracker/" class={current === 'tracker' ? 'active' : ''}>📋 Pink Slip</a>
           <a href="/calculator/" class={current === 'calculator' ? 'active' : ''}>💶 Budget</a>
-          <a href="/shift-tracker/" class={current === 'tracker' ? 'active' : ''}>⏱️ Work Tracker</a>
+          <a href="/shift-tracker/" class={current === 'shift' ? 'active' : ''}>⏱️ Work Tracker</a>
           <a href="/about/" class={current === 'about' ? 'active' : ''}>About</a>
         </nav>
 
@@ -122,11 +123,12 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
 
         <div class="csg-footer-links-grid">
           <div class="csg-footer-col">
-            <h4>Quick Tools</h4>
+            <h4>Essential Tools</h4>
             <ul>
-              <li><a href="/shift-tracker/">Delivery Shift Splitter</a></li>
-              <li><a href="/calculator/">Cost of Living Calculator</a></li>
-              <li><a href="/blog/">Student Visa & Work Guides</a></li>
+              <li><a href="/pink-slip-tracker/">📋 Pink Slip 90-Day Tracker</a></li>
+              <li><a href="/shift-tracker/">🛵 Delivery Shift Splitter</a></li>
+              <li><a href="/calculator/">💶 Cost of Living Calculator</a></li>
+              <li><a href="/blog/">📚 All Student Guides</a></li>
             </ul>
           </div>
           <div class="csg-footer-col">
@@ -276,12 +278,12 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
   .csg-nav-links {
     display: flex;
     align-items: center;
-    gap: 1.25rem;
+    gap: 1.15rem;
   }
   .csg-nav-links a {
     text-decoration: none;
     color: var(--text-muted);
-    font-size: 0.92rem;
+    font-size: 0.9rem;
     font-weight: 700;
     transition: color 0.15s ease;
   }
