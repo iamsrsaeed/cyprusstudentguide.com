@@ -28,17 +28,14 @@ const trackerSchema = {
       <p class="st-desc">Track delivery shifts across multiple riders via instant live sync room codes, log personal finances, and export verified settlement sheets.</p>
     </div>
 
-    <!-- Live Sync Alert Toast -->
-    <div id="sync-toast-alert" class="st-toast-banner" style="display: none;"></div>
-
     <!-- Live Cloud Sync Hub Widget -->
     <div class="st-sync-hub">
       <div class="st-sync-left">
         <div class="st-sync-status-indicator">
-          <span class="st-pulse-dot dot-offline" id="sync-dot"></span>
+          <span class="st-pulse-dot" id="sync-dot"></span>
           <span id="sync-status-title" class="st-sync-title">Mode: Local Offline Storage</span>
         </div>
-        <span id="sync-status-desc" class="st-sync-sub">Data is saved locally in this browser. Log in with Google anytime to safely merge and back up to the cloud.</span>
+        <span id="sync-status-desc" class="st-sync-sub">Data is saved locally in this browser. Connect a room or Google account to sync live across devices.</span>
       </div>
 
       <div class="st-sync-actions">
@@ -185,11 +182,11 @@ const trackerSchema = {
       </div>
 
       <!-- Section C: Pay Day Settlement & Progress Tracker -->
-      <div class="st-card" style="border: 2px solid #2563eb;">
+      <div class="st-card" style="border: 2px solid var(--primary-glow);">
         <div class="st-card-head">
           <div class="st-filter-row" style="margin: 0;">
             <div>
-              <h2 class="st-card-title" style="color: #2563eb;">🏦 Pay Day Settlement & Progress Tracker</h2>
+              <h2 class="st-card-title" style="color: var(--primary-blue);">🏦 Pay Day Settlement & Progress Tracker</h2>
               <p class="st-card-sub">Filter by date or status, review individual balances, and settle payments.</p>
             </div>
             <div class="st-progress-filters">
@@ -231,7 +228,7 @@ const trackerSchema = {
         </div>
 
         <div class="st-sub-head" style="margin-top: 1rem; margin-bottom: 0.75rem;">
-          <h4 class="st-payout-heading" style="margin: 0; font-size: 1.05rem; font-weight: 800;">💵 Individual Rider Balances (Current Window):</h4>
+          <h4 class="st-payout-heading" style="margin: 0;">💵 Individual Rider Balances (Current Window):</h4>
           <button type="button" id="btn-settle-all-pending" class="st-btn st-btn-green">
             ✅ Mark All Pending in View as Paid
           </button>
@@ -247,7 +244,7 @@ const trackerSchema = {
         </div>
       </div>
 
-      <!-- Section D: Shift Sessions History Table & Isolated Reset -->
+      <!-- Section D: Individual Shift Sessions History Table & Isolated Reset -->
       <div class="st-card">
         <div class="st-filter-row">
           <div>
@@ -535,9 +532,10 @@ const trackerSchema = {
   import { 
     getAuth, 
     setPersistence,
-    indexedDBLocalPersistence,
     browserLocalPersistence,
     signInWithPopup, 
+    signInWithRedirect, 
+    getRedirectResult, 
     GoogleAuthProvider, 
     signOut, 
     onAuthStateChanged 
@@ -557,11 +555,6 @@ const trackerSchema = {
   const db = getFirestore(app);
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
-
-  // Multi-Device Persistence
-  setPersistence(auth, indexedDBLocalPersistence).catch(() => {
-    setPersistence(auth, browserLocalPersistence).catch(console.warn);
-  });
 
   // Storage Keys
   const STORAGE_KEY_CURRENCY = 'csg_user_currency';
@@ -585,7 +578,7 @@ const trackerSchema = {
   let activeSyncRoom = null;
   let currentUser = null;
   let unsubscribeSnapshot = null;
-  let isReceivingRemoteUpdate = false;
+  let isSyncing = false; // Render lock to kill infinite loops
 
   document.addEventListener('DOMContentLoaded', () => {
     const today = new Date().toISOString().split('T')[0];
@@ -626,18 +619,6 @@ const trackerSchema = {
     }
   });
 
-  function showToast(message, isSuccess = true) {
-    const toast = document.getElementById('sync-toast-alert');
-    if (toast) {
-      toast.innerText = message;
-      toast.style.background = isSuccess ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)';
-      toast.style.color = isSuccess ? '#10b981' : '#ef4444';
-      toast.style.borderColor = isSuccess ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)';
-      toast.style.display = 'block';
-      setTimeout(() => toast.style.display = 'none', 4500);
-    }
-  }
-
   function loadData() {
     try {
       const c = localStorage.getItem(STORAGE_KEY_CURRENCY);
@@ -666,6 +647,8 @@ const trackerSchema = {
   }
 
   function saveData(pushToCloud = true) {
+    if (isSyncing) return; // Prevent loop triggered during remote sync
+
     localStorage.setItem(STORAGE_KEY_CURRENCY, currentCurrency);
     localStorage.setItem(STORAGE_KEY_LEDGER, JSON.stringify(ledgerRecords));
     localStorage.setItem(STORAGE_KEY_SHIFTS, JSON.stringify(shiftRecords));
@@ -679,20 +662,12 @@ const trackerSchema = {
       setTimeout(() => txt.innerText = 'Auto-saved to browser', 2500);
     }
 
-    if (pushToCloud && !isReceivingRemoteUpdate) {
+    if (pushToCloud) {
       syncStateToCloud();
     }
   }
 
-  // Smart Merge Helper: Combine arrays by unique ID without duplicate entries
-  function mergeRecords(localArr, remoteArr) {
-    const map = new Map();
-    (remoteArr || []).forEach(item => { if (item && item.id) map.set(item.id, item); });
-    (localArr || []).forEach(item => { if (item && item.id) map.set(item.id, item); });
-    return Array.from(map.values());
-  }
-
-  // ================= REALTIME CLOUD & AUTH ENGINE =================
+  // ================= REALTIME CLOUD & AUTH =================
   function initRealtimeSyncHub() {
     const modal = document.getElementById('room-sync-modal');
     const openModalBtn = document.getElementById('btn-open-room-modal');
@@ -705,6 +680,18 @@ const trackerSchema = {
 
     if (openModalBtn) openModalBtn.addEventListener('click', () => modal.classList.add('active'));
     if (closeModalBtn) closeModalBtn.addEventListener('click', () => modal.classList.remove('active'));
+
+    // Handle Mobile Google Redirect
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result && result.user) {
+          currentUser = result.user;
+          setupUserCloudSync(currentUser.uid, currentUser.displayName || currentUser.email);
+        }
+      })
+      .catch((err) => {
+        console.error("Redirect Auth Error:", err);
+      });
 
     // Create Room
     if (createRoomBtn) {
@@ -728,26 +715,31 @@ const trackerSchema = {
       });
     }
 
-    // Google Sign-In
+    // Google Sign-In (Smart Auto-Detection)
     if (googleAuthBtn) {
       googleAuthBtn.addEventListener('click', async () => {
         if (currentUser) return;
         provider.setCustomParameters({ prompt: 'select_account' });
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
         try {
-          const res = await signInWithPopup(auth, provider);
-          currentUser = res.user;
-          setupUserCloudSync(currentUser.uid, currentUser.displayName || currentUser.email);
+          if (isMobile) {
+            await signInWithRedirect(auth, provider);
+          } else {
+            const res = await signInWithPopup(auth, provider);
+            currentUser = res.user;
+            setupUserCloudSync(currentUser.uid, currentUser.displayName || currentUser.email);
+          }
         } catch (err) {
           console.error("Sign-In Error:", err);
           if (err.code !== 'auth/popup-closed-by-user') {
-            alert('Sign-In Notice: ' + (err.message || 'Please try again'));
+            alert('Sign-In Notice: ' + err.message);
           }
         }
       });
     }
 
-    // Disconnect
+    // Disconnect Sync
     if (disconnectBtn) {
       disconnectBtn.addEventListener('click', async () => {
         if (confirm('Disconnect live sync and return to local offline mode?')) {
@@ -758,7 +750,6 @@ const trackerSchema = {
           try { await signOut(auth); } catch(e){}
           updateSyncUI();
           renderAll();
-          showToast('ℹ️ Disconnected from Cloud Sync. Working in Offline Mode.', false);
         }
       });
     }
@@ -782,21 +773,16 @@ const trackerSchema = {
     localStorage.setItem(STORAGE_KEY_ACTIVE_ROOM, roomCode);
 
     const docRef = doc(db, "sync_rooms", roomCode);
+    syncStateToCloud();
 
     unsubscribeSnapshot = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
         const remote = docSnap.data();
         applyRemoteData(remote);
-      } else {
-        syncStateToCloud();
       }
-    }, (err) => {
-      console.warn("Room listener:", err);
-      alert("⚠️ Room Sync Error: " + err.message);
-    });
+    }, (err) => console.warn("Room listener:", err));
 
     updateSyncUI();
-    showToast(`📡 Connected to Live Sync Room: ${roomCode}`, true);
   }
 
   function setupUserCloudSync(uid, displayName) {
@@ -805,35 +791,14 @@ const trackerSchema = {
     localStorage.removeItem(STORAGE_KEY_ACTIVE_ROOM);
 
     const docRef = doc(db, "user_profiles", uid);
+    syncStateToCloud();
 
     unsubscribeSnapshot = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
         const remote = docSnap.data();
-        
-        // SMART MERGE: Seamlessly preserve both local entries & cloud history
-        deliverySessions = mergeRecords(deliverySessions, remote.deliverySessions);
-        deliveryCustomExpenses = mergeRecords(deliveryCustomExpenses, remote.deliveryCustomExpenses);
-        ledgerRecords = mergeRecords(ledgerRecords, remote.ledgerRecords);
-        shiftRecords = mergeRecords(shiftRecords, remote.shiftRecords);
-        
-        if (remote.currency) currentCurrency = remote.currency;
-        if (remote.deliveryConfig) deliveryConfig = remote.deliveryConfig;
-
-        saveData(false);
-        initCurrency();
-        renderAll();
-
-        // Push clean merged state back to cloud
-        syncStateToCloud();
-      } else {
-        // Initial sync of current local entries
-        syncStateToCloud();
+        applyRemoteData(remote);
       }
-      showToast(`🟢 Synced with Google Account (${displayName || 'Active'})`, true);
-    }, (err) => {
-      console.error("Firestore Listener Error:", err);
-      alert("⚠️ Cloud Sync Error: " + err.message + "\nPlease verify Firestore Database & Rules in Firebase Console.");
-    });
+    }, (err) => console.warn("User listener:", err));
 
     updateSyncUI();
   }
@@ -852,30 +817,52 @@ const trackerSchema = {
     };
 
     if (activeSyncRoom) {
-      setDoc(doc(db, "sync_rooms", activeSyncRoom), payload, { merge: true })
-        .catch(err => alert("Room Sync Error: " + err.message));
+      setDoc(doc(db, "sync_rooms", activeSyncRoom), payload, { merge: true }).catch(console.warn);
     } else if (currentUser) {
-      setDoc(doc(db, "user_profiles", currentUser.uid), payload, { merge: true })
-        .catch(err => alert("Cloud Save Error: " + err.message));
+      setDoc(doc(db, "user_profiles", currentUser.uid), payload, { merge: true }).catch(console.warn);
     }
   }
 
   function applyRemoteData(remote) {
     if (!remote) return;
-    isReceivingRemoteUpdate = true;
+
+    // Check if data is already identical to prevent DOM thrashing / flickering
+    const currentPayloadStr = JSON.stringify({
+      c: currentCurrency,
+      ds: deliverySessions,
+      de: deliveryCustomExpenses,
+      cfg: deliveryConfig,
+      lr: ledgerRecords,
+      sr: shiftRecords
+    });
+
+    const remotePayloadStr = JSON.stringify({
+      c: remote.currency || '€',
+      ds: remote.deliverySessions || [],
+      de: remote.deliveryCustomExpenses || [],
+      cfg: remote.deliveryConfig || { fleetPercent: 18.0 },
+      lr: remote.ledgerRecords || [],
+      sr: remote.shiftRecords || []
+    });
+
+    if (currentPayloadStr === remotePayloadStr) return; // Exact match, skip render to prevent loop
+
+    isSyncing = true; // Lock local saves
 
     if (remote.currency) currentCurrency = remote.currency;
-    if (Array.isArray(remote.deliverySessions)) deliverySessions = remote.deliverySessions;
-    if (Array.isArray(remote.deliveryCustomExpenses)) deliveryCustomExpenses = remote.deliveryCustomExpenses;
+    if (remote.deliverySessions) deliverySessions = remote.deliverySessions;
+    if (remote.deliveryCustomExpenses) deliveryCustomExpenses = remote.deliveryCustomExpenses;
     if (remote.deliveryConfig) deliveryConfig = remote.deliveryConfig;
-    if (Array.isArray(remote.ledgerRecords)) ledgerRecords = remote.ledgerRecords;
-    if (Array.isArray(remote.shiftRecords)) shiftRecords = remote.shiftRecords;
+    if (remote.ledgerRecords) ledgerRecords = remote.ledgerRecords;
+    if (remote.shiftRecords) shiftRecords = remote.shiftRecords;
 
     saveData(false);
     initCurrency();
     renderAll();
 
-    isReceivingRemoteUpdate = false;
+    setTimeout(() => {
+      isSyncing = false;
+    }, 150);
   }
 
   function updateSyncUI() {
@@ -890,7 +877,7 @@ const trackerSchema = {
     if (activeSyncRoom) {
       dotEl.className = 'st-pulse-dot dot-live';
       titleEl.innerHTML = `🟢 Live Room Connected: <strong>${activeSyncRoom}</strong>`;
-      descEl.innerHTML = `Multi-device live sync active. Share code <strong>${activeSyncRoom}</strong> or link: <a href="?room=${activeSyncRoom}" target="_blank" style="color:#2563eb; font-weight:700;">Invite Link</a>`;
+      descEl.innerHTML = `Multi-device live sync active. Share code <strong>${activeSyncRoom}</strong> or link: <a href="?room=${activeSyncRoom}" target="_blank" style="color:var(--primary-blue); font-weight:700;">Invite Link</a>`;
       roomBtn.innerText = `Room: ${activeSyncRoom}`;
       disBtn.style.display = 'inline-flex';
       googleBtn.style.display = 'none';
@@ -904,7 +891,7 @@ const trackerSchema = {
     } else {
       dotEl.className = 'st-pulse-dot dot-offline';
       titleEl.innerText = 'Mode: Local Offline Storage';
-      descEl.innerText = 'Data is saved locally in this browser. Log in with Google anytime to safely merge and back up to the cloud.';
+      descEl.innerText = 'Data is saved locally in this browser. Connect a room or Google account to sync live across devices.';
       googleTxt.innerText = 'Google Cloud Sync';
       roomBtn.innerText = '📡 Live Room Code';
       disBtn.style.display = 'none';
@@ -932,14 +919,8 @@ const trackerSchema = {
   // 1. Currency Picker
   function initCurrency() {
     const sel = document.getElementById('global-currency-select');
-    if (sel) {
+    if (sel && sel.value !== currentCurrency) {
       sel.value = currentCurrency;
-      sel.addEventListener('change', (e) => {
-        currentCurrency = e.target.value;
-        saveData();
-        updateSymbols();
-        renderAll();
-      });
     }
     updateSymbols();
   }
@@ -970,6 +951,16 @@ const trackerSchema = {
         if (targetId === 'view-daily-log') renderShifts();
       });
     });
+
+    const currSelect = document.getElementById('global-currency-select');
+    if (currSelect) {
+      currSelect.addEventListener('change', (e) => {
+        currentCurrency = e.target.value;
+        saveData();
+        updateSymbols();
+        renderAll();
+      });
+    }
   }
 
   // ================= 3. ISOLATED TAB RESET ENGINE =================
@@ -1827,33 +1818,20 @@ const trackerSchema = {
 
 <style is:global>
   .st-wrapper { max-width: 980px; margin: 0 auto; }
-  .st-hero { text-align: center; margin-bottom: 1.5rem; }
+  .st-hero { text-align: center; margin-bottom: 2rem; }
   .st-badge { background: rgba(16, 185, 129, 0.12); color: #10b981; font-weight: 800; font-size: 0.8rem; padding: 0.35rem 0.85rem; border-radius: 30px; display: inline-block; margin-bottom: 0.75rem; }
   html.dark .st-badge { color: #34d399; }
   .st-title { font-size: 2.25rem; font-weight: 800; color: var(--text-main); margin: 0 0 0.65rem; line-height: 1.25; }
   .st-desc { color: var(--text-muted); font-size: 1.02rem; max-width: 720px; margin: 0 auto; }
 
-  /* Toast Banner */
-  .st-toast-banner {
-    border: 1px solid;
-    padding: 0.75rem 1rem;
-    border-radius: 10px;
-    font-size: 0.88rem;
-    font-weight: 800;
-    text-align: center;
-    margin-bottom: 1.25rem;
-    animation: fadeIn 0.3s ease;
-  }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-
-  .st-sync-hub { background: var(--card-bg); border: 1px solid var(--card-border); border-left: 4px solid #2563eb; border-radius: 12px; padding: 0.85rem 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+  .st-sync-hub { background: var(--card-bg); border: 1px solid var(--card-border); border-left: 4px solid var(--primary-blue); border-radius: 12px; padding: 0.85rem 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
   .st-sync-left { flex: 1; min-width: 260px; }
   .st-sync-status-indicator { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.2rem; }
   .st-sync-title { font-size: 0.92rem; font-weight: 800; color: var(--text-main); }
   .st-sync-sub { font-size: 0.78rem; color: var(--text-muted); display: block; line-height: 1.4; }
   .st-sync-actions { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
-  .st-btn-room { background: rgba(37, 99, 235, 0.1); color: #2563eb; border-color: rgba(37, 99, 235, 0.25); font-weight: 800; }
-  .st-btn-room:hover { background: #2563eb; color: #fff; }
+  .st-btn-room { background: rgba(37, 99, 235, 0.1); color: var(--primary-blue); border-color: rgba(37, 99, 235, 0.25); font-weight: 800; }
+  .st-btn-room:hover { background: var(--primary-blue); color: #fff; }
   .st-btn-google { background: #fff; color: #374151; border: 1px solid #d1d5db; font-weight: 700; gap: 0.4rem; }
   html.dark .st-btn-google { background: #1e293b; color: #f8fafc; border-color: #334155; }
   .st-btn-google:hover { border-color: #9ca3af; }
@@ -1872,19 +1850,19 @@ const trackerSchema = {
   .st-btn { border: 1px solid var(--card-border); background: var(--bg-color); color: var(--text-main); font-size: 0.78rem; font-weight: 700; padding: 0.4rem 0.75rem; border-radius: 6px; cursor: pointer; transition: all 0.15s ease; text-decoration: none; display: inline-flex; align-items: center; }
   .st-btn-green { background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
   .st-btn-green:hover { background: #10b981; color: #fff; }
-  .st-btn-gray:hover { border-color: #2563eb; color: #2563eb; }
-  .st-btn-demo { background: rgba(37, 99, 235, 0.1); color: #2563eb; border-color: rgba(37, 99, 235, 0.25); }
-  .st-btn-demo:hover { background: #2563eb; color: #fff; }
+  .st-btn-gray:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
+  .st-btn-demo { background: rgba(37, 99, 235, 0.1); color: var(--primary-blue); border-color: rgba(37, 99, 235, 0.25); }
+  .st-btn-demo:hover { background: var(--primary-blue); color: #fff; }
   .st-btn-red-soft { background: rgba(239, 68, 68, 0.08); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); font-size: 0.78rem; font-weight: 700; padding: 0.35rem 0.7rem; border-radius: 6px; cursor: pointer; }
   .st-btn-red-soft:hover { background: #ef4444; color: #fff; }
   .st-btn-file { cursor: pointer; }
   .st-btn-primary { background: #2563eb; color: #fff; border: none; font-size: 0.9rem; padding: 0.65rem 1.25rem; font-weight: 800; border-radius: 8px; }
   .st-btn-primary:hover { background: #1d4ed8; }
-  .st-btn-outline { width: 100%; background: var(--bg-color); border: 1px dashed #2563eb; color: #2563eb; padding: 0.6rem; border-radius: 8px; font-weight: 700; font-size: 0.86rem; cursor: pointer; margin-top: 0.5rem; }
+  .st-btn-outline { width: 100%; background: var(--bg-color); border: 1px dashed var(--primary-blue); color: var(--primary-blue); padding: 0.6rem; border-radius: 8px; font-weight: 700; font-size: 0.86rem; cursor: pointer; margin-top: 0.5rem; }
 
   .st-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; background: rgba(150, 150, 150, 0.08); padding: 0.4rem; border-radius: 12px; margin-bottom: 1.75rem; }
   .st-tab-btn { border: none; background: transparent; color: var(--text-muted); font-weight: 700; font-size: 0.88rem; padding: 0.75rem 0.5rem; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; text-align: center; }
-  .st-tab-btn.active { background: var(--card-bg); color: #2563eb; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06); }
+  .st-tab-btn.active { background: var(--card-bg); color: var(--primary-blue); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06); }
   .st-tab-content { display: none; }
   .st-tab-content.active { display: block; }
 
@@ -1901,7 +1879,7 @@ const trackerSchema = {
   .st-sub-box { background: rgba(150, 150, 150, 0.04); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
   .st-sub-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; }
   .st-sub-head h3 { font-size: 0.95rem; font-weight: 800; margin: 0; color: var(--text-main); }
-  .st-tag { font-size: 0.78rem; font-weight: 800; background: rgba(37, 99, 235, 0.1); color: #2563eb; padding: 0.2rem 0.6rem; border-radius: 20px; }
+  .st-tag { font-size: 0.78rem; font-weight: 800; background: rgba(37, 99, 235, 0.1); color: var(--primary-blue); padding: 0.2rem 0.6rem; border-radius: 20px; }
 
   .st-expenses-list { display: flex; flex-direction: column; gap: 0.65rem; margin-bottom: 0.5rem; }
   .st-expense-row { display: flex; gap: 0.65rem; align-items: center; }
@@ -1913,20 +1891,20 @@ const trackerSchema = {
   .st-rider-chips-wrap { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px dashed var(--card-border); }
   .st-chip-label { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); }
   .st-chips-list { display: flex; gap: 0.4rem; flex-wrap: wrap; }
-  .st-chip-btn { background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.2); color: #2563eb; font-size: 0.78rem; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 20px; cursor: pointer; transition: all 0.15s ease; }
-  .st-chip-btn:hover { background: #2563eb; color: #fff; }
+  .st-chip-btn { background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.2); color: var(--primary-blue); font-size: 0.78rem; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 20px; cursor: pointer; transition: all 0.15s ease; }
+  .st-chip-btn:hover { background: var(--primary-blue); color: #fff; }
 
   .st-grid-session-form { display: grid; grid-template-columns: 1.5fr 1.2fr 1.8fr 1.2fr 1.2fr; gap: 0.85rem; }
   .st-field label { display: block; font-size: 0.84rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.35rem; }
   .st-input, .st-select { width: 100%; background: var(--bg-color); color: var(--text-main); border: 1px solid var(--card-border); padding: 0.65rem 0.85rem; border-radius: 8px; font-family: inherit; font-size: 0.92rem; font-weight: 600; outline: none; }
-  .st-input:focus, .st-select:focus { border-color: #2563eb; }
+  .st-input:focus, .st-select:focus { border-color: var(--primary-blue); }
   .st-input-unit-left { position: relative; display: flex; align-items: center; }
   .st-unit-tag-right { position: absolute; right: 12px; font-weight: 800; color: var(--text-muted); pointer-events: none; }
   .st-hint { font-size: 0.72rem; color: var(--text-muted); display: block; margin-top: 0.25rem; }
 
   .st-time-combo { display: flex; align-items: center; gap: 0.4rem; }
   .st-time-sep { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); }
-  .st-tag-time { background: rgba(37, 99, 235, 0.08); color: #2563eb; font-size: 0.78rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 4px; white-space: nowrap; }
+  .st-tag-time { background: rgba(37, 99, 235, 0.08); color: var(--primary-blue); font-size: 0.78rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 4px; white-space: nowrap; }
 
   .st-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.85rem; margin-bottom: 1.5rem; }
   .st-stat-card { background: rgba(150, 150, 150, 0.03); border: 1px solid var(--card-border); border-radius: 12px; padding: 1rem; text-align: center; }
@@ -1935,7 +1913,7 @@ const trackerSchema = {
   .st-stat-sub { font-size: 0.72rem; color: var(--text-muted); }
   .st-stat-card.st-green .st-stat-num { color: #10b981; }
   .st-stat-card.st-red .st-stat-num { color: #ef4444; }
-  .st-stat-card.st-blue .st-stat-num { color: #2563eb; }
+  .st-stat-card.st-blue .st-stat-num { color: var(--primary-blue); }
 
   .st-progress-filters { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
   .st-status-btn { border: none; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.6rem; border-radius: 20px; cursor: pointer; transition: transform 0.1s; }
@@ -1972,7 +1950,7 @@ const trackerSchema = {
 
   .st-filter-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem; }
   .st-input-mini { background: var(--bg-color); color: var(--text-main); border: 1px solid var(--card-border); padding: 0.35rem 0.65rem; border-radius: 8px; font-weight: 700; font-size: 0.82rem; }
-  .st-tag-blue { background: rgba(37, 99, 235, 0.1); color: #2563eb; font-size: 0.82rem; font-weight: 800; padding: 0.3rem 0.75rem; border-radius: 20px; }
+  .st-tag-blue { background: rgba(37, 99, 235, 0.1); color: var(--primary-blue); font-size: 0.82rem; font-weight: 800; padding: 0.3rem 0.75rem; border-radius: 20px; }
 
   .st-table-wrapper { overflow-x: auto; }
   .st-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem; }
