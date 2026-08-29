@@ -555,7 +555,7 @@ const trackerSchema = {
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
 
-  // Mobile & Desktop Session Persistence
+  // Multi-Device Persistence
   setPersistence(auth, indexedDBLocalPersistence).catch(() => {
     setPersistence(auth, browserLocalPersistence).catch(console.warn);
   });
@@ -669,7 +669,7 @@ const trackerSchema = {
     }
   }
 
-  // ================= REALTIME CLOUD & AUTH =================
+  // ================= REALTIME CLOUD & AUTH ENGINE =================
   function initRealtimeSyncHub() {
     const modal = document.getElementById('room-sync-modal');
     const openModalBtn = document.getElementById('btn-open-room-modal');
@@ -705,7 +705,7 @@ const trackerSchema = {
       });
     }
 
-    // Direct Universal Popup Sign-In
+    // Google Sign-In
     if (googleAuthBtn) {
       googleAuthBtn.addEventListener('click', async () => {
         if (currentUser) return;
@@ -718,13 +718,13 @@ const trackerSchema = {
         } catch (err) {
           console.error("Sign-In Error:", err);
           if (err.code !== 'auth/popup-closed-by-user') {
-            alert('Sign-In: ' + (err.message || 'Please try again'));
+            alert('Sign-In Notice: ' + (err.message || 'Please try again'));
           }
         }
       });
     }
 
-    // Disconnect Sync
+    // Disconnect
     if (disconnectBtn) {
       disconnectBtn.addEventListener('click', async () => {
         if (confirm('Disconnect live sync and return to local offline mode?')) {
@@ -758,12 +758,15 @@ const trackerSchema = {
     localStorage.setItem(STORAGE_KEY_ACTIVE_ROOM, roomCode);
 
     const docRef = doc(db, "sync_rooms", roomCode);
-    syncStateToCloud();
 
+    // FETCH REMOTE FIRST: Do NOT push local state until we check remote
     unsubscribeSnapshot = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
         const remote = docSnap.data();
         applyRemoteData(remote);
+      } else {
+        // Room doesn't exist yet, initialize it with current data
+        syncStateToCloud();
       }
     }, (err) => console.warn("Room listener:", err));
 
@@ -776,12 +779,15 @@ const trackerSchema = {
     localStorage.removeItem(STORAGE_KEY_ACTIVE_ROOM);
 
     const docRef = doc(db, "user_profiles", uid);
-    syncStateToCloud();
 
+    // FETCH REMOTE FIRST: Do NOT overwrite with phone's stale local storage!
     unsubscribeSnapshot = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
         const remote = docSnap.data();
         applyRemoteData(remote);
+      } else {
+        // First-time user cloud backup initialization
+        syncStateToCloud();
       }
     }, (err) => console.warn("User listener:", err));
 
@@ -813,13 +819,13 @@ const trackerSchema = {
     isReceivingRemoteUpdate = true;
 
     if (remote.currency) currentCurrency = remote.currency;
-    if (remote.deliverySessions) deliverySessions = remote.deliverySessions;
-    if (remote.deliveryCustomExpenses) deliveryCustomExpenses = remote.deliveryCustomExpenses;
+    if (Array.isArray(remote.deliverySessions)) deliverySessions = remote.deliverySessions;
+    if (Array.isArray(remote.deliveryCustomExpenses)) deliveryCustomExpenses = remote.deliveryCustomExpenses;
     if (remote.deliveryConfig) deliveryConfig = remote.deliveryConfig;
-    if (remote.ledgerRecords) ledgerRecords = remote.ledgerRecords;
-    if (remote.shiftRecords) shiftRecords = remote.shiftRecords;
+    if (Array.isArray(remote.ledgerRecords)) ledgerRecords = remote.ledgerRecords;
+    if (Array.isArray(remote.shiftRecords)) shiftRecords = remote.shiftRecords;
 
-    saveData(false);
+    saveData(false); // Save to localStorage without pushing back
     initCurrency();
     renderAll();
 
