@@ -22,19 +22,47 @@ const allPosts = Object.entries(postFiles).map(([filePath, post]: [string, any])
     category: frontmatter.category || 'General',
   };
 }).sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime());
+
+const categories = ['All', ...new Set(allPosts.map(p => p.category).filter(Boolean))];
 ---
 
 <BaseLayout title={title} description={description} permalink={permalink} current="blog">
-  <div class="blog-container">
+  <div class="blog-container notranslate">
     <header class="blog-header">
       <span class="badge">KNOWLEDGE BASE</span>
       <h1>Student Guides & Articles</h1>
       <p>Practical, hype-free insights on part-time work, banking, public transit, and smart budgeting in Cyprus.</p>
     </header>
 
+    <!-- Interactive Instant Search & Category Filter Section -->
+    <div class="search-filter-card">
+      <div class="search-input-wrap">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text" 
+          id="guide-search-input" 
+          placeholder="Search guides (e.g., Lidl, Bank, Pink Slip, Tax, Bus, Work)..." 
+          aria-label="Search guides"
+        />
+        <button type="button" id="clear-search-btn" class="clear-btn" style="display: none;">✕</button>
+      </div>
+
+      <div class="category-pills" id="category-pills">
+        {categories.map((cat, idx) => (
+          <button 
+            type="button" 
+            class={`cat-pill ${idx === 0 ? 'active' : ''}`} 
+            data-category={cat}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+    </div>
+
     <div class="controls-bar">
       <div class="post-count">
-        Showing <span id="visible-count">{allPosts.length}</span> articles
+        Showing <strong id="visible-count">{allPosts.length}</strong> of {allPosts.length} articles
       </div>
       
       <div class="sort-wrapper">
@@ -45,6 +73,12 @@ const allPosts = Object.entries(postFiles).map(([filePath, post]: [string, any])
           <option value="title">Title (A-Z)</option>
         </select>
       </div>
+    </div>
+
+    <!-- Empty State Message -->
+    <div id="no-search-results" class="no-results" style="display: none;">
+      <p>🔎 No guides found matching your search.</p>
+      <button type="button" id="reset-filter-btn" class="btn-reset">Reset Filters</button>
     </div>
 
     <div class="posts-grid" id="posts-container">
@@ -61,6 +95,8 @@ const allPosts = Object.entries(postFiles).map(([filePath, post]: [string, any])
             class="post-card" 
             data-date={publishTime} 
             data-title={post.title.toLowerCase()}
+            data-desc={post.description.toLowerCase()}
+            data-category={post.category}
           >
             <div class="post-meta">
               <span class="post-category">{post.category}</span>
@@ -83,14 +119,14 @@ const allPosts = Object.entries(postFiles).map(([filePath, post]: [string, any])
 
 <style>
   .blog-container {
-    max-width: 1000px;
+    max-width: 1040px;
     margin: 0 auto;
-    padding: 2rem 1rem 4rem;
+    padding: 1.5rem 1rem 4rem;
   }
 
   .blog-header {
     text-align: center;
-    margin-bottom: 2.5rem;
+    margin-bottom: 2rem;
   }
 
   .badge {
@@ -106,16 +142,99 @@ const allPosts = Object.entries(postFiles).map(([filePath, post]: [string, any])
   }
 
   .blog-header h1 {
-    font-size: 2.2rem;
+    font-size: 2.3rem;
     margin-bottom: 0.5rem;
-    color: inherit;
+    font-weight: 800;
+    color: var(--text-main);
   }
 
   .blog-header p {
-    color: #94a3b8;
+    color: var(--text-muted);
     max-width: 650px;
     margin: 0 auto;
     line-height: 1.5;
+    font-size: 1.02rem;
+  }
+
+  /* Search & Filter Box */
+  .search-filter-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 1.25rem;
+    margin-bottom: 1.75rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+  }
+
+  .search-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 14px;
+    font-size: 1rem;
+    pointer-events: none;
+  }
+
+  #guide-search-input {
+    width: 100%;
+    background: var(--bg-color);
+    color: var(--text-main);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 0.75rem 2.5rem 0.75rem 2.6rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  #guide-search-input:focus {
+    border-color: var(--primary-blue);
+  }
+
+  .clear-btn {
+    position: absolute;
+    right: 12px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.2rem;
+  }
+
+  .category-pills {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .cat-pill {
+    background: rgba(150, 150, 150, 0.08);
+    border: 1px solid var(--card-border);
+    color: var(--text-main);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .cat-pill:hover {
+    border-color: var(--primary-blue);
+    color: var(--primary-blue);
+  }
+
+  .cat-pill.active {
+    background: var(--primary-blue);
+    color: #ffffff;
+    border-color: var(--primary-blue);
   }
 
   .controls-bar {
@@ -124,9 +243,9 @@ const allPosts = Object.entries(postFiles).map(([filePath, post]: [string, any])
     align-items: center;
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid rgba(150, 150, 150, 0.2);
+    border-bottom: 1px solid var(--card-border);
     font-size: 0.9rem;
-    color: #94a3b8;
+    color: var(--text-muted);
   }
 
   .sort-wrapper {
@@ -136,10 +255,10 @@ const allPosts = Object.entries(postFiles).map(([filePath, post]: [string, any])
   }
 
   .sort-wrapper select {
-    background: rgba(150, 150, 150, 0.15);
-    color: inherit;
-    border: 1px solid rgba(150, 150, 150, 0.3);
-    border-radius: 6px;
+    background: var(--bg-color);
+    color: var(--text-main);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
     padding: 0.35rem 0.6rem;
     font-size: 0.85rem;
     font-weight: 600;
@@ -153,28 +272,22 @@ const allPosts = Object.entries(postFiles).map(([filePath, post]: [string, any])
     gap: 1.5rem;
   }
 
-  /* Card Dark/Light Theme Control */
+  /* Post Card Styles */
   .post-card {
-    background: #182234 !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 12px;
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: transform 0.2s ease, border-color 0.2s ease;
-  }
-
-  :global(html:not(.dark)) .post-card,
-  :global(body:not(.dark)) .post-card {
-    background: #ffffff !important;
-    border: 1px solid rgba(0, 0, 0, 0.08) !important;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
   .post-card:hover {
     transform: translateY(-3px);
-    border-color: #3b82f6 !important;
+    border-color: var(--primary-blue);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
   }
 
   .post-meta {
@@ -182,52 +295,41 @@ const allPosts = Object.entries(postFiles).map(([filePath, post]: [string, any])
     justify-content: space-between;
     align-items: center;
     font-size: 0.75rem;
-    color: #94a3b8;
+    color: var(--text-muted);
     margin-bottom: 0.75rem;
   }
 
   .post-category {
-    background: rgba(59, 130, 246, 0.15);
-    color: #38bdf8;
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary-blue);
     padding: 0.25rem 0.6rem;
     border-radius: 4px;
-    font-weight: 600;
-  }
-
-  :global(html:not(.dark)) .post-category {
-    color: #2563eb;
+    font-weight: 700;
+    font-size: 0.76rem;
   }
 
   .post-card h2 {
     font-size: 1.25rem;
     line-height: 1.4;
     margin: 0 0 0.75rem;
+    font-weight: 800;
   }
 
   .post-card h2 a {
-    color: #38bdf8 !important;
+    color: var(--text-main);
     text-decoration: none;
-    font-weight: 700;
-  }
-
-  :global(html:not(.dark)) .post-card h2 a {
-    color: #1e293b !important;
   }
 
   .post-card h2 a:hover {
-    color: #60a5fa !important;
+    color: var(--primary-blue);
   }
 
   .post-card p {
-    color: #cbd5e1;
+    color: var(--text-muted);
     font-size: 0.92rem;
     line-height: 1.55;
     margin-bottom: 1.25rem;
     flex-grow: 1;
-  }
-
-  :global(html:not(.dark)) .post-card p {
-    color: #475569;
   }
 
   .post-footer {
@@ -235,26 +337,35 @@ const allPosts = Object.entries(postFiles).map(([filePath, post]: [string, any])
     justify-content: space-between;
     align-items: center;
     font-size: 0.8rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid var(--card-border);
     padding-top: 0.75rem;
-    color: #94a3b8;
-  }
-
-  :global(html:not(.dark)) .post-footer {
-    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    color: var(--text-muted);
   }
 
   .read-more {
-    color: #38bdf8;
+    color: var(--primary-blue);
     text-decoration: none;
     font-weight: 700;
   }
 
-  .read-more:hover {
-    text-decoration: underline;
+  .no-results {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-muted);
   }
 
-  @media (max-width: 600px) {
+  .btn-reset {
+    margin-top: 0.75rem;
+    background: var(--primary-blue);
+    color: #ffffff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  @media (max-width: 640px) {
     .controls-bar {
       flex-direction: column;
       align-items: flex-start;
@@ -267,36 +378,101 @@ const allPosts = Object.entries(postFiles).map(([filePath, post]: [string, any])
 </style>
 
 <script is:inline>
-  function initPostSorting() {
+  function initBlogSearchAndFilter() {
+    const searchInput = document.getElementById('guide-search-input');
+    const clearBtn = document.getElementById('clear-search-btn');
+    const catPills = document.querySelectorAll('.cat-pill');
     const sortSelect = document.getElementById('sort-select');
     const postsContainer = document.getElementById('posts-container');
-    
-    if (!sortSelect || !postsContainer) return;
+    const visibleCountEl = document.getElementById('visible-count');
+    const noResultsEl = document.getElementById('no-search-results');
+    const resetBtn = document.getElementById('reset-filter-btn');
 
-    sortSelect.addEventListener('change', () => {
-      const criteria = sortSelect.value;
+    let activeCategory = 'All';
+
+    function filterPosts() {
+      const query = (searchInput.value || '').trim().toLowerCase();
       const cards = Array.from(postsContainer.querySelectorAll('.post-card'));
+      let visibleCount = 0;
 
-      cards.sort((a, b) => {
-        const dateA = parseInt(a.getAttribute('data-date') || '0', 10);
-        const dateB = parseInt(b.getAttribute('data-date') || '0', 10);
-        const titleA = (a.getAttribute('data-title') || '').trim();
-        const titleB = (b.getAttribute('data-title') || '').trim();
+      if (clearBtn) {
+        clearBtn.style.display = query.length > 0 ? 'block' : 'none';
+      }
 
-        if (criteria === 'newest') {
-          return dateB - dateA;
-        } else if (criteria === 'oldest') {
-          return dateA - dateB;
-        } else if (criteria === 'title') {
-          return titleA.localeCompare(titleB);
+      cards.forEach(card => {
+        const title = card.getAttribute('data-title') || '';
+        const desc = card.getAttribute('data-desc') || '';
+        const category = card.getAttribute('data-category') || '';
+
+        const matchesQuery = query === '' || title.includes(query) || desc.includes(query);
+        const matchesCat = activeCategory === 'All' || category === activeCategory;
+
+        if (matchesQuery && matchesCat) {
+          card.style.display = 'flex';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
         }
-        return 0;
       });
 
-      postsContainer.innerHTML = '';
-      cards.forEach(card => postsContainer.appendChild(card));
+      if (visibleCountEl) visibleCountEl.innerText = visibleCount;
+      if (noResultsEl) noResultsEl.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+
+    if (searchInput) {
+      searchInput.addEventListener('input', filterPosts);
+    }
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        filterPosts();
+        searchInput.focus();
+      });
+    }
+
+    catPills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        catPills.forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        activeCategory = pill.getAttribute('data-category');
+        filterPosts();
+      });
     });
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        if (searchInput) searchInput.value = '';
+        catPills.forEach(p => p.classList.remove('active'));
+        if (catPills[0]) catPills[0].classList.add('active');
+        activeCategory = 'All';
+        filterPosts();
+      });
+    }
+
+    if (sortSelect && postsContainer) {
+      sortSelect.addEventListener('change', () => {
+        const criteria = sortSelect.value;
+        const cards = Array.from(postsContainer.querySelectorAll('.post-card'));
+
+        cards.sort((a, b) => {
+          const dateA = parseInt(a.getAttribute('data-date') || '0', 10);
+          const dateB = parseInt(b.getAttribute('data-date') || '0', 10);
+          const titleA = (a.getAttribute('data-title') || '').trim();
+          const titleB = (b.getAttribute('data-title') || '').trim();
+
+          if (criteria === 'newest') return dateB - dateA;
+          if (criteria === 'oldest') return dateA - dateB;
+          if (criteria === 'title') return titleA.localeCompare(titleB);
+          return 0;
+        });
+
+        postsContainer.innerHTML = '';
+        cards.forEach(card => postsContainer.appendChild(card));
+        filterPosts();
+      });
+    }
   }
 
-  document.addEventListener('DOMContentLoaded', initPostSorting);
+  document.addEventListener('DOMContentLoaded', initBlogSearchAndFilter);
 </script>
