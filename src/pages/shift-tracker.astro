@@ -101,8 +101,6 @@ const trackerSchema = {
 
     <!-- ================= TAB 1: DELIVERY SESSIONS & SETTLEMENT ================= -->
     <div id="view-delivery-sessions" class="st-tab-content active">
-      
-      <!-- Section A: Global Fleet Cut & Dynamic Custom Expenses -->
       <div class="st-card">
         <div class="st-card-head">
           <h2 class="st-card-title">⚙️ Fleet Commission & Shared Operating Expenses</h2>
@@ -134,7 +132,6 @@ const trackerSchema = {
         </div>
       </div>
 
-      <!-- Section B: Add Shift Session Form with Quick Name Chips -->
       <div class="st-card">
         <h3 class="st-box-title">➕ Add Delivery Shift Session</h3>
         <p class="st-card-sub" style="margin-top: -0.5rem; margin-bottom: 1rem;">Log each individual shift slot and exact app earnings.</p>
@@ -181,7 +178,6 @@ const trackerSchema = {
         </button>
       </div>
 
-      <!-- Section C: Pay Day Settlement & Progress Tracker -->
       <div class="st-card" style="border: 2px solid #2563eb;">
         <div class="st-card-head">
           <div class="st-filter-row" style="margin: 0;">
@@ -244,7 +240,6 @@ const trackerSchema = {
         </div>
       </div>
 
-      <!-- Section D: Individual Shift Sessions History Table & Isolated Reset -->
       <div class="st-card">
         <div class="st-filter-row">
           <div>
@@ -282,7 +277,6 @@ const trackerSchema = {
           </div>
         </div>
       </div>
-
     </div>
 
     <!-- ================= TAB 2: DAILY INCOME & EXPENSE LEDGER ================= -->
@@ -768,7 +762,10 @@ const trackerSchema = {
         // Room doesn't exist yet, initialize it with current data
         syncStateToCloud();
       }
-    }, (err) => console.warn("Room listener:", err));
+    }, (err) => {
+      console.warn("Room listener:", err);
+      alert("⚠️ Room Sync Error: " + err.message);
+    });
 
     updateSyncUI();
   }
@@ -780,16 +777,20 @@ const trackerSchema = {
 
     const docRef = doc(db, "user_profiles", uid);
 
-    // FETCH REMOTE FIRST: Do NOT overwrite with phone's stale local storage!
+    // FETCH REMOTE FIRST: Visual Error Alert if permissions fail
     unsubscribeSnapshot = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
         const remote = docSnap.data();
+        console.log("📥 Remote cloud data received:", remote);
         applyRemoteData(remote);
       } else {
-        // First-time user cloud backup initialization
+        console.log("📤 Initializing new cloud profile for user...");
         syncStateToCloud();
       }
-    }, (err) => console.warn("User listener:", err));
+    }, (err) => {
+      console.error("Firestore Listener Error:", err);
+      alert("⚠️ Cloud Sync Error: " + err.message + "\nPlease verify Firestore Database & Rules in Firebase Console.");
+    });
 
     updateSyncUI();
   }
@@ -808,9 +809,12 @@ const trackerSchema = {
     };
 
     if (activeSyncRoom) {
-      setDoc(doc(db, "sync_rooms", activeSyncRoom), payload, { merge: true }).catch(console.warn);
+      setDoc(doc(db, "sync_rooms", activeSyncRoom), payload, { merge: true })
+        .catch(err => alert("Room Sync Error: " + err.message));
     } else if (currentUser) {
-      setDoc(doc(db, "user_profiles", currentUser.uid), payload, { merge: true }).catch(console.warn);
+      setDoc(doc(db, "user_profiles", currentUser.uid), payload, { merge: true })
+        .then(() => console.log("✅ Cloud save successful"))
+        .catch(err => alert("Cloud Save Error: " + err.message));
     }
   }
 
@@ -825,7 +829,7 @@ const trackerSchema = {
     if (Array.isArray(remote.ledgerRecords)) ledgerRecords = remote.ledgerRecords;
     if (Array.isArray(remote.shiftRecords)) shiftRecords = remote.shiftRecords;
 
-    saveData(false); // Save to localStorage without pushing back
+    saveData(false);
     initCurrency();
     renderAll();
 
