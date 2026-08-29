@@ -1,0 +1,641 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const title = "Cyprus Student Pink Slip & Immigration Onboarding Tracker (90-Day Timeline)";
+const description = "Interactive 90-day step-by-step immigration roadmap for international students in Cyprus. Track Mukhtar house stamping, bank statement, CRMD medical screening, and biometrics.";
+const permalink = "https://cyprusstudentguide.com/pink-slip-tracker/";
+
+const toolSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Cyprus Student Pink Slip Onboarding Tracker",
+  "url": permalink,
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "All",
+  "browserRequirements": "Requires JavaScript",
+  "description": description
+};
+---
+
+<BaseLayout title={title} description={description} permalink={permalink} current="tracker">
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(toolSchema)} />
+
+  <div class="tracker-hero notranslate">
+    <span class="hero-badge">⚡ 90-Day Legal Onboarding Assistant</span>
+    <h1>Pink Slip & CRMD Migration Tracker</h1>
+    <p class="hero-desc">
+      Track your mandatory 3-month immigration deadlines, housing certification, bank setup, and medical tests with zero compliance errors.
+    </p>
+  </div>
+
+  <div class="tracker-layout notranslate">
+    <!-- Left Sticky Column: Setup & Progress -->
+    <aside class="tracker-sidebar">
+      <div class="sidebar-card">
+        <h3>📅 1. Set Cyprus Arrival Date</h3>
+        <p class="sidebar-sub">Your 90-day CRMD submission countdown begins the day you enter Cyprus.</p>
+        
+        <div class="date-input-wrap">
+          <label for="arrival-date">Arrival Date (Airport Entry):</label>
+          <input type="date" id="arrival-date" class="date-input" />
+        </div>
+
+        <div class="deadline-banner" id="deadline-banner">
+          <span class="deadline-label">90-Day Submission Deadline:</span>
+          <strong id="deadline-date-display">Select arrival date</strong>
+          <div class="countdown-badge" id="days-left-badge">Waiting for input...</div>
+        </div>
+
+        <hr class="card-divider" />
+
+        <div class="progress-section">
+          <div class="progress-label-row">
+            <span>Overall Migration Progress:</span>
+            <strong id="progress-percent">0%</strong>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progress-bar-fill" style="width: 0%;"></div>
+          </div>
+          <p class="progress-sub" id="tasks-completed-text">0 of 12 tasks completed</p>
+        </div>
+
+        <button type="button" id="reset-tracker-btn" class="btn-reset-tracker">
+          🔄 Reset All Checklist Data
+        </button>
+      </div>
+
+      <!-- Quick Assistance Callout -->
+      <div class="sidebar-card info-box">
+        <h4>💡 Need Help With Documents?</h4>
+        <p>Each phase below includes direct links to our ground-tested guides with step-by-step instructions and fee breakdowns.</p>
+      </div>
+    </aside>
+
+    <!-- Right Main Column: 4-Phase Checklist -->
+    <main class="tracker-main">
+      
+      <!-- Phase 1: Days 1 - 15 -->
+      <section class="phase-card">
+        <div class="phase-header">
+          <div class="phase-badge">Phase 1 (Days 1–15)</div>
+          <h2>🏠 Housing & Mukhtar Certification</h2>
+          <p class="phase-desc">Secure your legal residence address before booking bank appointments.</p>
+        </div>
+
+        <div class="task-list">
+          <label class="task-item">
+            <input type="checkbox" class="task-checkbox" data-task-id="t1" />
+            <div class="task-content">
+              <strong>Secure Minimum 12-Month Tenancy Agreement</strong>
+              <p>Sign contract specifying exact residential address and monthly rent share.</p>
+            </div>
+          </label>
+
+          <label class="task-item">
+            <input type="checkbox" class="task-checkbox" data-task-id="t2" />
+            <div class="task-content">
+              <strong>Get 2 Cypriot Witnesses (Full Name & ID)</strong>
+              <p>Required by immigration to co-sign the lease in front of the community leader.</p>
+            </div>
+          </label>
+
+          <label class="task-item">
+            <input type="checkbox" class="task-checkbox" data-task-id="t3" />
+            <div class="task-content">
+              <strong>Stamp Lease at Local Mukhtar Office</strong>
+              <p>Attach €2–€5 revenue stamps (Hartosima) and obtain official embossed community seal.</p>
+              <a href="/blog/cyprus-student-accommodation-flat-hunting-guide/" class="task-link" target="_blank">Read Mukhtar Certification Guide ➔</a>
+            </div>
+          </label>
+        </div>
+      </section>
+
+      <!-- Phase 2: Days 15 - 45 -->
+      <section class="phase-card">
+        <div class="phase-header">
+          <div class="phase-badge">Phase 2 (Days 15–45)</div>
+          <h2>💳 Bank Account & Financial Verification</h2>
+          <p class="phase-desc">Generate your verified bank statement with the mandatory living deposit.</p>
+        </div>
+
+        <div class="task-list">
+          <label class="task-item">
+            <input type="checkbox" class="task-checkbox" data-task-id="t4" />
+            <div class="task-content">
+              <strong>Submit Bank Account Application (BOC 1App / Eurobank)</strong>
+              <p>Upload stamped Mukhtar agreement, university acceptance letter, and home country bank letter.</p>
+              <a href="/blog/how-to-open-bank-account-cyprus-student-immigration-guide/" class="task-link" target="_blank">Read Student Bank Account Guide ➔</a>
+            </div>
+          </label>
+
+          <label class="task-item">
+            <input type="checkbox" class="task-checkbox" data-task-id="t5" />
+            <div class="task-content">
+              <strong>Deposit Mandatory Maintenance Funds (~€850)</strong>
+              <p>Transfer funds via local card, cash counter, or 0% fee remittance tools.</p>
+              <a href="/blog/how-to-send-money-from-cyprus-taptap-send-bonus-guide/" class="task-link" target="_blank">Use Taptap Send 0% Fee & €10 Bonus ➔</a>
+            </div>
+          </label>
+
+          <label class="task-item">
+            <input type="checkbox" class="task-checkbox" data-task-id="t6" />
+            <div class="task-content">
+              <strong>Collect Official Bank Confirmation Letter & IBAN Statement</strong>
+              <p>Ensure the bank letter states your active account balance for migration use.</p>
+            </div>
+          </label>
+        </div>
+      </section>
+
+      <!-- Phase 3: Days 45 - 70 -->
+      <section class="phase-card">
+        <div class="phase-header">
+          <div class="phase-badge">Phase 3 (Days 45–70)</div>
+          <h2>🏥 Mandatory CRMD Medical Tests & Health Insurance</h2>
+          <p class="phase-desc">Screen for infectious conditions (results are valid for 3 months).</p>
+        </div>
+
+        <div class="task-list">
+          <label class="task-item">
+            <input type="checkbox" class="task-checkbox" data-task-id="t7" />
+            <div class="task-content">
+              <strong>Check If Medical is Bundled in College Fees</strong>
+              <p>Many universities arrange organized on-campus screening days without out-of-pocket costs.</p>
+            </div>
+          </label>
+
+          <label class="task-item">
+            <input type="checkbox" class="task-checkbox" data-task-id="t8" />
+            <div class="task-content">
+              <strong>Complete 4 Blood Tests (HIV, Hep B/C, Syphilis) & Chest X-Ray (TB)</strong>
+              <p>Carry your original passport to the diagnostic laboratory and radiology center.</p>
+              <a href="/blog/cyprus-student-medical-test-health-insurance-guide/" class="task-link" target="_blank">Read Medical Test Guide ➔</a>
+            </div>
+          </label>
+
+          <label class="task-item">
+            <input type="checkbox" class="task-checkbox" data-task-id="t9" />
+            <div class="task-content">
+              <strong>Secure Plan A Private Health Insurance Certificate</strong>
+              <p>Must meet CRMD statutory minimum hospitalization (€8,500+) and repatriation cover.</p>
+            </div>
+          </label>
+        </div>
+      </section>
+
+      <!-- Phase 4: Days 70 - 90 -->
+      <section class="phase-card">
+        <div class="phase-header">
+          <div class="phase-badge">Phase 4 (Days 70–90)</div>
+          <h2>🏛️ University Visa Section Lodgement & Biometrics</h2>
+          <p class="phase-desc">Final submission to the Civil Registry & Migration Department (CRMD).</p>
+        </div>
+
+        <div class="task-list">
+          <label class="task-item">
+            <input type="checkbox" class="task-checkbox" data-task-id="t10" />
+            <div class="task-content">
+              <strong>Submit Unified Package to University Visa Desk</strong>
+              <p>Include stamped lease, bank statement, sealed medical report, insurance, and passport photos.</p>
+            </div>
+          </label>
+
+          <label class="task-item">
+            <input type="checkbox" class="task-checkbox" data-task-id="t11" />
+            <div class="task-content">
+              <strong>Receive CRMD Biometric Appointment Date & Fee Slip (Fiche)</strong>
+              <p>This payment receipt (Fiche) proves you have legally lodged before the 90-day deadline.</p>
+            </div>
+          </label>
+
+          <label class="task-item">
+            <input type="checkbox" class="task-checkbox" data-task-id="t12" />
+            <div class="task-content">
+              <strong>Attend Biometrics at Migration District Unit (Capture Photo & Fingerprints)</strong>
+              <p>Your physical Pink Slip (ARC card) is issued within 4 to 8 weeks after biometric capture.</p>
+            </div>
+          </label>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</BaseLayout>
+
+<script is:inline>
+  const STORAGE_KEY_DATE = 'csg_arrival_date';
+  const STORAGE_KEY_TASKS = 'csg_pinkslip_tasks';
+
+  function initTracker() {
+    const arrivalInput = document.getElementById('arrival-date');
+    const deadlineText = document.getElementById('deadline-date-display');
+    const daysLeftBadge = document.getElementById('days-left-badge');
+    const progressBar = document.getElementById('progress-bar-fill');
+    const progressPercentText = document.getElementById('progress-percent');
+    const tasksCountText = document.getElementById('tasks-completed-text');
+    const resetBtn = document.getElementById('reset-tracker-btn');
+    const checkboxes = document.querySelectorAll('.task-checkbox');
+
+    // 1. Load saved arrival date
+    const savedDate = localStorage.getItem(STORAGE_KEY_DATE);
+    if (savedDate && arrivalInput) {
+      arrivalInput.value = savedDate;
+      calculateDeadline(savedDate);
+    }
+
+    // 2. Load saved task states
+    let completedTasks = JSON.parse(localStorage.getItem(STORAGE_KEY_TASKS) || '[]');
+    checkboxes.forEach(cb => {
+      const id = cb.getAttribute('data-task-id');
+      if (completedTasks.includes(id)) {
+        cb.checked = true;
+        cb.closest('.task-item')?.classList.add('completed');
+      }
+
+      cb.addEventListener('change', () => {
+        if (cb.checked) {
+          if (!completedTasks.includes(id)) completedTasks.push(id);
+          cb.closest('.task-item')?.classList.add('completed');
+        } else {
+          completedTasks = completedTasks.filter(t => t !== id);
+          cb.closest('.task-item')?.classList.remove('completed');
+        }
+        localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify(completedTasks));
+        updateProgress();
+      });
+    });
+
+    // 3. Arrival date listener
+    if (arrivalInput) {
+      arrivalInput.addEventListener('change', (e) => {
+        const val = e.target.value;
+        if (val) {
+          localStorage.setItem(STORAGE_KEY_DATE, val);
+          calculateDeadline(val);
+        }
+      });
+    }
+
+    // 4. Calculate 90-day deadline
+    function calculateDeadline(arrivalDateStr) {
+      const arrival = new Date(arrivalDateStr);
+      if (isNaN(arrival.getTime())) return;
+
+      const deadline = new Date(arrival);
+      deadline.setDate(arrival.getDate() + 90);
+
+      const formattedDeadline = deadline.toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
+
+      if (deadlineText) deadlineText.innerText = formattedDeadline;
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const diffTime = deadline - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (daysLeftBadge) {
+        if (diffDays > 0) {
+          daysLeftBadge.innerText = `⏳ ${diffDays} days remaining to submit`;
+          daysLeftBadge.className = 'countdown-badge badge-active';
+        } else if (diffDays === 0) {
+          daysLeftBadge.innerText = `⚠️ Deadline is TODAY!`;
+          daysLeftBadge.className = 'countdown-badge badge-urgent';
+        } else {
+          daysLeftBadge.innerText = `🚨 90-Day deadline passed (${Math.abs(diffDays)} days ago)`;
+          daysLeftBadge.className = 'countdown-badge badge-passed';
+        }
+      }
+    }
+
+    // 5. Update Progress Bar
+    function updateProgress() {
+      const total = checkboxes.length;
+      const done = completedTasks.length;
+      const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+      if (progressBar) progressBar.style.width = pct + '%';
+      if (progressPercentText) progressPercentText.innerText = pct + '%';
+      if (tasksCountText) tasksCountText.innerText = `${done} of ${total} tasks completed`;
+    }
+
+    // 6. Reset
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        if (confirm('Are you sure you want to reset your checklist progress?')) {
+          localStorage.removeItem(STORAGE_KEY_DATE);
+          localStorage.removeItem(STORAGE_KEY_TASKS);
+          completedTasks = [];
+          checkboxes.forEach(cb => {
+            cb.checked = false;
+            cb.closest('.task-item')?.classList.remove('completed');
+          });
+          if (arrivalInput) arrivalInput.value = '';
+          if (deadlineText) deadlineText.innerText = 'Select arrival date';
+          if (daysLeftBadge) {
+            daysLeftBadge.innerText = 'Waiting for input...';
+            daysLeftBadge.className = 'countdown-badge';
+          }
+          updateProgress();
+        }
+      });
+    }
+
+    updateProgress();
+  }
+
+  document.addEventListener('DOMContentLoaded', initTracker);
+</script>
+
+<style>
+  .tracker-hero {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+  .hero-badge {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary-blue);
+    font-weight: 800;
+    font-size: 0.8rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 30px;
+    display: inline-block;
+    margin-bottom: 0.75rem;
+  }
+  .tracker-hero h1 {
+    font-size: 2.35rem;
+    font-weight: 900;
+    margin: 0 0 0.5rem;
+    line-height: 1.25;
+  }
+  .hero-desc {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    max-width: 680px;
+    margin: 0 auto;
+    line-height: 1.55;
+  }
+
+  .tracker-layout {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .tracker-sidebar {
+    position: sticky;
+    top: 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .sidebar-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 1.4rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+  }
+
+  .sidebar-card h3 {
+    font-size: 1.05rem;
+    font-weight: 800;
+    margin: 0 0 0.3rem;
+  }
+
+  .sidebar-sub {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.45;
+    margin: 0 0 1rem;
+  }
+
+  .date-input-wrap label {
+    display: block;
+    font-size: 0.84rem;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+  }
+
+  .date-input {
+    width: 100%;
+    background: var(--bg-color);
+    color: var(--text-main);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 0.6rem 0.75rem;
+    font-family: inherit;
+    font-size: 0.92rem;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .deadline-banner {
+    background: rgba(37, 99, 235, 0.05);
+    border: 1px dashed var(--primary-blue);
+    border-radius: 10px;
+    padding: 0.85rem;
+    margin-top: 1rem;
+    text-align: center;
+  }
+
+  .deadline-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    display: block;
+    text-transform: uppercase;
+  }
+
+  .deadline-banner strong {
+    font-size: 1.15rem;
+    color: var(--primary-blue);
+    display: block;
+    margin: 0.25rem 0 0.5rem;
+  }
+
+  .countdown-badge {
+    font-size: 0.78rem;
+    font-weight: 800;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    display: inline-block;
+    background: rgba(150, 150, 150, 0.1);
+    color: var(--text-muted);
+  }
+  .badge-active { background: #dbeafe; color: #1e40af; }
+  .badge-urgent { background: #fee2e2; color: #b91c1c; }
+  .badge-passed { background: #fef3c7; color: #92400e; }
+
+  .card-divider {
+    border: 0;
+    border-top: 1px solid var(--card-border);
+    margin: 1.25rem 0;
+  }
+
+  .progress-section { margin-bottom: 1rem; }
+  .progress-label-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 0.45rem;
+  }
+  .progress-bar-bg {
+    height: 10px;
+    background: rgba(150, 150, 150, 0.15);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2563eb, #38bdf8);
+    transition: width 0.3s ease;
+  }
+  .progress-sub {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin: 0.4rem 0 0;
+    text-align: right;
+  }
+
+  .btn-reset-tracker {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--card-border);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn-reset-tracker:hover {
+    background: rgba(239, 68, 68, 0.08);
+    color: #ef4444;
+    border-color: #ef4444;
+  }
+
+  .info-box h4 {
+    margin: 0 0 0.35rem;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--primary-blue);
+  }
+  .info-box p {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* Main Checklist Styles */
+  .tracker-main {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .phase-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+  }
+
+  .phase-header {
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid var(--card-border);
+  }
+  .phase-badge {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary-blue);
+    font-size: 0.74rem;
+    font-weight: 800;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 0.4rem;
+  }
+  .phase-header h2 {
+    font-size: 1.3rem;
+    font-weight: 800;
+    margin: 0 0 0.25rem;
+    color: var(--text-main);
+  }
+  .phase-desc {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  .task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .task-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    background: var(--bg-color);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .task-item:hover {
+    border-color: var(--primary-blue);
+  }
+  .task-item.completed {
+    background: rgba(34, 197, 94, 0.04);
+    border-color: rgba(34, 197, 94, 0.3);
+  }
+  .task-item.completed strong {
+    text-decoration: line-through;
+    color: var(--text-muted);
+  }
+
+  .task-checkbox {
+    margin-top: 0.25rem;
+    width: 18px;
+    height: 18px;
+    accent-color: #2563eb;
+    cursor: pointer;
+  }
+
+  .task-content strong {
+    display: block;
+    font-size: 0.95rem;
+    color: var(--text-main);
+    margin-bottom: 0.2rem;
+  }
+  .task-content p {
+    margin: 0 0 0.4rem;
+    font-size: 0.84rem;
+    color: var(--text-muted);
+    line-height: 1.45;
+  }
+  .task-link {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    text-decoration: underline;
+  }
+
+  @media (max-width: 860px) {
+    .tracker-layout { grid-template-columns: 1fr; }
+    .tracker-sidebar { position: static; }
+  }
+</style>
