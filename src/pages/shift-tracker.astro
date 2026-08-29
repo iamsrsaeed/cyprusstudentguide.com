@@ -70,7 +70,7 @@ const trackerSchema = {
 
       <div class="st-save-status">
         <span class="st-dot"></span>
-        <span id="save-status-text">Auto-saved to browser</span>
+        <span id="save-status-text" class="st-save-text">Auto-saved to browser</span>
       </div>
 
       <div class="st-actions-group">
@@ -578,7 +578,8 @@ const trackerSchema = {
   let activeSyncRoom = null;
   let currentUser = null;
   let unsubscribeSnapshot = null;
-  let isSyncing = false; // Render lock to kill infinite loops
+  let isUpdatingDOM = false;
+  let cloudPushTimeout = null;
 
   document.addEventListener('DOMContentLoaded', () => {
     const today = new Date().toISOString().split('T')[0];
@@ -647,7 +648,7 @@ const trackerSchema = {
   }
 
   function saveData(pushToCloud = true) {
-    if (isSyncing) return; // Prevent loop triggered during remote sync
+    if (isUpdatingDOM) return;
 
     localStorage.setItem(STORAGE_KEY_CURRENCY, currentCurrency);
     localStorage.setItem(STORAGE_KEY_LEDGER, JSON.stringify(ledgerRecords));
@@ -659,11 +660,14 @@ const trackerSchema = {
     const txt = document.getElementById('save-status-text');
     if (txt) {
       txt.innerText = 'Saved ' + new Date().toLocaleTimeString();
-      setTimeout(() => txt.innerText = 'Auto-saved to browser', 2500);
     }
 
     if (pushToCloud) {
-      syncStateToCloud();
+      // Debounced push to cloud (prevents continuous hammering)
+      if (cloudPushTimeout) clearTimeout(cloudPushTimeout);
+      cloudPushTimeout = setTimeout(() => {
+        syncStateToCloud();
+      }, 400);
     }
   }
 
@@ -681,7 +685,6 @@ const trackerSchema = {
     if (openModalBtn) openModalBtn.addEventListener('click', () => modal.classList.add('active'));
     if (closeModalBtn) closeModalBtn.addEventListener('click', () => modal.classList.remove('active'));
 
-    // Handle Mobile Google Redirect
     getRedirectResult(auth)
       .then((result) => {
         if (result && result.user) {
@@ -693,7 +696,6 @@ const trackerSchema = {
         console.error("Redirect Auth Error:", err);
       });
 
-    // Create Room
     if (createRoomBtn) {
       createRoomBtn.addEventListener('click', () => {
         const randCode = 'CY-' + Math.floor(1000 + Math.random() * 9000);
@@ -702,7 +704,6 @@ const trackerSchema = {
       });
     }
 
-    // Join Room
     if (joinRoomBtn) {
       joinRoomBtn.addEventListener('click', () => {
         const code = joinRoomInput.value.trim().toUpperCase();
@@ -715,7 +716,6 @@ const trackerSchema = {
       });
     }
 
-    // Google Sign-In (Smart Auto-Detection)
     if (googleAuthBtn) {
       googleAuthBtn.addEventListener('click', async () => {
         if (currentUser) return;
@@ -739,7 +739,6 @@ const trackerSchema = {
       });
     }
 
-    // Disconnect Sync
     if (disconnectBtn) {
       disconnectBtn.addEventListener('click', async () => {
         if (confirm('Disconnect live sync and return to local offline mode?')) {
@@ -754,7 +753,6 @@ const trackerSchema = {
       });
     }
 
-    // Auth State Listener
     onAuthStateChanged(auth, (user) => {
       currentUser = user;
       if (user) {
@@ -777,8 +775,7 @@ const trackerSchema = {
 
     unsubscribeSnapshot = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
-        const remote = docSnap.data();
-        applyRemoteData(remote);
+        applyRemoteData(docSnap.data());
       }
     }, (err) => console.warn("Room listener:", err));
 
@@ -795,8 +792,7 @@ const trackerSchema = {
 
     unsubscribeSnapshot = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
-        const remote = docSnap.data();
-        applyRemoteData(remote);
+        applyRemoteData(docSnap.data());
       }
     }, (err) => console.warn("User listener:", err));
 
@@ -826,7 +822,7 @@ const trackerSchema = {
   function applyRemoteData(remote) {
     if (!remote) return;
 
-    // Check if data is already identical to prevent DOM thrashing / flickering
+    // Deep equality check: If payload is identical, do NOT touch DOM
     const currentPayloadStr = JSON.stringify({
       c: currentCurrency,
       ds: deliverySessions,
@@ -845,9 +841,9 @@ const trackerSchema = {
       sr: remote.shiftRecords || []
     });
 
-    if (currentPayloadStr === remotePayloadStr) return; // Exact match, skip render to prevent loop
+    if (currentPayloadStr === remotePayloadStr) return;
 
-    isSyncing = true; // Lock local saves
+    isUpdatingDOM = true;
 
     if (remote.currency) currentCurrency = remote.currency;
     if (remote.deliverySessions) deliverySessions = remote.deliverySessions;
@@ -861,8 +857,8 @@ const trackerSchema = {
     renderAll();
 
     setTimeout(() => {
-      isSyncing = false;
-    }, 150);
+      isUpdatingDOM = false;
+    }, 100);
   }
 
   function updateSyncUI() {
@@ -900,7 +896,6 @@ const trackerSchema = {
     }
   }
 
-  // Load Demo Data
   function loadDemoData() {
     const today = new Date().toISOString().split('T')[0];
     deliverySessions = [
@@ -916,7 +911,6 @@ const trackerSchema = {
     renderAll();
   }
 
-  // 1. Currency Picker
   function initCurrency() {
     const sel = document.getElementById('global-currency-select');
     if (sel && sel.value !== currentCurrency) {
@@ -929,7 +923,6 @@ const trackerSchema = {
     document.querySelectorAll('.curr-sym').forEach(el => el.innerText = currentCurrency);
   }
 
-  // 2. Tabs Switcher
   function initTabs() {
     const tabBtns = document.querySelectorAll('.st-tab-btn');
     const contents = document.querySelectorAll('.st-tab-content');
@@ -963,7 +956,6 @@ const trackerSchema = {
     }
   }
 
-  // ================= 3. ISOLATED TAB RESET ENGINE =================
   function initIsolatedTabClearing() {
     const clearDelBtn = document.getElementById('btn-clear-delivery-tab');
     if (clearDelBtn) {
@@ -1004,12 +996,11 @@ const trackerSchema = {
     }
   }
 
-  // ================= 4. DELIVERY SESSIONS & EXPENSES ENGINE =================
   function initDeliverySessionsEngine() {
     const fleetInp = document.getElementById('cfg-fleet-percent');
     if (fleetInp) {
       fleetInp.value = deliveryConfig.fleetPercent;
-      fleetInp.addEventListener('input', () => {
+      fleetInp.addEventListener('change', () => {
         deliveryConfig.fleetPercent = parseFloat(fleetInp.value) || 0;
         saveData();
         renderDeliverySessions();
@@ -1126,12 +1117,12 @@ const trackerSchema = {
         <button type="button" class="st-btn-del" title="Remove this expense">✕</button>
       `;
 
-      row.querySelector('.exp-name-input').addEventListener('input', (e) => {
+      row.querySelector('.exp-name-input').addEventListener('change', (e) => {
         deliveryCustomExpenses[idx].name = e.target.value;
         saveData();
       });
 
-      row.querySelector('.exp-amt-input').addEventListener('input', (e) => {
+      row.querySelector('.exp-amt-input').addEventListener('change', (e) => {
         deliveryCustomExpenses[idx].amount = parseFloat(e.target.value) || 0;
         saveData();
         renderDeliverySessions();
@@ -1760,7 +1751,7 @@ const trackerSchema = {
 
     document.getElementById('btn-export-json').addEventListener('click', () => {
       const backup = {
-        version: "10.0",
+        version: "11.0",
         currency: currentCurrency,
         ledger: ledgerRecords,
         shifts: shiftRecords,
@@ -1844,8 +1835,12 @@ const trackerSchema = {
   .st-tool-group { display: flex; align-items: center; gap: 0.5rem; }
   .st-tool-label { font-size: 0.88rem; font-weight: 700; color: var(--text-main); }
   .st-select-mini { background: var(--bg-color); color: var(--text-main); border: 1px solid var(--card-border); padding: 0.35rem 0.6rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem; outline: none; cursor: pointer; }
-  .st-save-status { display: flex; align-items: center; gap: 0.45rem; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); }
-  .st-dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; display: inline-block; box-shadow: 0 0 6px #10b981; }
+  
+  /* Fixed Width Status Label - Kills Jitter Completely */
+  .st-save-status { display: flex; align-items: center; gap: 0.45rem; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); min-width: 175px; }
+  .st-save-text { display: inline-block; white-space: nowrap; }
+  .st-dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; display: inline-block; box-shadow: 0 0 6px #10b981; flex-shrink: 0; }
+  
   .st-actions-group { display: flex; gap: 0.45rem; flex-wrap: wrap; }
   .st-btn { border: 1px solid var(--card-border); background: var(--bg-color); color: var(--text-main); font-size: 0.78rem; font-weight: 700; padding: 0.4rem 0.75rem; border-radius: 6px; cursor: pointer; transition: all 0.15s ease; text-decoration: none; display: inline-flex; align-items: center; }
   .st-btn-green { background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
