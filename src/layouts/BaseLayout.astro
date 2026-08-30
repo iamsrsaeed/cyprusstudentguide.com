@@ -25,8 +25,10 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     <link rel="apple-touch-icon" href="/favicon.svg" />
     <meta name="theme-color" content="#2563eb" />
 
+    <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4089174887676363" crossorigin="anonymous"></script>
 
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Cyprus Student Guide" />
     <meta property="og:title" content={title} />
@@ -34,6 +36,7 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     <meta property="og:url" content={permalink} />
     <meta property="og:image" content="https://cyprusstudentguide.com/favicon.svg" />
 
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet" />
@@ -58,11 +61,13 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     </script>
   </head>
   <body>
+    <!-- Announcement Bar -->
     <div class="csg-announcement-bar notranslate">
       <span>🎁 <strong>TAPTAP SEND BONUS:</strong> Send money from Cyprus with 0% fee! Code: <code>MDSAIDUR240</code></span>
       <a href="/blog/how-to-send-money-from-cyprus-taptap-send-bonus-guide/">Claim €10 Bonus ➔</a>
     </div>
 
+    <!-- Header Navigation -->
     <header class="csg-header">
       <div class="csg-container csg-nav-inner">
         <a href="/" class="csg-brand notranslate">
@@ -70,6 +75,7 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
           <span class="csg-brand-text">Cyprus <span>Student Guide</span></span>
         </a>
 
+        <!-- Desktop Navigation -->
         <nav class="csg-nav-links notranslate">
           <a href="/" class={current === 'home' ? 'active' : ''}>Home</a>
           <a href="/blog/" class={current === 'guides' ? 'active' : ''}>Guides</a>
@@ -79,16 +85,19 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
           <a href="/about/" class={current === 'about' ? 'active' : ''}>About</a>
         </nav>
 
+        <!-- Right Side Controls with 1-Click Interactive Popup -->
         <div class="csg-nav-actions notranslate">
+          <!-- Direct Sign-In / Passport Access -->
           <div id="nav-auth-container" class="nav-auth-wrap">
-            <a href="/profile/" id="nav-login-btn" class="nav-btn-signin" title="Sign in with Google">
-              👤 Sign In
-            </a>
+            <button type="button" id="nav-login-btn" class="nav-btn-signin" title="Sign in with Google">
+              👤 <span>Sign In</span>
+            </button>
             <a href="/profile/" id="nav-user-avatar-btn" class="nav-user-avatar" style="display: none;" title="My Student Passport">
-              <img id="nav-user-avatar-img" src="" alt="Profile" />
+              <img id="nav-user-avatar-img" src="/favicon.svg" alt="Profile" />
             </a>
           </div>
 
+          <!-- Language Selector -->
           <div class="csg-lang-wrapper">
             <select id="language-switcher" aria-label="Select Language" class="csg-lang-select">
               <option value="en">🇬🇧 EN</option>
@@ -98,16 +107,19 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
             </select>
           </div>
 
+          <!-- Theme Toggle -->
           <button id="theme-toggle" type="button" aria-label="Toggle Dark Mode" class="csg-theme-btn">
             🌙
           </button>
 
+          <!-- Mobile Menu Toggle -->
           <button id="mobile-menu-toggle" type="button" aria-label="Toggle Navigation Menu" class="csg-hamburger-btn">
             <span class="hamburger-icon">☰</span>
           </button>
         </div>
       </div>
 
+      <!-- Mobile Dropdown Navigation Drawer -->
       <div id="mobile-nav-drawer" class="csg-mobile-drawer notranslate" style="display: none;">
         <nav class="csg-mobile-links">
           <a href="/profile/" class={current === 'profile' ? 'active' : ''}>👤 Student Passport & Profile</a>
@@ -172,29 +184,41 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
       </div>
     </footer>
 
+    <!-- Direct Global 1-Click Authentication Engine -->
     <script is:inline type="module">
-      import('../lib/firebase.js').then(({ auth }) => {
-        import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js').then(({ onAuthStateChanged }) => {
-          const navLoginBtn = document.getElementById('nav-login-btn');
-          const navAvatarBtn = document.getElementById('nav-user-avatar-btn');
-          const navAvatarImg = document.getElementById('nav-user-avatar-img');
+      import { auth, loginWithGoogle } from '/src/lib/firebase.js';
+      import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 
-          onAuthStateChanged(auth, (user) => {
-            if (user) {
-              if (navLoginBtn) navLoginBtn.style.display = 'none';
-              if (navAvatarBtn) navAvatarBtn.style.display = 'flex';
-              if (navAvatarImg) navAvatarImg.src = user.photoURL || '/favicon.svg';
-            } else {
-              if (navLoginBtn) navLoginBtn.style.display = 'inline-flex';
-              if (navAvatarBtn) navAvatarBtn.style.display = 'none';
-            }
-          });
+      const navLoginBtn = document.getElementById('nav-login-btn');
+      const navAvatarBtn = document.getElementById('nav-user-avatar-btn');
+      const navAvatarImg = document.getElementById('nav-user-avatar-img');
+
+      // 1-Click Google Sign-in Handler
+      if (navLoginBtn) {
+        navLoginBtn.addEventListener('click', async () => {
+          try {
+            await loginWithGoogle();
+            window.location.href = '/profile/';
+          } catch (e) {
+            console.error('Sign-in error:', e);
+            window.location.href = '/profile/';
+          }
         });
-      }).catch((err) => {
-        console.warn('Auth UI state skipped on build:', err);
+      }
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          if (navLoginBtn) navLoginBtn.style.display = 'none';
+          if (navAvatarBtn) navAvatarBtn.style.display = 'flex';
+          if (navAvatarImg) navAvatarImg.src = user.photoURL || '/favicon.svg';
+        } else {
+          if (navLoginBtn) navLoginBtn.style.display = 'inline-flex';
+          if (navAvatarBtn) navAvatarBtn.style.display = 'none';
+        }
       });
     </script>
 
+    <!-- Standard Interactive Scripts -->
     <script is:inline>
       const themeToggleBtn = document.getElementById('theme-toggle');
       if (themeToggleBtn) {
@@ -362,14 +386,14 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     justify-content: space-between;
     align-items: center;
     min-height: 60px;
-    gap: 0.5rem;
+    gap: 0.35rem;
     width: 100%;
   }
 
   .csg-brand {
     display: flex;
     align-items: center;
-    gap: 0.45rem;
+    gap: 0.4rem;
     text-decoration: none;
     color: var(--text-main);
     flex-shrink: 1;
@@ -378,18 +402,20 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
   .csg-logo-badge {
     background: linear-gradient(135deg, #2563eb, #0284c7);
     color: #ffffff;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-weight: 900;
-    padding: 0.28rem 0.5rem;
-    border-radius: 7px;
+    padding: 0.25rem 0.45rem;
+    border-radius: 6px;
     box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
     flex-shrink: 0;
   }
   .csg-brand-text {
-    font-size: clamp(0.85rem, 3.4vw, 1.15rem);
+    font-size: clamp(0.82rem, 3.2vw, 1.15rem);
     font-weight: 800;
     letter-spacing: -0.02em;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .csg-brand-text span { color: var(--primary-blue); }
 
@@ -420,15 +446,18 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
   .nav-btn-signin {
     background: rgba(37, 99, 235, 0.1);
     color: var(--primary-blue);
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     font-weight: 800;
-    padding: 0.32rem 0.65rem;
+    padding: 0.3rem 0.55rem;
     border-radius: 6px;
-    text-decoration: none;
+    border: 1px solid rgba(37, 99, 235, 0.2);
+    cursor: pointer;
     display: inline-flex;
     align-items: center;
+    gap: 0.25rem;
     transition: background 0.15s;
     white-space: nowrap;
+    font-family: inherit;
   }
   .nav-btn-signin:hover {
     background: var(--primary-blue);
@@ -579,11 +608,12 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
 
   @media (max-width: 480px) {
     .csg-container { padding: 0 0.75rem; }
-    .csg-nav-inner { min-height: 56px; gap: 0.25rem; }
-    .csg-logo-badge { font-size: 0.78rem; padding: 0.2rem 0.4rem; }
-    .csg-lang-select { font-size: 0.72rem; padding: 0.22rem 0.25rem; }
-    .csg-theme-btn { padding: 0.22rem 0.4rem; font-size: 0.82rem; }
-    .csg-hamburger-btn { padding: 0.22rem 0.42rem; font-size: 0.9rem; }
-    .nav-btn-signin { font-size: 0.72rem; padding: 0.25rem 0.45rem; }
+    .csg-nav-inner { min-height: 56px; gap: 0.2rem; }
+    .csg-logo-badge { font-size: 0.75rem; padding: 0.18rem 0.38rem; }
+    .csg-lang-select { font-size: 0.7rem; padding: 0.2rem 0.2rem; }
+    .csg-theme-btn { padding: 0.2rem 0.35rem; font-size: 0.8rem; }
+    .csg-hamburger-btn { padding: 0.2rem 0.38rem; font-size: 0.85rem; }
+    .nav-btn-signin { font-size: 0.7rem; padding: 0.22rem 0.38rem; }
+    .nav-btn-signin span { display: none; } /* On small screens show icon only */
   }
 </style>
