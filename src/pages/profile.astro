@@ -9,7 +9,7 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
 <BaseLayout title={title} description={description} permalink={permalink} current="profile">
   <div class="profile-container notranslate">
     
-    <!-- Initial / Unauthenticated View (Rendered by default, never blank) -->
+    <!-- 1. Unauthenticated View -->
     <div id="auth-gate" class="auth-card">
       <div class="auth-icon">🔐</div>
       <h1>Student Passport & Cloud Sync</h1>
@@ -19,9 +19,10 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
         <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.616z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707 0-.59.102-1.167.282-1.707V4.961H.957C.347 6.173 0 7.548 0 9s.347 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/></svg>
         Sign In with Google
       </button>
+      <div id="login-error-msg" style="color: #ef4444; font-size: 0.85rem; margin-top: 1rem; display: none;"></div>
     </div>
 
-    <!-- Authenticated Profile Dashboard (Toggled when logged in) -->
+    <!-- 2. Authenticated Profile Dashboard -->
     <div id="profile-dashboard" class="dashboard-hidden">
       <header class="profile-header-card">
         <div class="profile-avatar-wrap">
@@ -105,9 +106,37 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
 </BaseLayout>
 
 <script is:inline type="module">
-  import { auth, db, loginWithGoogle, logoutUser } from '/src/lib/firebase.js';
-  import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-  import { doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import { 
+    getAuth, 
+    signInWithPopup, 
+    signInWithRedirect, 
+    getRedirectResult, 
+    GoogleAuthProvider, 
+    signOut, 
+    onAuthStateChanged 
+  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+  import { 
+    getFirestore, 
+    doc, 
+    getDoc, 
+    setDoc 
+  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBnLArPDFIG6Kr9OtkoCzhdFBHMbgzK8k0",
+    authDomain: "cyprusstudentguidelogin.firebaseapp.com",
+    projectId: "cyprusstudentguidelogin",
+    storageBucket: "cyprusstudentguidelogin.firebasestorage.app",
+    messagingSenderId: "215797465320",
+    appId: "1:215797465320:web:afad34a9c5aa686772c95d",
+    measurementId: "G-1RWQEC5L8D"
+  };
+
+  const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const provider = new GoogleAuthProvider();
 
   const authGate = document.getElementById('auth-gate');
   const profileDashboard = document.getElementById('profile-dashboard');
@@ -115,6 +144,7 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
   const btnLogout = document.getElementById('btn-logout');
   const profileForm = document.getElementById('profile-form');
   const saveToast = document.getElementById('save-toast');
+  const loginErrorMsg = document.getElementById('login-error-msg');
 
   const userAvatarImg = document.getElementById('user-avatar-img');
   const userDisplayName = document.getElementById('user-display-name');
@@ -129,6 +159,17 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
   const inputRent = document.getElementById('input-rent');
 
   let currentUser = null;
+
+  // Check redirect result for mobile devices
+  getRedirectResult(auth)
+    .then((res) => {
+      if (res && res.user) {
+        currentUser = res.user;
+      }
+    })
+    .catch((err) => {
+      console.error('Redirect error:', err);
+    });
 
   onAuthStateChanged(auth, async (user) => {
     if (user) {
@@ -158,7 +199,7 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
           if (inputRent) inputRent.value = pref.monthlyRentBudget || 450;
         }
       } catch (err) {
-        console.error('Failed to load user document:', err);
+        console.error('Firestore read error:', err);
       }
     } else {
       currentUser = null;
@@ -169,18 +210,27 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
 
   if (btnLoginGate) {
     btnLoginGate.addEventListener('click', async () => {
+      provider.setCustomParameters({ prompt: 'select_account' });
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       try {
-        await loginWithGoogle();
-      } catch (e) {
-        console.error(e);
-        alert('Google Sign-in failed. Please check popup permissions.');
+        if (isMobile) {
+          await signInWithRedirect(auth, provider);
+        } else {
+          await signInWithPopup(auth, provider);
+        }
+      } catch (err) {
+        console.error('Profile Sign In Error:', err);
+        if (loginErrorMsg) {
+          loginErrorMsg.innerText = 'Sign-in notice: ' + (err.message || 'Please check popup settings.');
+          loginErrorMsg.style.display = 'block';
+        }
       }
     });
   }
 
   if (btnLogout) {
     btnLogout.addEventListener('click', async () => {
-      await logoutUser();
+      await signOut(auth);
       window.location.reload();
     });
   }
@@ -221,8 +271,8 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
           setTimeout(() => { saveToast.style.display = 'none'; }, 3000);
         }
       } catch (err) {
-        console.error('Error saving profile:', err);
-        alert('Failed to save changes. Check connection.');
+        console.error('Save error:', err);
+        alert('Failed to save. Check Firestore permissions.');
       } finally {
         if (btn) {
           btn.disabled = false;
