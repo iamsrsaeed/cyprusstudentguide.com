@@ -21,15 +21,14 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     <meta name="description" content={description} />
     <link rel="canonical" href={permalink} />
 
-    <!-- Cyprus Student Guide Custom Favicon & App Icons -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
     <meta name="theme-color" content="#2563eb" />
 
-    <!-- Google AdSense Verification & Auto Ads Script -->
+    <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4089174887676363" crossorigin="anonymous"></script>
 
-    <!-- Open Graph / Social Meta Tags -->
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Cyprus Student Guide" />
     <meta property="og:title" content={title} />
@@ -37,18 +36,13 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     <meta property="og:url" content={permalink} />
     <meta property="og:image" content="https://cyprusstudentguide.com/favicon.svg" />
 
-    <!-- Twitter / X Cards -->
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content="https://cyprusstudentguide.com/favicon.svg" />
-
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet" />
 
-    <!-- Theme Initialization Script -->
+    <slot name="head" />
+
     <script is:inline>
       const theme = (() => {
         if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
@@ -67,7 +61,7 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     </script>
   </head>
   <body>
-    <!-- Top Announcement Bar -->
+    <!-- Announcement Bar -->
     <div class="csg-announcement-bar notranslate">
       <span>🎁 <strong>TAPTAP SEND BONUS:</strong> Send money from Cyprus with 0% fee! Code: <code>MDSAIDUR240</code></span>
       <a href="/blog/how-to-send-money-from-cyprus-taptap-send-bonus-guide/">Claim €10 Bonus ➔</a>
@@ -81,7 +75,7 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
           <span class="csg-brand-text">Cyprus <span>Student Guide</span></span>
         </a>
 
-        <!-- Desktop Navigation Menu -->
+        <!-- Desktop Navigation -->
         <nav class="csg-nav-links notranslate">
           <a href="/" class={current === 'home' ? 'active' : ''}>Home</a>
           <a href="/blog/" class={current === 'guides' ? 'active' : ''}>Guides</a>
@@ -91,8 +85,18 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
           <a href="/about/" class={current === 'about' ? 'active' : ''}>About</a>
         </nav>
 
-        <!-- Right Side Utility Controls -->
+        <!-- Right Side Controls with Dynamic Auth -->
         <div class="csg-nav-actions notranslate">
+          <!-- Auth Container -->
+          <div id="nav-auth-container" class="nav-auth-wrap">
+            <a href="/profile/" id="nav-login-btn" class="nav-btn-signin" title="Sign in with Google">
+              👤 Sign In
+            </a>
+            <a href="/profile/" id="nav-user-avatar-btn" class="nav-user-avatar" style="display: none;" title="My Student Passport">
+              <img id="nav-user-avatar-img" src="" alt="Profile" />
+            </a>
+          </div>
+
           <!-- Language Selector -->
           <div class="csg-lang-wrapper">
             <select id="language-switcher" aria-label="Select Language" class="csg-lang-select">
@@ -108,7 +112,7 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
             🌙
           </button>
 
-          <!-- Mobile Hamburger Toggle Button -->
+          <!-- Mobile Menu Toggle -->
           <button id="mobile-menu-toggle" type="button" aria-label="Toggle Navigation Menu" class="csg-hamburger-btn">
             <span class="hamburger-icon">☰</span>
           </button>
@@ -118,6 +122,7 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
       <!-- Mobile Dropdown Navigation Drawer -->
       <div id="mobile-nav-drawer" class="csg-mobile-drawer notranslate" style="display: none;">
         <nav class="csg-mobile-links">
+          <a href="/profile/" class={current === 'profile' ? 'active' : ''}>👤 Student Passport & Profile</a>
           <a href="/" class={current === 'home' ? 'active' : ''}>🏠 Home</a>
           <a href="/blog/" class={current === 'guides' ? 'active' : ''}>📚 All Guides</a>
           <a href="/pink-slip-tracker/" class={current === 'tracker' ? 'active' : ''}>📋 Pink Slip Tracker</a>
@@ -129,22 +134,17 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
       </div>
     </header>
 
-    <!-- Hidden Container For Google Translate -->
     <div id="google_translate_element" style="display:none;"></div>
 
-    <!-- Main Content Injection -->
     <main class="csg-main">
       <div class="csg-container">
         <slot />
-
-        <!-- Automatic Site-Wide Regulatory & Pricing Disclaimer -->
         {!hideDisclaimer && current !== 'disclaimer' && (
           <DisclaimerNotice />
         )}
       </div>
     </main>
 
-    <!-- Footer -->
     <footer class="csg-footer notranslate">
       <div class="csg-container csg-footer-inner">
         <div class="csg-footer-brand">
@@ -159,6 +159,7 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
           <div class="csg-footer-col">
             <h4>Essential Tools</h4>
             <ul>
+              <li><a href="/profile/">👤 Student Passport</a></li>
               <li><a href="/pink-slip-tracker/">📋 Pink Slip 90-Day Tracker</a></li>
               <li><a href="/shift-tracker/">🛵 Delivery Shift Splitter</a></li>
               <li><a href="/calculator/">💶 Cost of Living Calculator</a></li>
@@ -183,9 +184,29 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
       </div>
     </footer>
 
-    <!-- Interactive Scripts: Theme, Mobile Menu & Google Translate -->
+    <!-- Header Dynamic Auth Script -->
+    <script>
+      import { auth } from '../lib/firebase.js';
+      import { onAuthStateChanged } from 'firebase/auth';
+
+      const navLoginBtn = document.getElementById('nav-login-btn');
+      const navAvatarBtn = document.getElementById('nav-user-avatar-btn');
+      const navAvatarImg = document.getElementById('nav-user-avatar-img') as HTMLImageElement;
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          if (navLoginBtn) navLoginBtn.style.display = 'none';
+          if (navAvatarBtn) navAvatarBtn.style.display = 'flex';
+          if (navAvatarImg) navAvatarImg.src = user.photoURL || '/favicon.svg';
+        } else {
+          if (navLoginBtn) navLoginBtn.style.display = 'inline-flex';
+          if (navAvatarBtn) navAvatarBtn.style.display = 'none';
+        }
+      });
+    </script>
+
+    <!-- Standard Scripts -->
     <script is:inline>
-      // 1. Theme Toggle
       const themeToggleBtn = document.getElementById('theme-toggle');
       if (themeToggleBtn) {
         const isDark = document.documentElement.classList.contains('dark');
@@ -198,7 +219,6 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
         });
       }
 
-      // 2. Mobile Menu Toggle
       const mobileToggleBtn = document.getElementById('mobile-menu-toggle');
       const mobileDrawer = document.getElementById('mobile-nav-drawer');
       if (mobileToggleBtn && mobileDrawer) {
@@ -217,7 +237,6 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
         });
       }
 
-      // 3. Google Translate Engine Setup
       function googleTranslateElementInit() {
         if (window.google && window.google.translate) {
           new window.google.translate.TranslateElement({
@@ -312,7 +331,6 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     box-sizing: border-box;
   }
 
-  /* Top Announcement Bar */
   .csg-announcement-bar {
     background: #0f172a;
     color: #f8fafc;
@@ -341,7 +359,6 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
   }
   .csg-announcement-bar a:hover { text-decoration: underline; }
 
-  /* Header */
   .csg-header {
     background: var(--card-bg);
     border-bottom: 1px solid var(--card-border);
@@ -360,7 +377,6 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     width: 100%;
   }
 
-  /* Brand Logo & Text */
   .csg-brand {
     display: flex;
     align-items: center;
@@ -388,7 +404,6 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
   }
   .csg-brand-text span { color: var(--primary-blue); }
 
-  /* Desktop Menu */
   .csg-nav-links {
     display: flex;
     align-items: center;
@@ -406,12 +421,43 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     color: var(--primary-blue);
   }
 
-  /* Right Side Utility Actions */
   .csg-nav-actions {
     display: flex;
     align-items: center;
     gap: 0.35rem;
     flex-shrink: 0;
+  }
+
+  /* Nav Auth Buttons */
+  .nav-btn-signin {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary-blue);
+    font-size: 0.78rem;
+    font-weight: 800;
+    padding: 0.32rem 0.65rem;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .nav-btn-signin:hover {
+    background: var(--primary-blue);
+    color: #ffffff;
+  }
+  .nav-user-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+  }
+  .nav-user-avatar img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--primary-blue);
+    object-fit: cover;
   }
 
   .csg-lang-select {
@@ -450,7 +496,6 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     color: var(--text-main);
   }
 
-  /* Mobile Drawer Menu */
   .csg-mobile-drawer {
     border-top: 1px solid var(--card-border);
     background: var(--card-bg);
@@ -474,13 +519,11 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     color: var(--primary-blue);
   }
 
-  /* Main */
   .csg-main {
     flex: 1;
     padding: 2rem 0 3rem;
   }
 
-  /* Footer */
   .csg-footer {
     background: var(--card-bg);
     border-top: 1px solid var(--card-border);
@@ -532,7 +575,6 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     font-weight: 600;
   }
 
-  /* Hide raw Google Translate iframe & toolbar */
   .goog-te-banner-frame,
   .goog-te-gadget,
   #google_translate_element {
@@ -541,7 +583,6 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
   }
   body { top: 0px !important; }
 
-  /* Responsive Rules with Safe Screen Insets */
   @media (max-width: 860px) {
     .csg-nav-links { display: none; }
     .csg-hamburger-btn { display: flex; align-items: center; justify-content: center; }
@@ -555,5 +596,6 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     .csg-lang-select { font-size: 0.72rem; padding: 0.22rem 0.25rem; }
     .csg-theme-btn { padding: 0.22rem 0.4rem; font-size: 0.82rem; }
     .csg-hamburger-btn { padding: 0.22rem 0.42rem; font-size: 0.9rem; }
+    .nav-btn-signin { font-size: 0.72rem; padding: 0.25rem 0.45rem; }
   }
 </style>
