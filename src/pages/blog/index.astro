@@ -12,12 +12,22 @@ const allPosts = Object.entries(postFiles).map(([filePath, post]: [string, any])
   const slug = frontmatter.slug || fileSlug;
   const category = frontmatter.category || 'General';
 
-  // Dynamic 3D Thumbnail for Blog Listing Cards
-  let thumb = '/assets/blog/casual-life-3d-workspace.webp';
-  if (category.toLowerCase().includes('immigration') || category.toLowerCase().includes('legal')) {
-    thumb = '/assets/blog/casual-life-3d-girl-boy-poses.webp';
-  } else if (category.toLowerCase().includes('finance') || category.toLowerCase().includes('banking') || category.toLowerCase().includes('living')) {
-    thumb = '/assets/blog/casual-life-3d-meditation-crystal.webp';
+  // Professional Icon Map
+  let icon = '📑';
+  let badgeColor = 'blue';
+  const catLower = category.toLowerCase();
+  if (catLower.includes('immigration') || catLower.includes('legal')) {
+    icon = '🏛️';
+    badgeColor = 'purple';
+  } else if (catLower.includes('finance') || catLower.includes('banking')) {
+    icon = '💳';
+    badgeColor = 'green';
+  } else if (catLower.includes('job') || catLower.includes('work') || catLower.includes('tax')) {
+    icon = '💼';
+    badgeColor = 'orange';
+  } else if (catLower.includes('living') || catLower.includes('housing') || catLower.includes('transport')) {
+    icon = '🏠';
+    badgeColor = 'cyan';
   }
 
   return {
@@ -26,7 +36,8 @@ const allPosts = Object.entries(postFiles).map(([filePath, post]: [string, any])
     description: frontmatter.description || '',
     category: category,
     publishDate: frontmatter.publishDate || '2026-08-16',
-    thumb: thumb,
+    icon: icon,
+    badgeColor: badgeColor,
     rawText: `${frontmatter.title} ${frontmatter.description} ${category}`.toLowerCase()
   };
 }).sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime());
@@ -41,7 +52,7 @@ const categories = ['All', ...new Set(allPosts.map(p => p.category))];
     <header class="blog-hub-header">
       <span class="hub-badge">KNOWLEDGE BASE</span>
       <h1>Student Guides & Articles</h1>
-      <p class="hub-desc">Practical, hype-free insights on part-time work, banking, public transit, and smart budgeting in Cyprus.</p>
+      <p class="hub-desc">Practical, ground-tested handbooks on immigration, part-time work, banking, and smart budgeting in Cyprus.</p>
     </header>
 
     <!-- Search & Filter Controls -->
@@ -50,7 +61,7 @@ const categories = ['All', ...new Set(allPosts.map(p => p.category))];
         <input 
           type="text" 
           id="guide-search-input" 
-          placeholder="🔍 Search guides (e.g., Lidl, Bank, Pink Slip, Tax, Bus, Work)..." 
+          placeholder="🔍 Search guides (e.g., Bank, Pink Slip, Tax, Bus, Work, Lidl)..." 
           aria-label="Search student guides"
         />
       </div>
@@ -72,28 +83,27 @@ const categories = ['All', ...new Set(allPosts.map(p => p.category))];
       </div>
     </div>
 
-    <!-- Articles Grid with 3D Graphic Cards -->
+    <!-- Clean Grid with Professional Category Icons -->
     <div class="articles-grid" id="articles-grid">
       {allPosts.map((post) => (
         <article 
-          class="article-card" 
+          class={`article-card card-accent-${post.badgeColor}`} 
           data-category={post.category} 
           data-search-content={post.rawText}
         >
-          <div class="card-thumb-wrap">
-            <img src={post.thumb} alt={post.category} loading="lazy" width="80" height="80" />
-          </div>
-          <div class="card-body">
+          <div class="card-header-row">
+            <div class="card-icon-badge">{post.icon}</div>
             <div class="card-meta">
               <span class="cat-tag">{post.category}</span>
               <span class="date-tag">{new Date(post.publishDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
             </div>
-            <h2 class="card-title">
-              <a href={`/blog/${post.slug}/`}>{post.title}</a>
-            </h2>
-            <p class="card-excerpt">{post.description}</p>
-            <a href={`/blog/${post.slug}/`} class="card-read-link">Read Full Guide ➔</a>
           </div>
+          
+          <h2 class="card-title">
+            <a href={`/blog/${post.slug}/`}>{post.title}</a>
+          </h2>
+          <p class="card-excerpt">{post.description}</p>
+          <a href={`/blog/${post.slug}/`} class="card-read-link">Read Full Guide ➔</a>
         </article>
       ))}
     </div>
@@ -102,7 +112,7 @@ const categories = ['All', ...new Set(allPosts.map(p => p.category))];
     <div id="no-results-box" class="no-results-card" style="display: none;">
       <div class="no-results-icon">🔎</div>
       <h3>No matching guides found</h3>
-      <p>Try searching with different keywords like "bank", "jobs", "lidl", or clear the filter.</p>
+      <p>Try searching with different keywords like "bank", "jobs", "lidl", or clear the category filter.</p>
     </div>
 
   </div>
@@ -200,7 +210,6 @@ const categories = ['All', ...new Set(allPosts.map(p => p.category))];
     line-height: 1.6;
   }
 
-  /* Controls Panel */
   .controls-panel {
     margin-bottom: 2.5rem;
   }
@@ -268,39 +277,42 @@ const categories = ['All', ...new Set(allPosts.map(p => p.category))];
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
     transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
   }
   .article-card:hover {
     transform: translateY(-4px);
-    border-color: var(--primary-blue);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
   }
 
-  .card-thumb-wrap {
-    background: rgba(37, 99, 235, 0.04);
-    border-radius: 12px;
-    padding: 0.75rem;
+  .card-accent-blue:hover { border-color: #2563eb; }
+  .card-accent-purple:hover { border-color: #6366f1; }
+  .card-accent-green:hover { border-color: #059669; }
+  .card-accent-orange:hover { border-color: #d97706; }
+  .card-accent-cyan:hover { border-color: #0284c7; }
+
+  .card-header-row {
     display: flex;
-    justify-content: center;
     align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 0.85rem;
   }
-  .card-thumb-wrap img {
-    height: 70px;
-    width: auto;
-    object-fit: contain;
+  .card-icon-badge {
+    width: 44px;
+    height: 44px;
+    background: rgba(37, 99, 235, 0.08);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
   }
 
-  .card-body {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-  }
   .card-meta {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.6rem;
+    flex-direction: column;
+    gap: 0.15rem;
   }
   .cat-tag {
     font-size: 0.74rem;
@@ -308,7 +320,7 @@ const categories = ['All', ...new Set(allPosts.map(p => p.category))];
     color: var(--primary-blue);
   }
   .date-tag {
-    font-size: 0.74rem;
+    font-size: 0.72rem;
     color: var(--text-muted);
   }
   .card-title {
@@ -327,7 +339,7 @@ const categories = ['All', ...new Set(allPosts.map(p => p.category))];
     color: var(--text-muted);
     line-height: 1.5;
     flex-grow: 1;
-    margin: 0 0 1rem;
+    margin: 0 0 1.25rem;
   }
   .card-read-link {
     color: var(--primary-blue);
@@ -336,7 +348,6 @@ const categories = ['All', ...new Set(allPosts.map(p => p.category))];
     text-decoration: none;
   }
 
-  /* No results state */
   .no-results-card {
     text-align: center;
     background: var(--card-bg);
