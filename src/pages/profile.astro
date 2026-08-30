@@ -9,7 +9,7 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
 <BaseLayout title={title} description={description} permalink={permalink} current="profile">
   <div class="profile-container notranslate">
     
-    <!-- 1. Unauthenticated View -->
+    <!-- 1. Unauthenticated Gate Card (Hidden instantly via CSS if user is logged in) -->
     <div id="auth-gate" class="auth-card">
       <div class="auth-icon">🔐</div>
       <h1>Student Passport & Cloud Sync</h1>
@@ -22,8 +22,8 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
       <div id="login-error-msg" style="color: #ef4444; font-size: 0.85rem; margin-top: 1rem; display: none;"></div>
     </div>
 
-    <!-- 2. Authenticated Profile Dashboard -->
-    <div id="profile-dashboard" class="dashboard-hidden">
+    <!-- 2. Authenticated Profile Dashboard (Displayed instantly via CSS if user is logged in) -->
+    <div id="profile-dashboard" class="profile-dashboard-view">
       <header class="profile-header-card">
         <div class="profile-avatar-wrap">
           <img id="user-avatar-img" src="/favicon.svg" alt="Student Avatar" class="profile-avatar" />
@@ -105,6 +105,32 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
   </div>
 </BaseLayout>
 
+<!-- Instant Pre-Hydration Sync for Profile (No Lag) -->
+<script is:inline>
+  (function() {
+    try {
+      const cachedAvatar = localStorage.getItem('csg_cached_user_avatar');
+      const cachedName = localStorage.getItem('csg_cached_user_name');
+      const cachedEmail = localStorage.getItem('csg_cached_user_email');
+
+      if (cachedAvatar) {
+        const img = document.getElementById('user-avatar-img');
+        if (img) img.src = cachedAvatar;
+      }
+      if (cachedName) {
+        const nameEl = document.getElementById('user-display-name');
+        const inputName = document.getElementById('input-name');
+        if (nameEl) nameEl.innerText = cachedName;
+        if (inputName) inputName.value = cachedName;
+      }
+      if (cachedEmail) {
+        const emailEl = document.getElementById('user-email-text');
+        if (emailEl) emailEl.innerText = cachedEmail;
+      }
+    } catch (e) {}
+  })();
+</script>
+
 <script is:inline type="module">
   import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
   import { 
@@ -138,8 +164,6 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
   const db = getFirestore(app);
   const provider = new GoogleAuthProvider();
 
-  const authGate = document.getElementById('auth-gate');
-  const profileDashboard = document.getElementById('profile-dashboard');
   const btnLoginGate = document.getElementById('btn-login-gate');
   const btnLogout = document.getElementById('btn-logout');
   const profileForm = document.getElementById('profile-form');
@@ -160,7 +184,6 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
 
   let currentUser = null;
 
-  // Check redirect result for mobile devices
   getRedirectResult(auth)
     .then((res) => {
       if (res && res.user) {
@@ -174,12 +197,19 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       currentUser = user;
-      if (authGate) authGate.style.display = 'none';
-      if (profileDashboard) profileDashboard.classList.remove('dashboard-hidden');
+      document.documentElement.classList.add('user-is-logged-in');
 
-      if (userAvatarImg) userAvatarImg.src = user.photoURL || '/favicon.svg';
-      if (userDisplayName) userDisplayName.innerText = user.displayName || 'Student Member';
-      if (userEmailText) userEmailText.innerText = user.email || '';
+      const photo = user.photoURL || '/favicon.svg';
+      const name = user.displayName || 'Student Member';
+      const email = user.email || '';
+
+      localStorage.setItem('csg_cached_user_avatar', photo);
+      localStorage.setItem('csg_cached_user_name', name);
+      localStorage.setItem('csg_cached_user_email', email);
+
+      if (userAvatarImg) userAvatarImg.src = photo;
+      if (userDisplayName) userDisplayName.innerText = name;
+      if (userEmailText) userEmailText.innerText = email;
 
       try {
         const userDocRef = doc(db, 'users', user.uid);
@@ -189,7 +219,7 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
           const p = data.profile || {};
           const pref = data.preferences || {};
 
-          if (inputName) inputName.value = p.displayName || user.displayName || '';
+          if (inputName) inputName.value = p.displayName || name;
           if (selectCity) selectCity.value = p.city || 'Limassol';
           if (inputInstitution) inputInstitution.value = p.institution || '';
           if (inputArrival) inputArrival.value = p.arrivalDate || '';
@@ -203,8 +233,10 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
       }
     } else {
       currentUser = null;
-      if (authGate) authGate.style.display = 'block';
-      if (profileDashboard) profileDashboard.classList.add('dashboard-hidden');
+      document.documentElement.classList.remove('user-is-logged-in');
+      localStorage.removeItem('csg_cached_user_avatar');
+      localStorage.removeItem('csg_cached_user_name');
+      localStorage.removeItem('csg_cached_user_email');
     }
   });
 
@@ -230,6 +262,10 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
 
   if (btnLogout) {
     btnLogout.addEventListener('click', async () => {
+      localStorage.removeItem('csg_cached_user_avatar');
+      localStorage.removeItem('csg_cached_user_name');
+      localStorage.removeItem('csg_cached_user_email');
+      document.documentElement.classList.remove('user-is-logged-in');
       await signOut(auth);
       window.location.reload();
     });
@@ -247,10 +283,11 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
       }
 
       try {
+        const updatedName = inputName.value.trim() || currentUser.displayName;
         const userDocRef = doc(db, 'users', currentUser.uid);
         await setDoc(userDocRef, {
           profile: {
-            displayName: inputName.value.trim() || currentUser.displayName,
+            displayName: updatedName,
             email: currentUser.email,
             city: selectCity.value,
             institution: inputInstitution.value.trim(),
@@ -264,7 +301,8 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
           updatedAt: new Date().toISOString()
         }, { merge: true });
 
-        if (userDisplayName) userDisplayName.innerText = inputName.value.trim() || currentUser.displayName;
+        localStorage.setItem('csg_cached_user_name', updatedName);
+        if (userDisplayName) userDisplayName.innerText = updatedName;
 
         if (saveToast) {
           saveToast.style.display = 'inline-block';
@@ -272,7 +310,7 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
         }
       } catch (err) {
         console.error('Save error:', err);
-        alert('Failed to save. Check Firestore permissions.');
+        alert('Failed to save. Check connection.');
       } finally {
         if (btn) {
           btn.disabled = false;
@@ -292,8 +330,21 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
     width: 100%;
   }
 
-  .dashboard-hidden {
+  /* ZERO-FLICKER AUTH SYSTEM RULES */
+  /* 1. Default (Not logged in) */
+  #auth-gate {
+    display: block;
+  }
+  #profile-dashboard {
+    display: none;
+  }
+
+  /* 2. Instant Pre-Render State (When logged in) */
+  html.user-is-logged-in #auth-gate {
     display: none !important;
+  }
+  html.user-is-logged-in #profile-dashboard {
+    display: block !important;
   }
 
   .auth-card {
