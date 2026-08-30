@@ -43,31 +43,28 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
 
     <slot name="head" />
 
-    <!-- 1. Zero-Flicker Theme & Auth Cache Initializer -->
+    <!-- 1. ZERO-LATENCY PRE-PARSING ENGINE (EXECUTES BEFORE FIRST FRAME) -->
     <script is:inline>
-      // Theme Check
-      const theme = (() => {
-        if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
-          return localStorage.getItem('theme');
-        }
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-          return 'dark';
-        }
-        return 'light';
-      })();
-      if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
+      (function() {
+        // Theme Pre-check
+        const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        if (theme === 'dark') document.documentElement.classList.add('dark');
 
-      // Check Cached User Avatar to prevent Sign-In UI Flicker
-      try {
+        // Instant Auth CSS Rule Injection to eliminate 1ms layout shifts
         const cachedAvatar = localStorage.getItem('csg_cached_user_avatar');
         if (cachedAvatar) {
           document.documentElement.classList.add('user-is-logged-in');
+          const style = document.createElement('style');
+          style.id = 'zero-flicker-auth-rules';
+          style.textContent = `
+            #auth-gate { display: none !important; }
+            #profile-dashboard { display: block !important; }
+            #nav-login-btn { display: none !important; }
+            #nav-user-avatar-btn { display: flex !important; }
+          `;
+          document.head.appendChild(style);
         }
-      } catch (e) {}
+      })();
     </script>
   </head>
   <body>
@@ -95,7 +92,7 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
           <a href="/about/" class={current === 'about' ? 'active' : ''}>About</a>
         </nav>
 
-        <!-- Right Side Controls with Instant Cached Auth -->
+        <!-- Right Side Controls with Direct Google Auth -->
         <div class="csg-nav-actions notranslate">
           <!-- Auth Container -->
           <div id="nav-auth-container" class="nav-auth-wrap">
@@ -194,7 +191,7 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
       </div>
     </footer>
 
-    <!-- Instant Pre-Hydration Render Script (Zero-Delay) -->
+    <!-- Instant Pre-Hydration Sync -->
     <script is:inline>
       (function() {
         const cachedAvatar = localStorage.getItem('csg_cached_user_avatar');
@@ -205,7 +202,7 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
       })();
     </script>
 
-    <!-- Standalone Global Nav Authentication Script -->
+    <!-- Global Firebase Auth Listener -->
     <script is:inline type="module">
       import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
       import { 
@@ -246,6 +243,8 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
         } else {
           document.documentElement.classList.remove('user-is-logged-in');
           localStorage.removeItem('csg_cached_user_avatar');
+          const rule = document.getElementById('zero-flicker-auth-rules');
+          if (rule) rule.remove();
         }
       });
 
@@ -493,7 +492,6 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     flex-shrink: 0;
   }
 
-  /* ZERO-FLICKER AUTH SYSTEM CSS */
   .nav-btn-signin {
     display: inline-flex;
     background: rgba(37, 99, 235, 0.1);
@@ -529,7 +527,6 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     object-fit: cover;
   }
 
-  /* If cached as logged in, immediately flip states via CSS */
   html.user-is-logged-in .nav-btn-signin {
     display: none !important;
   }
