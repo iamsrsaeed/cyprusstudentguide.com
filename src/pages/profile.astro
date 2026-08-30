@@ -1,0 +1,477 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const title = 'Student Passport & Profile Settings | Cyprus Student Guide';
+const description = 'Manage your Cyprus student profile, customize tools settings, and sync shifts and checklists across all devices.';
+const permalink = 'https://cyprusstudentguide.com/profile/';
+---
+
+<BaseLayout title={title} description={description} permalink={permalink} current="profile">
+  <!-- Prevent search engines from indexing private user dashboard -->
+  <meta name="robots" content="noindex, nofollow" slot="head" />
+
+  <div class="profile-container notranslate">
+    <!-- Unauthenticated State -->
+    <div id="auth-gate" class="auth-card" style="display: none;">
+      <div class="auth-icon">🔐</div>
+      <h1>Student Profile & Cloud Sync</h1>
+      <p>Sign in with your Google account to customize your student identity, backup delivery shift logs, and sync your 90-day Pink Slip timeline across all devices.</p>
+      <button type="button" id="btn-login-gate" class="btn-google-primary">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.616z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707 0-.59.102-1.167.282-1.707V4.961H.957C.347 6.173 0 7.548 0 9s.347 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/></svg>
+        Sign In with Google
+      </button>
+    </div>
+
+    <!-- Authenticated Profile Dashboard -->
+    <div id="profile-dashboard" style="display: none;">
+      <header class="profile-header-card">
+        <div class="profile-avatar-wrap">
+          <img id="user-avatar-img" src="" alt="Student Avatar" class="profile-avatar" />
+          <span class="status-indicator" title="Connected"></span>
+        </div>
+        <div class="profile-header-info">
+          <div class="badge-row">
+            <span class="verified-pill">🎓 Verified Student Member</span>
+            <span id="sync-status-pill" class="sync-pill">⚡ Cloud Synced</span>
+          </div>
+          <h1 id="user-display-name">Student Member</h1>
+          <p id="user-email-text" class="email-muted">loading...</p>
+        </div>
+        <div class="profile-header-actions">
+          <button type="button" id="btn-logout" class="btn-logout">Logout</button>
+        </div>
+      </header>
+
+      <!-- Customization Form Grid -->
+      <form id="profile-form" class="customization-grid">
+        <!-- 1. Identity & Location -->
+        <div class="settings-card">
+          <h2>📍 Student Identity & Location</h2>
+          <p class="card-desc">Personalize your student profile details for local community tools.</p>
+          
+          <div class="form-group">
+            <label for="input-name">Display Name</label>
+            <input type="text" id="input-name" placeholder="Enter your full name" />
+          </div>
+
+          <div class="form-group">
+            <label for="select-city">Current City in Cyprus</label>
+            <select id="select-city">
+              <option value="Limassol">Limassol (Lemesos)</option>
+              <option value="Nicosia">Nicosia (Lefkosia)</option>
+              <option value="Larnaca">Larnaca</option>
+              <option value="Paphos">Paphos</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="input-institution">University / College</label>
+            <input type="text" id="input-institution" placeholder="e.g. UCLan Cyprus, Frederick, European Univ" />
+          </div>
+
+          <div class="form-group">
+            <label for="input-arrival">Cyprus Entry / Arrival Date</label>
+            <input type="date" id="input-arrival" />
+            <small>Used to sync your 90-day Pink Slip countdown tracker automatically.</small>
+          </div>
+        </div>
+
+        <!-- 2. Tool & Financial Defaults -->
+        <div class="settings-card">
+          <h2>💼 Work & Budget Preferences</h2>
+          <p class="card-desc">Pre-set your default numbers to calculate delivery shifts and living costs faster.</p>
+
+          <div class="form-group">
+            <label for="input-rate">Default Base Hourly Rate (€)</label>
+            <input type="number" step="0.1" id="input-rate" placeholder="6.50" />
+          </div>
+
+          <div class="form-group">
+            <label for="input-commission">Fleet Manager Commission Split (%)</label>
+            <input type="number" step="1" id="input-commission" placeholder="15" />
+            <small>Default percentage taken by your delivery fleet agency.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="input-rent">Monthly Accommodation Budget (€)</label>
+            <input type="number" id="input-rent" placeholder="450" />
+          </div>
+        </div>
+
+        <!-- Submit Controls -->
+        <div class="form-actions-bar">
+          <button type="submit" id="btn-save-profile" class="btn-save-primary">Save Profile Changes</button>
+          <span id="save-toast" class="save-toast" style="display: none;">✅ Changes saved to cloud!</span>
+        </div>
+      </form>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import { auth, db, loginWithGoogle, logoutUser } from '../lib/firebase.js';
+  import { onAuthStateChanged } from 'firebase/auth';
+  import { doc, getDoc, setDoc } from 'firebase/firestore';
+
+  const authGate = document.getElementById('auth-gate');
+  const profileDashboard = document.getElementById('profile-dashboard');
+  const btnLoginGate = document.getElementById('btn-login-gate');
+  const btnLogout = document.getElementById('btn-logout');
+  const profileForm = document.getElementById('profile-form');
+  const saveToast = document.getElementById('save-toast');
+
+  // UI elements
+  const userAvatarImg = document.getElementById('user-avatar-img') as HTMLImageElement;
+  const userDisplayName = document.getElementById('user-display-name');
+  const userEmailText = document.getElementById('user-email-text');
+  
+  const inputName = document.getElementById('input-name') as HTMLInputElement;
+  const selectCity = document.getElementById('select-city') as HTMLSelectElement;
+  const inputInstitution = document.getElementById('input-institution') as HTMLInputElement;
+  const inputArrival = document.getElementById('input-arrival') as HTMLInputElement;
+  const inputRate = document.getElementById('input-rate') as HTMLInputElement;
+  const inputCommission = document.getElementById('input-commission') as HTMLInputElement;
+  const inputRent = document.getElementById('input-rent') as HTMLInputElement;
+
+  let currentUser: any = null;
+
+  // 1. Auth State Listener
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      currentUser = user;
+      if (authGate) authGate.style.display = 'none';
+      if (profileDashboard) profileDashboard.style.display = 'block';
+
+      // Fill Basic Google Info
+      if (userAvatarImg) userAvatarImg.src = user.photoURL || '/favicon.svg';
+      if (userDisplayName) userDisplayName.innerText = user.displayName || 'Student Member';
+      if (userEmailText) userEmailText.innerText = user.email || '';
+
+      // Load Firestore Profile Data
+      try {
+        const userDocRef = doc(db, 'users', user.uid);
+        const snap = await getDoc(userDocRef);
+        if (snap.exists()) {
+          const data = snap.data();
+          const p = data.profile || {};
+          const pref = data.preferences || {};
+
+          if (inputName) inputName.value = p.displayName || user.displayName || '';
+          if (selectCity) selectCity.value = p.city || 'Limassol';
+          if (inputInstitution) inputInstitution.value = p.institution || '';
+          if (inputArrival) inputArrival.value = p.arrivalDate || '';
+
+          if (inputRate) inputRate.value = pref.defaultHourlyRate || 6.5;
+          if (inputCommission) inputCommission.value = pref.fleetCommission || 15;
+          if (inputRent) inputRent.value = pref.monthlyRentBudget || 450;
+        }
+      } catch (err) {
+        console.error('Failed to load user document:', err);
+      }
+    } else {
+      currentUser = null;
+      if (authGate) authGate.style.display = 'block';
+      if (profileDashboard) profileDashboard.style.display = 'none';
+    }
+  });
+
+  // 2. Login & Logout Actions
+  if (btnLoginGate) {
+    btnLoginGate.addEventListener('click', async () => {
+      try {
+        await loginWithGoogle();
+      } catch (e) {
+        alert('Google Sign-in failed. Please try again.');
+      }
+    });
+  }
+
+  if (btnLogout) {
+    btnLogout.addEventListener('click', async () => {
+      await logoutUser();
+      window.location.reload();
+    });
+  }
+
+  // 3. Save Profile Form
+  if (profileForm) {
+    profileForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      const btn = document.getElementById('btn-save-profile') as HTMLButtonElement;
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = 'Saving...';
+      }
+
+      try {
+        const userDocRef = doc(db, 'users', currentUser.uid);
+        await setDoc(userDocRef, {
+          profile: {
+            displayName: inputName.value.trim() || currentUser.displayName,
+            email: currentUser.email,
+            city: selectCity.value,
+            institution: inputInstitution.value.trim(),
+            arrivalDate: inputArrival.value
+          },
+          preferences: {
+            defaultHourlyRate: parseFloat(inputRate.value) || 6.5,
+            fleetCommission: parseFloat(inputCommission.value) || 15,
+            monthlyRentBudget: parseFloat(inputRent.value) || 450
+          },
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+
+        if (userDisplayName) userDisplayName.innerText = inputName.value.trim() || currentUser.displayName;
+
+        if (saveToast) {
+          saveToast.style.display = 'inline-block';
+          setTimeout(() => { saveToast.style.display = 'none'; }, 3000);
+        }
+      } catch (err) {
+        console.error('Error saving profile:', err);
+        alert('Failed to save changes. Check connection.');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = 'Save Profile Changes';
+        }
+      }
+    });
+  }
+</script>
+
+<style>
+  .profile-container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 1.5rem 0.75rem 4rem;
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  /* Auth Gate Card */
+  .auth-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    padding: 3rem 1.5rem;
+    text-align: center;
+    max-width: 520px;
+    margin: 2rem auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  }
+  .auth-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+  .auth-card h1 { font-size: 1.6rem; font-weight: 900; margin: 0 0 0.6rem; color: var(--text-main); }
+  .auth-card p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.75rem; }
+  
+  .btn-google-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    background: #ffffff;
+    color: #1f2937;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    transition: background 0.15s, transform 0.15s;
+    font-family: inherit;
+  }
+  .btn-google-primary:hover {
+    background: #f9fafb;
+    transform: translateY(-2px);
+  }
+
+  /* Profile Header */
+  .profile-header-card {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(56, 189, 248, 0.03) 100%);
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+  .profile-avatar-wrap {
+    position: relative;
+    flex-shrink: 0;
+  }
+  .profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid var(--primary-blue);
+    object-fit: cover;
+    background: var(--card-bg);
+  }
+  .status-indicator {
+    width: 14px;
+    height: 14px;
+    background: #16a34a;
+    border: 2px solid var(--card-bg);
+    border-radius: 50%;
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+  }
+  .profile-header-info {
+    flex-grow: 1;
+    min-width: 200px;
+  }
+  .badge-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 0.4rem;
+    flex-wrap: wrap;
+  }
+  .verified-pill {
+    background: var(--primary-blue);
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+  }
+  .sync-pill {
+    background: rgba(16, 185, 129, 0.12);
+    color: #059669;
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+  }
+  .profile-header-info h1 {
+    font-size: 1.45rem;
+    font-weight: 900;
+    margin: 0 0 0.2rem;
+    color: var(--text-main);
+  }
+  .email-muted {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .btn-logout {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-family: inherit;
+  }
+  .btn-logout:hover {
+    background: #ef4444;
+    color: #ffffff;
+  }
+
+  /* Settings Grid */
+  .customization-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .settings-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 1.75rem;
+  }
+  .settings-card h2 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin: 0 0 0.35rem;
+    color: var(--text-main);
+  }
+  .card-desc {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 0 0 1.5rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .form-group label {
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: var(--text-main);
+  }
+  .form-group input,
+  .form-group select {
+    background: var(--card-bg);
+    color: var(--text-main);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+    width: 100%;
+  }
+  .form-group input:focus,
+  .form-group select:focus {
+    border-color: var(--primary-blue);
+  }
+  .form-group small {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+
+  .form-actions-bar {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .btn-save-primary {
+    background: var(--primary-blue);
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 0.95rem;
+    border: none;
+    border-radius: 10px;
+    padding: 0.8rem 1.6rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  .btn-save-primary:hover {
+    background: var(--primary-blue-hover);
+  }
+  .save-toast {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #16a34a;
+  }
+
+  @media (max-width: 600px) {
+    .profile-header-card {
+      flex-direction: column;
+      text-align: center;
+      gap: 1rem;
+      padding: 1.5rem 1rem;
+    }
+    .badge-row { justify-content: center; }
+    .settings-card { padding: 1.25rem 1rem; }
+    .btn-save-primary { width: 100%; }
+  }
+</style>
