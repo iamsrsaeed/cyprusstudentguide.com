@@ -7,11 +7,7 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
 ---
 
 <BaseLayout title={title} description={description} permalink={permalink} current="profile">
-  <!-- Prevent search engines from indexing private user dashboard -->
-  <meta name="robots" content="noindex, nofollow" slot="head" />
-
   <div class="profile-container notranslate">
-    <!-- Unauthenticated State -->
     <div id="auth-gate" class="auth-card" style="display: none;">
       <div class="auth-icon">🔐</div>
       <h1>Student Profile & Cloud Sync</h1>
@@ -22,11 +18,10 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
       </button>
     </div>
 
-    <!-- Authenticated Profile Dashboard -->
     <div id="profile-dashboard" style="display: none;">
       <header class="profile-header-card">
         <div class="profile-avatar-wrap">
-          <img id="user-avatar-img" src="" alt="Student Avatar" class="profile-avatar" />
+          <img id="user-avatar-img" src="/favicon.svg" alt="Student Avatar" class="profile-avatar" />
           <span class="status-indicator" title="Connected"></span>
         </div>
         <div class="profile-header-info">
@@ -42,9 +37,7 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
         </div>
       </header>
 
-      <!-- Customization Form Grid -->
       <form id="profile-form" class="customization-grid">
-        <!-- 1. Identity & Location -->
         <div class="settings-card">
           <h2>📍 Student Identity & Location</h2>
           <p class="card-desc">Personalize your student profile details for local community tools.</p>
@@ -76,7 +69,6 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
           </div>
         </div>
 
-        <!-- 2. Tool & Financial Defaults -->
         <div class="settings-card">
           <h2>💼 Work & Budget Preferences</h2>
           <p class="card-desc">Pre-set your default numbers to calculate delivery shifts and living costs faster.</p>
@@ -98,7 +90,6 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
           </div>
         </div>
 
-        <!-- Submit Controls -->
         <div class="form-actions-bar">
           <button type="submit" id="btn-save-profile" class="btn-save-primary">Save Profile Changes</button>
           <span id="save-toast" class="save-toast" style="display: none;">✅ Changes saved to cloud!</span>
@@ -108,10 +99,10 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
   </div>
 </BaseLayout>
 
-<script>
+<script is:inline type="module">
   import { auth, db, loginWithGoogle, logoutUser } from '../lib/firebase.js';
-  import { onAuthStateChanged } from 'firebase/auth';
-  import { doc, getDoc, setDoc } from 'firebase/firestore';
+  import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+  import { doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
   const authGate = document.getElementById('auth-gate');
   const profileDashboard = document.getElementById('profile-dashboard');
@@ -120,34 +111,30 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
   const profileForm = document.getElementById('profile-form');
   const saveToast = document.getElementById('save-toast');
 
-  // UI elements
-  const userAvatarImg = document.getElementById('user-avatar-img') as HTMLImageElement;
+  const userAvatarImg = document.getElementById('user-avatar-img');
   const userDisplayName = document.getElementById('user-display-name');
   const userEmailText = document.getElementById('user-email-text');
   
-  const inputName = document.getElementById('input-name') as HTMLInputElement;
-  const selectCity = document.getElementById('select-city') as HTMLSelectElement;
-  const inputInstitution = document.getElementById('input-institution') as HTMLInputElement;
-  const inputArrival = document.getElementById('input-arrival') as HTMLInputElement;
-  const inputRate = document.getElementById('input-rate') as HTMLInputElement;
-  const inputCommission = document.getElementById('input-commission') as HTMLInputElement;
-  const inputRent = document.getElementById('input-rent') as HTMLInputElement;
+  const inputName = document.getElementById('input-name');
+  const selectCity = document.getElementById('select-city');
+  const inputInstitution = document.getElementById('input-institution');
+  const inputArrival = document.getElementById('input-arrival');
+  const inputRate = document.getElementById('input-rate');
+  const inputCommission = document.getElementById('input-commission');
+  const inputRent = document.getElementById('input-rent');
 
-  let currentUser: any = null;
+  let currentUser = null;
 
-  // 1. Auth State Listener
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       currentUser = user;
       if (authGate) authGate.style.display = 'none';
       if (profileDashboard) profileDashboard.style.display = 'block';
 
-      // Fill Basic Google Info
       if (userAvatarImg) userAvatarImg.src = user.photoURL || '/favicon.svg';
       if (userDisplayName) userDisplayName.innerText = user.displayName || 'Student Member';
       if (userEmailText) userEmailText.innerText = user.email || '';
 
-      // Load Firestore Profile Data
       try {
         const userDocRef = doc(db, 'users', user.uid);
         const snap = await getDoc(userDocRef);
@@ -175,7 +162,6 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
     }
   });
 
-  // 2. Login & Logout Actions
   if (btnLoginGate) {
     btnLoginGate.addEventListener('click', async () => {
       try {
@@ -193,13 +179,12 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
     });
   }
 
-  // 3. Save Profile Form
   if (profileForm) {
     profileForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!currentUser) return;
 
-      const btn = document.getElementById('btn-save-profile') as HTMLButtonElement;
+      const btn = document.getElementById('btn-save-profile');
       if (btn) {
         btn.disabled = true;
         btn.innerText = 'Saving...';
@@ -251,7 +236,6 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
     width: 100%;
   }
 
-  /* Auth Gate Card */
   .auth-card {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
@@ -288,7 +272,6 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
     transform: translateY(-2px);
   }
 
-  /* Profile Header */
   .profile-header-card {
     background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(56, 189, 248, 0.03) 100%);
     border: 1px solid var(--card-border);
@@ -377,7 +360,6 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
     color: #ffffff;
   }
 
-  /* Settings Grid */
   .customization-grid {
     display: flex;
     flex-direction: column;
