@@ -17,7 +17,7 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-const { Content, frontmatter } = post;
+const { Content, frontmatter, rawContent } = post;
 
 const title = frontmatter.title;
 const description = frontmatter.description;
@@ -25,6 +25,20 @@ const publishDate = frontmatter.publishDate;
 const author = frontmatter.author || 'Saidur Rahman';
 const category = frontmatter.category || 'General';
 const permalink = `https://cyprusstudentguide.com/blog/${Astro.params.slug}/`;
+
+// Dynamic Reading Time Calculation
+const wordCount = rawContent ? rawContent().split(/\s+/).length : 600;
+const readTime = Math.ceil(wordCount / 200);
+
+// Dynamic 3D Illustration Mapping based on Category
+let categoryIllustration = '/assets/blog/casual-life-3d-workspace.webp';
+if (category.toLowerCase().includes('immigration') || category.toLowerCase().includes('legal')) {
+  categoryIllustration = '/assets/blog/casual-life-3d-girl-boy-poses.webp';
+} else if (category.toLowerCase().includes('finance') || category.toLowerCase().includes('banking') || category.toLowerCase().includes('living')) {
+  categoryIllustration = '/assets/blog/casual-life-3d-meditation-crystal.webp';
+} else if (category.toLowerCase().includes('job') || category.toLowerCase().includes('tax')) {
+  categoryIllustration = '/assets/blog/casual-life-3d-workspace.webp';
+}
 
 const formattedDate = new Date(publishDate).toLocaleDateString('en-GB', {
   day: 'numeric',
@@ -60,21 +74,62 @@ const articleSchema = {
 <BaseLayout title={title} description={description} permalink={permalink} current="blog">
   <script type="application/ld+json" is:inline set:html={JSON.stringify(articleSchema)} />
 
+  <!-- Live Top Reading Progress Bar -->
+  <div class="reading-progress-track">
+    <div id="reading-progress-bar" class="reading-progress-fill"></div>
+  </div>
+
   <article class="post-detail-container notranslate">
-    <header class="post-header">
-      <div class="post-meta-top">
-        <span class="category-badge">{category}</span>
-        <time datetime={publishDate}>{formattedDate}</time>
+    <!-- Header Hero Banner with 3D Visual -->
+    <header class="post-hero-card">
+      <div class="post-hero-text">
+        <div class="post-meta-badges">
+          <span class="category-pill">{category}</span>
+          <span class="read-time-pill">⏱️ {readTime} min read</span>
+        </div>
+        <h1 class="post-title">{title}</h1>
+        <div class="author-inline">
+          <span>By <strong>{author}</strong> • Updated {formattedDate}</span>
+        </div>
       </div>
-      <h1 class="post-title">{title}</h1>
-      <div class="author-row">
-        <span>By <strong>{author}</strong></span>
+      <div class="post-hero-graphic">
+        <img src={categoryIllustration} alt={category} width="160" height="160" loading="eager" />
       </div>
     </header>
 
-    <!-- Main Markdown Article Content -->
+    <!-- Key Takeaways / Quick TL;DR Card -->
+    <div class="tldr-box">
+      <div class="tldr-title">⚡ Quick Guide Overview</div>
+      <p>{description}</p>
+    </div>
+
+    <!-- Main Rendered Markdown Body -->
     <div class="post-content-body">
       <Content />
+    </div>
+
+    <!-- Dynamic Smart Interactive Widget Callout -->
+    <div class="smart-tool-callout">
+      <div class="smart-tool-icon">🛠️</div>
+      <div class="smart-tool-info">
+        <h3>Save Time With Our Interactive Tools</h3>
+        <p>Keep your Cyprus legal paperwork, delivery shifts, and living budget 100% compliant and automated.</p>
+        <div class="smart-tool-buttons">
+          <a href="/pink-slip-tracker/" class="btn-smart-action">📋 Pink Slip Tracker</a>
+          <a href="/shift-tracker/" class="btn-smart-action">🛵 Shift Tracker</a>
+          <a href="/calculator/" class="btn-smart-action">💶 Budget Calculator</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Article Interactive Feedback & Share -->
+    <div class="interactive-engagement-box">
+      <div class="engagement-text">Was this guide helpful for your student journey?</div>
+      <div class="engagement-actions">
+        <button type="button" class="btn-feedback" id="feedback-yes">👍 Helpful</button>
+        <button type="button" class="btn-feedback" id="feedback-copy">🔗 Copy Link</button>
+      </div>
+      <span id="feedback-msg" class="feedback-toast"></span>
     </div>
 
     <footer class="post-footer-area">
@@ -85,20 +140,72 @@ const articleSchema = {
   </article>
 </BaseLayout>
 
+<script is:inline>
+  // 1. Live Scroll Reading Progress
+  window.addEventListener('scroll', () => {
+    const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = (window.scrollY / totalHeight) * 100;
+    const bar = document.getElementById('reading-progress-bar');
+    if (bar) bar.style.width = `${progress}%`;
+  });
+
+  // 2. Interactive Engagement Handlers
+  const feedbackYes = document.getElementById('feedback-yes');
+  const feedbackCopy = document.getElementById('feedback-copy');
+  const feedbackMsg = document.getElementById('feedback-msg');
+
+  if (feedbackYes) {
+    feedbackYes.addEventListener('click', () => {
+      feedbackYes.innerText = '🎉 Thank You!';
+      feedbackYes.disabled = true;
+    });
+  }
+
+  if (feedbackCopy) {
+    feedbackCopy.addEventListener('click', () => {
+      navigator.clipboard.writeText(window.location.href);
+      if (feedbackMsg) {
+        feedbackMsg.innerText = 'Link copied to clipboard!';
+        feedbackMsg.style.display = 'inline-block';
+        setTimeout(() => { feedbackMsg.style.display = 'none'; }, 2500);
+      }
+    });
+  }
+</script>
+
 <style is:global>
-  /* Global overrides strictly for rendered markdown body elements */
+  /* Markdown Rendered Elements Typography & High-End Polish */
   .post-content-body {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
     overflow-wrap: break-word;
     word-wrap: break-word;
+    font-size: 1.05rem;
+    line-height: 1.8;
+  }
+
+  .post-content-body h2 {
+    font-size: 1.55rem;
+    font-weight: 800;
+    margin: 2.25rem 0 0.85rem;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--card-border);
+    padding-bottom: 0.4rem;
+  }
+
+  .post-content-body h3 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin: 1.75rem 0 0.6rem;
+    color: var(--primary-blue);
   }
 
   .post-content-body p {
-    font-size: 1.05rem;
-    line-height: 1.75;
-    margin: 1.25rem 0;
+    margin: 1.15rem 0;
     color: var(--text-main);
     text-align: left;
   }
@@ -113,100 +220,271 @@ const articleSchema = {
     width: 100% !important;
   }
 
-  .post-content-body ul {
-    list-style-type: disc !important;
-  }
-
-  .post-content-body ol {
-    list-style-type: decimal !important;
-  }
+  .post-content-body ul { list-style-type: disc !important; }
+  .post-content-body ol { list-style-type: decimal !important; }
 
   .post-content-body li {
     margin: 0.65rem 0 !important;
-    font-size: 1.02rem !important;
     line-height: 1.65 !important;
-    padding-left: 0.35rem !important;
+    padding-left: 0.25rem !important;
   }
 
-  .post-content-body li p {
-    margin: 0.35rem 0 !important;
+  /* Responsive Styled Tables in Markdown */
+  .post-content-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.75rem 0;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--card-border);
+    display: table;
   }
 
-  /* Mobile Inset Protection */
+  .post-content-body th,
+  .post-content-body td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--card-border);
+    text-align: left;
+    font-size: 0.92rem;
+  }
+
+  .post-content-body th {
+    background: rgba(37, 99, 235, 0.08);
+    font-weight: 800;
+    color: var(--text-main);
+  }
+
+  .post-content-body blockquote {
+    border-left: 4px solid var(--primary-blue);
+    background: rgba(37, 99, 235, 0.05);
+    margin: 1.5rem 0;
+    padding: 1rem 1.25rem;
+    border-radius: 0 10px 10px 0;
+    font-style: italic;
+  }
+
   @media (max-width: 640px) {
     .post-content-body ul,
     .post-content-body ol {
-      padding-left: 1.65rem !important;
+      padding-left: 1.5rem !important;
     }
-
-    .post-content-body li {
-      font-size: 0.98rem !important;
-    }
-
-    .post-content-body p {
-      font-size: 1rem;
-      line-height: 1.7;
+    .post-content-body table {
+      display: block;
+      overflow-x: auto;
     }
   }
 </style>
 
 <style>
+  /* Sticky Reading Progress Top Bar */
+  .reading-progress-track {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: transparent;
+    z-index: 9999;
+  }
+  .reading-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #2563eb, #38bdf8);
+    transition: width 0.1s ease-out;
+  }
+
   .post-detail-container {
-    max-width: 780px;
+    max-width: 820px;
     margin: 0 auto;
-    padding: 1rem 0.5rem 4rem;
+    padding: 1rem 0.75rem 4rem;
     width: 100%;
     box-sizing: border-box;
   }
 
-  .post-header {
-    text-align: left;
-    margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--card-border);
-  }
-
-  .post-meta-top {
-    display: flex;
+  /* Hero Header Card with Graphic */
+  .post-hero-card {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.07) 0%, rgba(56, 189, 248, 0.03) 100%);
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    padding: 2rem 1.75rem;
+    display: grid;
+    grid-template-columns: 1fr 140px;
+    gap: 1.5rem;
     align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.85rem;
-    font-size: 0.85rem;
-    color: var(--text-muted);
+    margin-bottom: 2rem;
   }
 
-  .category-badge {
-    background: rgba(37, 99, 235, 0.1);
-    color: var(--primary-blue);
+  .post-meta-badges {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    margin-bottom: 0.85rem;
+    flex-wrap: wrap;
+  }
+
+  .category-pill {
+    background: var(--primary-blue);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 800;
     padding: 0.25rem 0.65rem;
     border-radius: 6px;
-    font-weight: 800;
-    font-size: 0.78rem;
     letter-spacing: 0.02em;
   }
 
+  .read-time-pill {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.55rem;
+    border-radius: 6px;
+  }
+
   .post-title {
-    font-size: clamp(1.8rem, 5vw, 2.5rem);
+    font-size: clamp(1.65rem, 4.5vw, 2.35rem);
     font-weight: 900;
     line-height: 1.25;
-    margin: 0 0 1rem;
+    margin: 0 0 0.85rem;
     color: var(--text-main);
   }
 
-  .author-row {
-    font-size: 0.92rem;
+  .author-inline {
+    font-size: 0.88rem;
     color: var(--text-muted);
   }
 
-  .author-row strong {
+  .post-hero-graphic {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .post-hero-graphic img {
+    max-width: 100%;
+    height: auto;
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.06));
+  }
+
+  /* Quick TL;DR Box */
+  .tldr-box {
+    background: var(--card-bg);
+    border: 1px dashed var(--primary-blue);
+    border-radius: 14px;
+    padding: 1.25rem 1.4rem;
+    margin-bottom: 2.25rem;
+  }
+  .tldr-title {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--primary-blue);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.35rem;
+  }
+  .tldr-box p {
+    margin: 0;
+    font-size: 0.96rem;
+    color: var(--text-muted);
+    line-height: 1.55;
+  }
+
+  /* Smart Tool Widget Callout */
+  .smart-tool-callout {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin: 3rem 0 2rem;
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  }
+  .smart-tool-icon {
+    font-size: 2.2rem;
+    line-height: 1;
+  }
+  .smart-tool-info h3 {
+    margin: 0 0 0.4rem;
+    font-size: 1.18rem;
+    font-weight: 800;
+  }
+  .smart-tool-info p {
+    margin: 0 0 1rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+  .smart-tool-buttons {
+    display: flex;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+  }
+  .btn-smart-action {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary-blue);
+    font-size: 0.84rem;
+    font-weight: 800;
+    padding: 0.45rem 0.85rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+  .btn-smart-action:hover {
+    background: var(--primary-blue);
+    color: #ffffff;
+  }
+
+  /* Interactive Engagement & Feedback Box */
+  .interactive-engagement-box {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 2.5rem;
+  }
+  .engagement-text {
+    font-size: 0.92rem;
+    font-weight: 700;
     color: var(--text-main);
+  }
+  .engagement-actions {
+    display: flex;
+    gap: 0.65rem;
+  }
+  .btn-feedback {
+    background: rgba(150, 150, 150, 0.1);
+    border: 1px solid var(--card-border);
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 0.84rem;
+    font-weight: 700;
+    padding: 0.4rem 0.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn-feedback:hover {
+    border-color: var(--primary-blue);
+    color: var(--primary-blue);
+  }
+  .feedback-toast {
+    display: none;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #16a34a;
+    width: 100%;
   }
 
   .post-footer-area {
-    margin-top: 3.5rem;
-    padding-top: 1.5rem;
+    margin-top: 2rem;
   }
-
   .footer-divider {
     border: 0;
     border-top: 1px solid var(--card-border);
@@ -214,8 +492,16 @@ const articleSchema = {
   }
 
   @media (max-width: 640px) {
-    .post-detail-container {
-      padding: 0.5rem 0.25rem 3rem;
+    .post-hero-card {
+      grid-template-columns: 1fr;
+      text-align: center;
+      gap: 1.25rem;
+      padding: 1.5rem 1.15rem;
     }
+    .post-meta-badges { justify-content: center; }
+    .post-hero-graphic { order: -1; }
+    .post-hero-graphic img { width: 100px; height: 100px; }
+    .smart-tool-callout { flex-direction: column; padding: 1.25rem; }
+    .interactive-engagement-box { flex-direction: column; text-align: center; }
   }
 </style>
