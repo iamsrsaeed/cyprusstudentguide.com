@@ -1,478 +1,350 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
-const title = 'Blog & Student Guides';
-const description = 'Practical guides, tips, and essential survival advice for international students in Cyprus.';
+const title = 'Cyprus Student Guides & Articles | Knowledge Base';
+const description = 'Practical, authentic, and step-by-step guides covering student immigration, part-time work, banking, and daily budgeting in Cyprus.';
 const permalink = 'https://cyprusstudentguide.com/blog/';
 
-// Load all markdown files for blog page
 const postFiles = import.meta.glob('../../data/blog-posts/*.md', { eager: true });
-
 const allPosts = Object.entries(postFiles).map(([filePath, post]: [string, any]) => {
   const frontmatter = post.frontmatter || {};
   const fileSlug = filePath.split('/').pop()?.replace('.md', '') || '';
   const slug = frontmatter.slug || fileSlug;
-  
+  const category = frontmatter.category || 'General';
+
+  // Dynamic 3D Thumbnail for Blog Listing Cards
+  let thumb = '/assets/blog/casual-life-3d-workspace.webp';
+  if (category.toLowerCase().includes('immigration') || category.toLowerCase().includes('legal')) {
+    thumb = '/assets/blog/casual-life-3d-girl-boy-poses.webp';
+  } else if (category.toLowerCase().includes('finance') || category.toLowerCase().includes('banking') || category.toLowerCase().includes('living')) {
+    thumb = '/assets/blog/casual-life-3d-meditation-crystal.webp';
+  }
+
   return {
     slug,
-    title: frontmatter.title || 'Untitled Guide',
+    title: frontmatter.title || 'Student Guide',
     description: frontmatter.description || '',
+    category: category,
     publishDate: frontmatter.publishDate || '2026-08-16',
-    author: frontmatter.author || 'Saidur Rahman',
-    category: frontmatter.category || 'General',
+    thumb: thumb,
+    rawText: `${frontmatter.title} ${frontmatter.description} ${category}`.toLowerCase()
   };
 }).sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime());
 
-const categories = ['All', ...new Set(allPosts.map(p => p.category).filter(Boolean))];
+const categories = ['All', ...new Set(allPosts.map(p => p.category))];
 ---
 
-<BaseLayout title={title} description={description} permalink={permalink} current="blog">
-  <div class="blog-container notranslate">
-    <header class="blog-header">
-      <span class="badge">KNOWLEDGE BASE</span>
+<BaseLayout title={title} description={description} permalink={permalink} current="guides">
+  <div class="blog-hub-container notranslate">
+    
+    <!-- Hero Header -->
+    <header class="blog-hub-header">
+      <span class="hub-badge">KNOWLEDGE BASE</span>
       <h1>Student Guides & Articles</h1>
-      <p>Practical, hype-free insights on part-time work, banking, public transit, and smart budgeting in Cyprus.</p>
+      <p class="hub-desc">Practical, hype-free insights on part-time work, banking, public transit, and smart budgeting in Cyprus.</p>
     </header>
 
-    <!-- Interactive Instant Search & Category Filter Section -->
-    <div class="search-filter-card">
-      <div class="search-input-wrap">
-        <span class="search-icon">🔍</span>
+    <!-- Search & Filter Controls -->
+    <div class="controls-panel">
+      <div class="search-box-wrap">
         <input 
           type="text" 
           id="guide-search-input" 
-          placeholder="Search guides (e.g., Lidl, Bank, Pink Slip, Tax, Bus, Work)..." 
-          aria-label="Search guides"
+          placeholder="🔍 Search guides (e.g., Lidl, Bank, Pink Slip, Tax, Bus, Work)..." 
+          aria-label="Search student guides"
         />
-        <button type="button" id="clear-search-btn" class="clear-btn" style="display: none;">✕</button>
       </div>
 
-      <div class="category-pills" id="category-pills">
+      <div class="category-pills-row">
         {categories.map((cat, idx) => (
           <button 
             type="button" 
-            class={`cat-pill ${idx === 0 ? 'active' : ''}`} 
+            class={`category-pill ${idx === 0 ? 'active' : ''}`} 
             data-category={cat}
           >
             {cat}
           </button>
         ))}
       </div>
-    </div>
 
-    <div class="controls-bar">
-      <div class="post-count">
-        Showing <strong id="visible-count">{allPosts.length}</strong> of {allPosts.length} articles
-      </div>
-      
-      <div class="sort-wrapper">
-        <label for="sort-select">Sort by:</label>
-        <select id="sort-select" aria-label="Sort blog posts">
-          <option value="newest">Newest First</option>
-          <option value="oldest">Oldest First</option>
-          <option value="title">Title (A-Z)</option>
-        </select>
+      <div class="filter-status-row">
+        <span id="results-count-text">Showing <strong>{allPosts.length}</strong> of {allPosts.length} articles</span>
       </div>
     </div>
 
-    <!-- Empty State Message -->
-    <div id="no-search-results" class="no-results" style="display: none;">
-      <p>🔎 No guides found matching your search.</p>
-      <button type="button" id="reset-filter-btn" class="btn-reset">Reset Filters</button>
-    </div>
-
-    <div class="posts-grid" id="posts-container">
-      {allPosts.map((post) => {
-        const publishTime = new Date(post.publishDate).getTime();
-        const formattedDate = new Date(post.publishDate).toLocaleDateString('en-GB', {
-          day: 'numeric',
-          month: 'short',
-          year: 'numeric'
-        });
-
-        return (
-          <article 
-            class="post-card" 
-            data-date={publishTime} 
-            data-title={post.title.toLowerCase()}
-            data-desc={post.description.toLowerCase()}
-            data-category={post.category}
-          >
-            <div class="post-meta">
-              <span class="post-category">{post.category}</span>
-              <time datetime={post.publishDate}>{formattedDate}</time>
+    <!-- Articles Grid with 3D Graphic Cards -->
+    <div class="articles-grid" id="articles-grid">
+      {allPosts.map((post) => (
+        <article 
+          class="article-card" 
+          data-category={post.category} 
+          data-search-content={post.rawText}
+        >
+          <div class="card-thumb-wrap">
+            <img src={post.thumb} alt={post.category} loading="lazy" width="80" height="80" />
+          </div>
+          <div class="card-body">
+            <div class="card-meta">
+              <span class="cat-tag">{post.category}</span>
+              <span class="date-tag">{new Date(post.publishDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
             </div>
-            <h2>
+            <h2 class="card-title">
               <a href={`/blog/${post.slug}/`}>{post.title}</a>
             </h2>
-            <p>{post.description}</p>
-            <div class="post-footer">
-              <span class="author">By {post.author}</span>
-              <a href={`/blog/${post.slug}/`} class="read-more">Read Guide →</a>
-            </div>
-          </article>
-        );
-      })}
+            <p class="card-excerpt">{post.description}</p>
+            <a href={`/blog/${post.slug}/`} class="card-read-link">Read Full Guide ➔</a>
+          </div>
+        </article>
+      ))}
     </div>
+
+    <!-- Empty State -->
+    <div id="no-results-box" class="no-results-card" style="display: none;">
+      <div class="no-results-icon">🔎</div>
+      <h3>No matching guides found</h3>
+      <p>Try searching with different keywords like "bank", "jobs", "lidl", or clear the filter.</p>
+    </div>
+
   </div>
 </BaseLayout>
 
-<style>
-  .blog-container {
-    max-width: 1040px;
-    margin: 0 auto;
-    padding: 1.5rem 1rem 4rem;
-  }
-
-  .blog-header {
-    text-align: center;
-    margin-bottom: 2rem;
-  }
-
-  .badge {
-    background: rgba(37, 99, 235, 0.15);
-    color: #3b82f6;
-    padding: 0.35rem 0.85rem;
-    border-radius: 50px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    display: inline-block;
-    margin-bottom: 0.75rem;
-  }
-
-  .blog-header h1 {
-    font-size: 2.3rem;
-    margin-bottom: 0.5rem;
-    font-weight: 800;
-    color: var(--text-main);
-  }
-
-  .blog-header p {
-    color: var(--text-muted);
-    max-width: 650px;
-    margin: 0 auto;
-    line-height: 1.5;
-    font-size: 1.02rem;
-  }
-
-  /* Search & Filter Box */
-  .search-filter-card {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 14px;
-    padding: 1.25rem;
-    margin-bottom: 1.75rem;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-  }
-
-  .search-input-wrap {
-    position: relative;
-    display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
-  }
-
-  .search-icon {
-    position: absolute;
-    left: 14px;
-    font-size: 1rem;
-    pointer-events: none;
-  }
-
-  #guide-search-input {
-    width: 100%;
-    background: var(--bg-color);
-    color: var(--text-main);
-    border: 1px solid var(--card-border);
-    border-radius: 10px;
-    padding: 0.75rem 2.5rem 0.75rem 2.6rem;
-    font-size: 0.95rem;
-    font-weight: 600;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
-  #guide-search-input:focus {
-    border-color: var(--primary-blue);
-  }
-
-  .clear-btn {
-    position: absolute;
-    right: 12px;
-    background: transparent;
-    border: none;
-    color: var(--text-muted);
-    font-size: 1rem;
-    cursor: pointer;
-    padding: 0.2rem;
-  }
-
-  .category-pills {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
-
-  .cat-pill {
-    background: rgba(150, 150, 150, 0.08);
-    border: 1px solid var(--card-border);
-    color: var(--text-main);
-    font-size: 0.8rem;
-    font-weight: 700;
-    padding: 0.35rem 0.75rem;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-  }
-
-  .cat-pill:hover {
-    border-color: var(--primary-blue);
-    color: var(--primary-blue);
-  }
-
-  .cat-pill.active {
-    background: var(--primary-blue);
-    color: #ffffff;
-    border-color: var(--primary-blue);
-  }
-
-  .controls-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--card-border);
-    font-size: 0.9rem;
-    color: var(--text-muted);
-  }
-
-  .sort-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .sort-wrapper select {
-    background: var(--bg-color);
-    color: var(--text-main);
-    border: 1px solid var(--card-border);
-    border-radius: 8px;
-    padding: 0.35rem 0.6rem;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    outline: none;
-  }
-
-  .posts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 1.5rem;
-  }
-
-  /* Post Card Styles */
-  .post-card {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  .post-card:hover {
-    transform: translateY(-3px);
-    border-color: var(--primary-blue);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-  }
-
-  .post-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-bottom: 0.75rem;
-  }
-
-  .post-category {
-    background: rgba(37, 99, 235, 0.1);
-    color: var(--primary-blue);
-    padding: 0.25rem 0.6rem;
-    border-radius: 4px;
-    font-weight: 700;
-    font-size: 0.76rem;
-  }
-
-  .post-card h2 {
-    font-size: 1.25rem;
-    line-height: 1.4;
-    margin: 0 0 0.75rem;
-    font-weight: 800;
-  }
-
-  .post-card h2 a {
-    color: var(--text-main);
-    text-decoration: none;
-  }
-
-  .post-card h2 a:hover {
-    color: var(--primary-blue);
-  }
-
-  .post-card p {
-    color: var(--text-muted);
-    font-size: 0.92rem;
-    line-height: 1.55;
-    margin-bottom: 1.25rem;
-    flex-grow: 1;
-  }
-
-  .post-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.8rem;
-    border-top: 1px solid var(--card-border);
-    padding-top: 0.75rem;
-    color: var(--text-muted);
-  }
-
-  .read-more {
-    color: var(--primary-blue);
-    text-decoration: none;
-    font-weight: 700;
-  }
-
-  .no-results {
-    text-align: center;
-    padding: 3rem 1rem;
-    color: var(--text-muted);
-  }
-
-  .btn-reset {
-    margin-top: 0.75rem;
-    background: var(--primary-blue);
-    color: #ffffff;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    font-weight: 700;
-    cursor: pointer;
-  }
-
-  @media (max-width: 640px) {
-    .controls-bar {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.75rem;
-    }
-    .posts-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-</style>
-
 <script is:inline>
-  function initBlogSearchAndFilter() {
+  function initSearchFilter() {
     const searchInput = document.getElementById('guide-search-input');
-    const clearBtn = document.getElementById('clear-search-btn');
-    const catPills = document.querySelectorAll('.cat-pill');
-    const sortSelect = document.getElementById('sort-select');
-    const postsContainer = document.getElementById('posts-container');
-    const visibleCountEl = document.getElementById('visible-count');
-    const noResultsEl = document.getElementById('no-search-results');
-    const resetBtn = document.getElementById('reset-filter-btn');
+    const catButtons = document.querySelectorAll('.category-pill');
+    const articles = document.querySelectorAll('.article-card');
+    const countText = document.getElementById('results-count-text');
+    const noResults = document.getElementById('no-results-box');
 
-    let activeCategory = 'All';
+    let activeCat = 'All';
+    let searchQuery = '';
 
-    function filterPosts() {
-      const query = (searchInput.value || '').trim().toLowerCase();
-      const cards = Array.from(postsContainer.querySelectorAll('.post-card'));
+    function filterGuides() {
       let visibleCount = 0;
 
-      if (clearBtn) {
-        clearBtn.style.display = query.length > 0 ? 'block' : 'none';
-      }
+      articles.forEach(article => {
+        const artCat = article.getAttribute('data-category');
+        const artSearch = article.getAttribute('data-search-content') || '';
 
-      cards.forEach(card => {
-        const title = card.getAttribute('data-title') || '';
-        const desc = card.getAttribute('data-desc') || '';
-        const category = card.getAttribute('data-category') || '';
+        const matchesCat = (activeCat === 'All' || artCat === activeCat);
+        const matchesQuery = !searchQuery || artSearch.includes(searchQuery);
 
-        const matchesQuery = query === '' || title.includes(query) || desc.includes(query);
-        const matchesCat = activeCategory === 'All' || category === activeCategory;
-
-        if (matchesQuery && matchesCat) {
-          card.style.display = 'flex';
+        if (matchesCat && matchesQuery) {
+          article.style.display = 'flex';
           visibleCount++;
         } else {
-          card.style.display = 'none';
+          article.style.display = 'none';
         }
       });
 
-      if (visibleCountEl) visibleCountEl.innerText = visibleCount;
-      if (noResultsEl) noResultsEl.style.display = visibleCount === 0 ? 'block' : 'none';
+      if (countText) {
+        countText.innerHTML = `Showing <strong>${visibleCount}</strong> of ${articles.length} articles`;
+      }
+
+      if (noResults) {
+        noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+      }
     }
 
     if (searchInput) {
-      searchInput.addEventListener('input', filterPosts);
-    }
-
-    if (clearBtn) {
-      clearBtn.addEventListener('click', () => {
-        searchInput.value = '';
-        filterPosts();
-        searchInput.focus();
+      searchInput.addEventListener('input', (e) => {
+        searchQuery = e.target.value.toLowerCase().trim();
+        filterGuides();
       });
     }
 
-    catPills.forEach(pill => {
-      pill.addEventListener('click', () => {
-        catPills.forEach(p => p.classList.remove('active'));
-        pill.classList.add('active');
-        activeCategory = pill.getAttribute('data-category');
-        filterPosts();
+    catButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        catButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeCat = btn.getAttribute('data-category') || 'All';
+        filterGuides();
       });
     });
-
-    if (resetBtn) {
-      resetBtn.addEventListener('click', () => {
-        if (searchInput) searchInput.value = '';
-        catPills.forEach(p => p.classList.remove('active'));
-        if (catPills[0]) catPills[0].classList.add('active');
-        activeCategory = 'All';
-        filterPosts();
-      });
-    }
-
-    if (sortSelect && postsContainer) {
-      sortSelect.addEventListener('change', () => {
-        const criteria = sortSelect.value;
-        const cards = Array.from(postsContainer.querySelectorAll('.post-card'));
-
-        cards.sort((a, b) => {
-          const dateA = parseInt(a.getAttribute('data-date') || '0', 10);
-          const dateB = parseInt(b.getAttribute('data-date') || '0', 10);
-          const titleA = (a.getAttribute('data-title') || '').trim();
-          const titleB = (b.getAttribute('data-title') || '').trim();
-
-          if (criteria === 'newest') return dateB - dateA;
-          if (criteria === 'oldest') return dateA - dateB;
-          if (criteria === 'title') return titleA.localeCompare(titleB);
-          return 0;
-        });
-
-        postsContainer.innerHTML = '';
-        cards.forEach(card => postsContainer.appendChild(card));
-        filterPosts();
-      });
-    }
   }
 
-  document.addEventListener('DOMContentLoaded', initBlogSearchAndFilter);
+  document.addEventListener('DOMContentLoaded', initSearchFilter);
 </script>
+
+<style>
+  .blog-hub-container {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 1rem 0.75rem 4rem;
+  }
+
+  .blog-hub-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+  .hub-badge {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary-blue);
+    font-size: 0.76rem;
+    font-weight: 800;
+    padding: 0.35rem 0.85rem;
+    border-radius: 30px;
+    display: inline-block;
+    margin-bottom: 0.75rem;
+  }
+  .blog-hub-header h1 {
+    font-size: clamp(2rem, 4.5vw, 2.7rem);
+    font-weight: 900;
+    margin: 0 0 0.6rem;
+  }
+  .hub-desc {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    max-width: 620px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* Controls Panel */
+  .controls-panel {
+    margin-bottom: 2.5rem;
+  }
+  .search-box-wrap {
+    margin-bottom: 1.25rem;
+  }
+  #guide-search-input {
+    width: 100%;
+    background: var(--card-bg);
+    color: var(--text-main);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 0.85rem 1.15rem;
+    font-family: inherit;
+    font-size: 0.98rem;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    box-sizing: border-box;
+  }
+  #guide-search-input:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  }
+
+  .category-pills-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+  .category-pill {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 0.4rem 0.85rem;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .category-pill:hover,
+  .category-pill.active {
+    background: var(--primary-blue);
+    color: #ffffff;
+    border-color: var(--primary-blue);
+  }
+
+  .filter-status-row {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  /* Articles Grid */
+  .articles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 1.5rem;
+  }
+  .article-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .article-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--primary-blue);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  }
+
+  .card-thumb-wrap {
+    background: rgba(37, 99, 235, 0.04);
+    border-radius: 12px;
+    padding: 0.75rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .card-thumb-wrap img {
+    height: 70px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+  .card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem;
+  }
+  .cat-tag {
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: var(--primary-blue);
+  }
+  .date-tag {
+    font-size: 0.74rem;
+    color: var(--text-muted);
+  }
+  .card-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    line-height: 1.4;
+    margin: 0 0 0.5rem;
+  }
+  .card-title a {
+    color: var(--text-main);
+    text-decoration: none;
+  }
+  .card-title a:hover { color: var(--primary-blue); }
+  .card-excerpt {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    flex-grow: 1;
+    margin: 0 0 1rem;
+  }
+  .card-read-link {
+    color: var(--primary-blue);
+    font-weight: 800;
+    font-size: 0.84rem;
+    text-decoration: none;
+  }
+
+  /* No results state */
+  .no-results-card {
+    text-align: center;
+    background: var(--card-bg);
+    border: 1px dashed var(--card-border);
+    border-radius: 16px;
+    padding: 3rem 1.5rem;
+  }
+  .no-results-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+  .no-results-card h3 { margin: 0 0 0.35rem; font-size: 1.25rem; }
+  .no-results-card p { color: var(--text-muted); margin: 0; }
+</style>
