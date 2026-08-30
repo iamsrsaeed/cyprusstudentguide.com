@@ -43,7 +43,9 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
 
     <slot name="head" />
 
+    <!-- 1. Zero-Flicker Theme & Auth Cache Initializer -->
     <script is:inline>
+      // Theme Check
       const theme = (() => {
         if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
           return localStorage.getItem('theme');
@@ -58,6 +60,14 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
       } else {
         document.documentElement.classList.remove('dark');
       }
+
+      // Check Cached User Avatar to prevent Sign-In UI Flicker
+      try {
+        const cachedAvatar = localStorage.getItem('csg_cached_user_avatar');
+        if (cachedAvatar) {
+          document.documentElement.classList.add('user-is-logged-in');
+        }
+      } catch (e) {}
     </script>
   </head>
   <body>
@@ -85,14 +95,14 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
           <a href="/about/" class={current === 'about' ? 'active' : ''}>About</a>
         </nav>
 
-        <!-- Right Side Controls with Direct Google Auth -->
+        <!-- Right Side Controls with Instant Cached Auth -->
         <div class="csg-nav-actions notranslate">
-          <!-- Direct Sign-In / Passport Access -->
+          <!-- Auth Container -->
           <div id="nav-auth-container" class="nav-auth-wrap">
             <button type="button" id="nav-login-btn" class="nav-btn-signin" title="Sign in with Google">
               👤 <span>Sign In</span>
             </button>
-            <a href="/profile/" id="nav-user-avatar-btn" class="nav-user-avatar" style="display: none;" title="My Student Passport">
+            <a href="/profile/" id="nav-user-avatar-btn" class="nav-user-avatar" title="My Student Passport">
               <img id="nav-user-avatar-img" src="/favicon.svg" alt="Profile" />
             </a>
           </div>
@@ -184,7 +194,18 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
       </div>
     </footer>
 
-    <!-- Standalone Global Nav Authentication Script (Matching Work Tracker Engine) -->
+    <!-- Instant Pre-Hydration Render Script (Zero-Delay) -->
+    <script is:inline>
+      (function() {
+        const cachedAvatar = localStorage.getItem('csg_cached_user_avatar');
+        const navAvatarImg = document.getElementById('nav-user-avatar-img');
+        if (cachedAvatar && navAvatarImg) {
+          navAvatarImg.src = cachedAvatar;
+        }
+      })();
+    </script>
+
+    <!-- Standalone Global Nav Authentication Script -->
     <script is:inline type="module">
       import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
       import { 
@@ -214,17 +235,17 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
       const navAvatarBtn = document.getElementById('nav-user-avatar-btn');
       const navAvatarImg = document.getElementById('nav-user-avatar-img');
 
-      // Check redirect result for mobile devices
       getRedirectResult(auth).catch(() => {});
 
       onAuthStateChanged(auth, (user) => {
         if (user) {
-          if (navLoginBtn) navLoginBtn.style.display = 'none';
-          if (navAvatarBtn) navAvatarBtn.style.display = 'flex';
-          if (navAvatarImg) navAvatarImg.src = user.photoURL || '/favicon.svg';
+          document.documentElement.classList.add('user-is-logged-in');
+          const photo = user.photoURL || '/favicon.svg';
+          localStorage.setItem('csg_cached_user_avatar', photo);
+          if (navAvatarImg) navAvatarImg.src = photo;
         } else {
-          if (navLoginBtn) navLoginBtn.style.display = 'inline-flex';
-          if (navAvatarBtn) navAvatarBtn.style.display = 'none';
+          document.documentElement.classList.remove('user-is-logged-in');
+          localStorage.removeItem('csg_cached_user_avatar');
         }
       });
 
@@ -472,7 +493,9 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     flex-shrink: 0;
   }
 
+  /* ZERO-FLICKER AUTH SYSTEM CSS */
   .nav-btn-signin {
+    display: inline-flex;
     background: rgba(37, 99, 235, 0.1);
     color: var(--primary-blue);
     font-size: 0.76rem;
@@ -481,7 +504,6 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     border-radius: 6px;
     border: 1px solid rgba(37, 99, 235, 0.2);
     cursor: pointer;
-    display: inline-flex;
     align-items: center;
     gap: 0.25rem;
     transition: background 0.15s;
@@ -492,8 +514,9 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     background: var(--primary-blue);
     color: #ffffff;
   }
+
   .nav-user-avatar {
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     text-decoration: none;
@@ -504,6 +527,14 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     border-radius: 50%;
     border: 2px solid var(--primary-blue);
     object-fit: cover;
+  }
+
+  /* If cached as logged in, immediately flip states via CSS */
+  html.user-is-logged-in .nav-btn-signin {
+    display: none !important;
+  }
+  html.user-is-logged-in .nav-user-avatar {
+    display: flex !important;
   }
 
   .csg-lang-select {
