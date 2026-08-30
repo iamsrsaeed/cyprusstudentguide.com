@@ -85,7 +85,7 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
           <a href="/about/" class={current === 'about' ? 'active' : ''}>About</a>
         </nav>
 
-        <!-- Right Side Controls with 1-Click Interactive Popup -->
+        <!-- Right Side Controls with Direct Google Auth -->
         <div class="csg-nav-actions notranslate">
           <!-- Direct Sign-In / Passport Access -->
           <div id="nav-auth-container" class="nav-auth-wrap">
@@ -184,27 +184,38 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
       </div>
     </footer>
 
-    <!-- Direct Global 1-Click Authentication Engine -->
+    <!-- Standalone Global Nav Authentication Script (Matching Work Tracker Engine) -->
     <script is:inline type="module">
-      import { auth, loginWithGoogle } from '/src/lib/firebase.js';
-      import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+      import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+      import { 
+        getAuth, 
+        signInWithPopup, 
+        signInWithRedirect, 
+        getRedirectResult, 
+        GoogleAuthProvider, 
+        onAuthStateChanged 
+      } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBnLArPDFIG6Kr9OtkoCzhdFBHMbgzK8k0",
+        authDomain: "cyprusstudentguidelogin.firebaseapp.com",
+        projectId: "cyprusstudentguidelogin",
+        storageBucket: "cyprusstudentguidelogin.firebasestorage.app",
+        messagingSenderId: "215797465320",
+        appId: "1:215797465320:web:afad34a9c5aa686772c95d",
+        measurementId: "G-1RWQEC5L8D"
+      };
+
+      const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const provider = new GoogleAuthProvider();
 
       const navLoginBtn = document.getElementById('nav-login-btn');
       const navAvatarBtn = document.getElementById('nav-user-avatar-btn');
       const navAvatarImg = document.getElementById('nav-user-avatar-img');
 
-      // 1-Click Google Sign-in Handler
-      if (navLoginBtn) {
-        navLoginBtn.addEventListener('click', async () => {
-          try {
-            await loginWithGoogle();
-            window.location.href = '/profile/';
-          } catch (e) {
-            console.error('Sign-in error:', e);
-            window.location.href = '/profile/';
-          }
-        });
-      }
+      // Check redirect result for mobile devices
+      getRedirectResult(auth).catch(() => {});
 
       onAuthStateChanged(auth, (user) => {
         if (user) {
@@ -216,9 +227,27 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
           if (navAvatarBtn) navAvatarBtn.style.display = 'none';
         }
       });
+
+      if (navLoginBtn) {
+        navLoginBtn.addEventListener('click', async () => {
+          provider.setCustomParameters({ prompt: 'select_account' });
+          const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+          try {
+            if (isMobile) {
+              await signInWithRedirect(auth, provider);
+            } else {
+              await signInWithPopup(auth, provider);
+              window.location.href = '/profile/';
+            }
+          } catch (err) {
+            console.error('Header Auth Error:', err);
+            window.location.href = '/profile/';
+          }
+        });
+      }
     </script>
 
-    <!-- Standard Interactive Scripts -->
+    <!-- Standard UI Scripts -->
     <script is:inline>
       const themeToggleBtn = document.getElementById('theme-toggle');
       if (themeToggleBtn) {
@@ -614,6 +643,6 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     .csg-theme-btn { padding: 0.2rem 0.35rem; font-size: 0.8rem; }
     .csg-hamburger-btn { padding: 0.2rem 0.38rem; font-size: 0.85rem; }
     .nav-btn-signin { font-size: 0.7rem; padding: 0.22rem 0.38rem; }
-    .nav-btn-signin span { display: none; } /* On small screens show icon only */
+    .nav-btn-signin span { display: none; }
   }
 </style>
