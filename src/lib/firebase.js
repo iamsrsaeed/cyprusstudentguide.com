@@ -1,30 +1,43 @@
-import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { 
+  getAuth, 
+  GoogleAuthProvider, 
+  signInWithPopup, 
+  signOut, 
+  onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { 
+  getFirestore, 
+  doc, 
+  getDoc, 
+  setDoc 
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-// Work Tracker এ ব্যবহৃত আপনার Firebase কনফিগারেশন এখানে বসান
+// আপনার Work Tracker থেকে প্রাপ্ত আসল Firebase কনফিগারেশন
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBnLArPDFIG6Kr9OtkoCzhdFBHMbgzK8k0",
+  authDomain: "cyprusstudentguidelogin.firebaseapp.com",
+  projectId: "cyprusstudentguidelogin",
+  storageBucket: "cyprusstudentguidelogin.firebasestorage.app",
+  messagingSenderId: "215797465320",
+  appId: "1:215797465320:web:afad34a9c5aa686772c95d",
+  measurementId: "G-1RWQEC5L8D"
 };
 
-// Singleton instance initialization
+// Singleton App Instance
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const googleProvider = new GoogleAuthProvider();
 
-// 1-Click Google Sign-in Handler
+// 1-Click Google Sign-in Engine
 export const loginWithGoogle = async () => {
   try {
+    googleProvider.setCustomParameters({ prompt: 'select_account' });
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
-    
-    // Check & create initial user profile document in Firestore if not exists
+
+    // First time login: Create profile document in Firestore
     const userDocRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userDocRef);
 
@@ -36,8 +49,7 @@ export const loginWithGoogle = async () => {
           photoURL: user.photoURL || "",
           city: "Limassol",
           institution: "",
-          arrivalDate: "",
-          avatarChoice: "default"
+          arrivalDate: ""
         },
         preferences: {
           defaultHourlyRate: 6.5,
@@ -45,16 +57,16 @@ export const loginWithGoogle = async () => {
           monthlyRentBudget: 450
         },
         createdAt: new Date().toISOString()
-      });
+      }, { merge: true });
     }
     return user;
   } catch (error) {
-    console.error("Authentication Error:", error);
+    console.error("Auth Error:", error);
     throw error;
   }
 };
 
-// Logout Handler
+// Logout Engine
 export const logoutUser = async () => {
   try {
     await signOut(auth);
