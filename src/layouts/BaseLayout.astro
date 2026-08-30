@@ -25,10 +25,8 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     <link rel="apple-touch-icon" href="/favicon.svg" />
     <meta name="theme-color" content="#2563eb" />
 
-    <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4089174887676363" crossorigin="anonymous"></script>
 
-    <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Cyprus Student Guide" />
     <meta property="og:title" content={title} />
@@ -36,7 +34,6 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     <meta property="og:url" content={permalink} />
     <meta property="og:image" content="https://cyprusstudentguide.com/favicon.svg" />
 
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet" />
@@ -61,13 +58,11 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     </script>
   </head>
   <body>
-    <!-- Announcement Bar -->
     <div class="csg-announcement-bar notranslate">
       <span>🎁 <strong>TAPTAP SEND BONUS:</strong> Send money from Cyprus with 0% fee! Code: <code>MDSAIDUR240</code></span>
       <a href="/blog/how-to-send-money-from-cyprus-taptap-send-bonus-guide/">Claim €10 Bonus ➔</a>
     </div>
 
-    <!-- Header Navigation -->
     <header class="csg-header">
       <div class="csg-container csg-nav-inner">
         <a href="/" class="csg-brand notranslate">
@@ -75,7 +70,6 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
           <span class="csg-brand-text">Cyprus <span>Student Guide</span></span>
         </a>
 
-        <!-- Desktop Navigation -->
         <nav class="csg-nav-links notranslate">
           <a href="/" class={current === 'home' ? 'active' : ''}>Home</a>
           <a href="/blog/" class={current === 'guides' ? 'active' : ''}>Guides</a>
@@ -85,9 +79,7 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
           <a href="/about/" class={current === 'about' ? 'active' : ''}>About</a>
         </nav>
 
-        <!-- Right Side Controls with Dynamic Auth -->
         <div class="csg-nav-actions notranslate">
-          <!-- Auth Container -->
           <div id="nav-auth-container" class="nav-auth-wrap">
             <a href="/profile/" id="nav-login-btn" class="nav-btn-signin" title="Sign in with Google">
               👤 Sign In
@@ -97,7 +89,6 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
             </a>
           </div>
 
-          <!-- Language Selector -->
           <div class="csg-lang-wrapper">
             <select id="language-switcher" aria-label="Select Language" class="csg-lang-select">
               <option value="en">🇬🇧 EN</option>
@@ -107,19 +98,16 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
             </select>
           </div>
 
-          <!-- Theme Toggle -->
           <button id="theme-toggle" type="button" aria-label="Toggle Dark Mode" class="csg-theme-btn">
             🌙
           </button>
 
-          <!-- Mobile Menu Toggle -->
           <button id="mobile-menu-toggle" type="button" aria-label="Toggle Navigation Menu" class="csg-hamburger-btn">
             <span class="hamburger-icon">☰</span>
           </button>
         </div>
       </div>
 
-      <!-- Mobile Dropdown Navigation Drawer -->
       <div id="mobile-nav-drawer" class="csg-mobile-drawer notranslate" style="display: none;">
         <nav class="csg-mobile-links">
           <a href="/profile/" class={current === 'profile' ? 'active' : ''}>👤 Student Passport & Profile</a>
@@ -184,28 +172,29 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
       </div>
     </footer>
 
-    <!-- Header Dynamic Auth Script -->
-    <script>
-      import { auth } from '../lib/firebase.js';
-      import { onAuthStateChanged } from 'firebase/auth';
+    <script is:inline type="module">
+      import('../lib/firebase.js').then(({ auth }) => {
+        import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js').then(({ onAuthStateChanged }) => {
+          const navLoginBtn = document.getElementById('nav-login-btn');
+          const navAvatarBtn = document.getElementById('nav-user-avatar-btn');
+          const navAvatarImg = document.getElementById('nav-user-avatar-img');
 
-      const navLoginBtn = document.getElementById('nav-login-btn');
-      const navAvatarBtn = document.getElementById('nav-user-avatar-btn');
-      const navAvatarImg = document.getElementById('nav-user-avatar-img') as HTMLImageElement;
-
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          if (navLoginBtn) navLoginBtn.style.display = 'none';
-          if (navAvatarBtn) navAvatarBtn.style.display = 'flex';
-          if (navAvatarImg) navAvatarImg.src = user.photoURL || '/favicon.svg';
-        } else {
-          if (navLoginBtn) navLoginBtn.style.display = 'inline-flex';
-          if (navAvatarBtn) navAvatarBtn.style.display = 'none';
-        }
+          onAuthStateChanged(auth, (user) => {
+            if (user) {
+              if (navLoginBtn) navLoginBtn.style.display = 'none';
+              if (navAvatarBtn) navAvatarBtn.style.display = 'flex';
+              if (navAvatarImg) navAvatarImg.src = user.photoURL || '/favicon.svg';
+            } else {
+              if (navLoginBtn) navLoginBtn.style.display = 'inline-flex';
+              if (navAvatarBtn) navAvatarBtn.style.display = 'none';
+            }
+          });
+        });
+      }).catch((err) => {
+        console.warn('Auth UI state skipped on build:', err);
       });
     </script>
 
-    <!-- Standard Scripts -->
     <script is:inline>
       const themeToggleBtn = document.getElementById('theme-toggle');
       if (themeToggleBtn) {
@@ -428,7 +417,6 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     flex-shrink: 0;
   }
 
-  /* Nav Auth Buttons */
   .nav-btn-signin {
     background: rgba(37, 99, 235, 0.1);
     color: var(--primary-blue);
