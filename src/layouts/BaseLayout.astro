@@ -68,7 +68,7 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
   </head>
   <body>
     <!-- Top Announcement Bar -->
-    <div class="csg-announcement-bar">
+    <div class="csg-announcement-bar notranslate">
       <span>🎁 <strong>TAPTAP SEND BONUS:</strong> Send money from Cyprus with 0% fee! Code: <code>MDSAIDUR240</code></span>
       <a href="/blog/how-to-send-money-from-cyprus-taptap-send-bonus-guide/">Claim €10 Bonus ➔</a>
     </div>
@@ -76,12 +76,13 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     <!-- Header Navigation -->
     <header class="csg-header">
       <div class="csg-container csg-nav-inner">
-        <a href="/" class="csg-brand">
+        <a href="/" class="csg-brand notranslate">
           <span class="csg-logo-badge">CY</span>
           <span class="csg-brand-text">Cyprus <span>Student Guide</span></span>
         </a>
 
-        <nav class="csg-nav-links">
+        <!-- Desktop Navigation Menu -->
+        <nav class="csg-nav-links notranslate">
           <a href="/" class={current === 'home' ? 'active' : ''}>Home</a>
           <a href="/blog/" class={current === 'guides' ? 'active' : ''}>Guides</a>
           <a href="/pink-slip-tracker/" class={current === 'tracker' ? 'active' : ''}>📋 Pink Slip</a>
@@ -90,13 +91,46 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
           <a href="/about/" class={current === 'about' ? 'active' : ''}>About</a>
         </nav>
 
-        <div class="csg-nav-actions">
+        <!-- Right Side Utility Controls -->
+        <div class="csg-nav-actions notranslate">
+          <!-- Language Selector -->
+          <div class="csg-lang-wrapper">
+            <select id="language-switcher" aria-label="Select Language" class="csg-lang-select">
+              <option value="en">🇬🇧 EN</option>
+              <option value="bn">🇧🇩 BN</option>
+              <option value="el">🇨🇾 EL</option>
+              <option value="hi">🇮🇳 HI</option>
+            </select>
+          </div>
+
+          <!-- Theme Toggle -->
           <button id="theme-toggle" type="button" aria-label="Toggle Dark Mode" class="csg-theme-btn">
             🌙
           </button>
+
+          <!-- Mobile Hamburger Toggle Button -->
+          <button id="mobile-menu-toggle" type="button" aria-label="Toggle Navigation Menu" class="csg-hamburger-btn">
+            <span class="hamburger-icon">☰</span>
+          </button>
         </div>
       </div>
+
+      <!-- Mobile Dropdown Navigation Drawer -->
+      <div id="mobile-nav-drawer" class="csg-mobile-drawer notranslate" style="display: none;">
+        <nav class="csg-mobile-links">
+          <a href="/" class={current === 'home' ? 'active' : ''}>🏠 Home</a>
+          <a href="/blog/" class={current === 'guides' ? 'active' : ''}>📚 All Guides</a>
+          <a href="/pink-slip-tracker/" class={current === 'tracker' ? 'active' : ''}>📋 Pink Slip Tracker</a>
+          <a href="/calculator/" class={current === 'calculator' ? 'active' : ''}>💶 Budget Calculator</a>
+          <a href="/shift-tracker/" class={current === 'shift' ? 'active' : ''}>⏱️ Shift Work Tracker</a>
+          <a href="/about/" class={current === 'about' ? 'active' : ''}>ℹ️ About Us</a>
+          <a href="/contact/" class={current === 'contact' ? 'active' : ''}>✉️ Contact Support</a>
+        </nav>
+      </div>
     </header>
+
+    <!-- Hidden Container For Google Translate -->
+    <div id="google_translate_element" style="display:none;"></div>
 
     <!-- Main Content Injection -->
     <main class="csg-main">
@@ -111,7 +145,7 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     </main>
 
     <!-- Footer -->
-    <footer class="csg-footer">
+    <footer class="csg-footer notranslate">
       <div class="csg-container csg-footer-inner">
         <div class="csg-footer-brand">
           <div class="csg-brand">
@@ -149,8 +183,9 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
       </div>
     </footer>
 
-    <!-- Theme Toggle Handler -->
+    <!-- Interactive Scripts: Theme, Mobile Menu & Google Translate -->
     <script is:inline>
+      // 1. Theme Toggle
       const themeToggleBtn = document.getElementById('theme-toggle');
       if (themeToggleBtn) {
         const isDark = document.documentElement.classList.contains('dark');
@@ -160,6 +195,72 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
           const currentlyDark = document.documentElement.classList.toggle('dark');
           localStorage.setItem('theme', currentlyDark ? 'dark' : 'light');
           themeToggleBtn.innerText = currentlyDark ? '☀️' : '🌙';
+        });
+      }
+
+      // 2. Mobile Menu Toggle
+      const mobileToggleBtn = document.getElementById('mobile-menu-toggle');
+      const mobileDrawer = document.getElementById('mobile-nav-drawer');
+      if (mobileToggleBtn && mobileDrawer) {
+        mobileToggleBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isOpen = mobileDrawer.style.display === 'block';
+          mobileDrawer.style.display = isOpen ? 'none' : 'block';
+          mobileToggleBtn.querySelector('.hamburger-icon').innerText = isOpen ? '☰' : '✕';
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+          if (!mobileDrawer.contains(e.target) && !mobileToggleBtn.contains(e.target)) {
+            mobileDrawer.style.display = 'none';
+            mobileToggleBtn.querySelector('.hamburger-icon').innerText = '☰';
+          }
+        });
+      }
+
+      // 3. Google Translate Engine Setup
+      function googleTranslateElementInit() {
+        if (window.google && window.google.translate) {
+          new window.google.translate.TranslateElement({
+            pageLanguage: 'en',
+            includedLanguages: 'en,bn,el,hi',
+            autoDisplay: false
+          }, 'google_translate_element');
+        }
+      }
+
+      // Load Google Translate Script asynchronously
+      (function() {
+        const gtScript = document.createElement('script');
+        gtScript.type = 'text/javascript';
+        gtScript.async = true;
+        gtScript.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+        document.head.appendChild(gtScript);
+      })();
+
+      // Handle custom language select trigger
+      const langSwitcher = document.getElementById('language-switcher');
+      if (langSwitcher) {
+        // Read existing cookie if set
+        const match = document.cookie.match(/(^|;) ?googtrans=([^;]*)(;|$)/);
+        if (match) {
+          const langCode = match[2].split('/')[2];
+          if (langCode) langSwitcher.value = langCode;
+        }
+
+        langSwitcher.addEventListener('change', () => {
+          const lang = langSwitcher.value;
+          const host = window.location.hostname;
+          const domain = host.includes('.') ? host.substring(host.lastIndexOf('.', host.lastIndexOf('.') - 1) + 1) : host;
+
+          if (lang === 'en') {
+            document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain};`;
+            document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+          } else {
+            document.cookie = `googtrans=/en/${lang}; path=/; domain=${domain};`;
+            document.cookie = `googtrans=/en/${lang}; path=/;`;
+          }
+          window.location.reload();
         });
       }
     </script>
@@ -208,7 +309,7 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     width: 100%;
   }
 
-  /* Announcement Bar */
+  /* Top Announcement Bar */
   .csg-announcement-bar {
     background: #0f172a;
     color: #f8fafc;
@@ -275,6 +376,7 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
   }
   .csg-brand-text span { color: var(--primary-blue); }
 
+  /* Desktop Menu */
   .csg-nav-links {
     display: flex;
     align-items: center;
@@ -283,7 +385,7 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
   .csg-nav-links a {
     text-decoration: none;
     color: var(--text-muted);
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     font-weight: 700;
     transition: color 0.15s ease;
   }
@@ -292,13 +394,71 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     color: var(--primary-blue);
   }
 
+  /* Right Side Utility Actions */
+  .csg-nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .csg-lang-select {
+    background: rgba(150, 150, 150, 0.1);
+    color: var(--text-main);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 0.38rem 0.5rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    outline: none;
+    font-family: var(--font-sans);
+  }
+
   .csg-theme-btn {
     background: rgba(150, 150, 150, 0.1);
     border: 1px solid var(--card-border);
     font-size: 1rem;
-    padding: 0.4rem 0.65rem;
+    padding: 0.38rem 0.65rem;
     border-radius: 8px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .csg-hamburger-btn {
+    display: none;
+    background: rgba(150, 150, 150, 0.1);
+    border: 1px solid var(--card-border);
+    font-size: 1.15rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--text-main);
+  }
+
+  /* Mobile Drawer Menu */
+  .csg-mobile-drawer {
+    border-top: 1px solid var(--card-border);
+    background: var(--card-bg);
+    padding: 1rem 1.25rem 1.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+  .csg-mobile-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+  .csg-mobile-links a {
+    text-decoration: none;
+    color: var(--text-main);
+    font-size: 0.95rem;
+    font-weight: 700;
+    padding: 0.4rem 0.2rem;
+    border-bottom: 1px dashed var(--card-border);
+  }
+  .csg-mobile-links a.active {
+    color: var(--primary-blue);
   }
 
   /* Main */
@@ -359,8 +519,25 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
     font-weight: 600;
   }
 
-  @media (max-width: 768px) {
+  /* Hide raw Google Translate iframe & toolbar */
+  .goog-te-banner-frame,
+  .goog-te-gadget,
+  #google_translate_element {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  body { top: 0px !important; }
+
+  /* Responsive Rules */
+  @media (max-width: 860px) {
     .csg-nav-links { display: none; }
+    .csg-hamburger-btn { display: flex; align-items: center; justify-content: center; }
     .csg-footer-links-grid { gap: 2rem; }
+  }
+
+  @media (max-width: 480px) {
+    .csg-brand-text { font-size: 1rem; }
+    .csg-logo-badge { font-size: 0.85rem; padding: 0.25rem 0.5rem; }
+    .csg-lang-select { font-size: 0.76rem; padding: 0.3rem 0.35rem; }
   }
 </style>
