@@ -9,7 +9,7 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
 <BaseLayout title={title} description={description} permalink={permalink} current="profile">
   <div class="profile-container notranslate">
     
-    <!-- 1. Unauthenticated Gate Card (Hidden instantly via CSS if user is logged in) -->
+    <!-- 1. Unauthenticated Gate Card -->
     <div id="auth-gate" class="auth-card">
       <div class="auth-icon">🔐</div>
       <h1>Student Passport & Cloud Sync</h1>
@@ -22,17 +22,24 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
       <div id="login-error-msg" style="color: #ef4444; font-size: 0.85rem; margin-top: 1rem; display: none;"></div>
     </div>
 
-    <!-- 2. Authenticated Profile Dashboard (Displayed instantly via CSS if user is logged in) -->
+    <!-- 2. Authenticated Profile Dashboard -->
     <div id="profile-dashboard" class="profile-dashboard-view">
+      <div class="privacy-trust-bar">
+        <span>🔒 <strong>Private & Client-Scoped:</strong> Your financial data, shift earnings, and arrival deadlines are private to your Google ID. We never collect or monetize personal inputs.</span>
+      </div>
+
       <header class="profile-header-card">
         <div class="profile-avatar-wrap">
           <img id="user-avatar-img" src="/favicon.svg" alt="Student Avatar" class="profile-avatar" />
-          <span class="status-indicator" title="Connected"></span>
+          <label class="avatar-edit-badge" title="Upload custom profile photo">
+            📷
+            <input type="file" id="avatar-file-input" accept="image/*" style="display: none;" />
+          </label>
         </div>
         <div class="profile-header-info">
           <div class="badge-row">
             <span class="verified-pill">🎓 Verified Student Member</span>
-            <span id="sync-status-pill" class="sync-pill">⚡ Cloud Synced</span>
+            <span id="sync-status-pill" class="sync-pill">⚡ Auto-Linked across all Tools</span>
           </div>
           <h1 id="user-display-name">Student Member</h1>
           <p id="user-email-text" class="email-muted">loading...</p>
@@ -42,70 +49,84 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
         </div>
       </header>
 
-      <!-- Customization Form Grid -->
       <form id="profile-form" class="customization-grid">
         <div class="settings-card">
-          <h2>📍 Student Identity & Location</h2>
-          <p class="card-desc">Personalize your student profile details for local community tools.</p>
+          <div class="card-title-row">
+            <h2>📍 Student Identity & Legal Migration</h2>
+            <span class="auto-badge">⚡ Auto-syncs to Pink Slip Tracker</span>
+          </div>
+          <p class="card-desc">Personalize your student identity. Setting your arrival date here will automatically sync your 90-day compliance checklist.</p>
           
           <div class="form-group">
             <label for="input-name">Display Name</label>
             <input type="text" id="input-name" placeholder="Enter your full name" />
           </div>
 
-          <div class="form-group">
-            <label for="select-city">Current City in Cyprus</label>
-            <select id="select-city">
-              <option value="Limassol">Limassol (Lemesos)</option>
-              <option value="Nicosia">Nicosia (Lefkosia)</option>
-              <option value="Larnaca">Larnaca</option>
-              <option value="Paphos">Paphos</option>
-            </select>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="select-city">Current City in Cyprus</label>
+              <select id="select-city">
+                <option value="Limassol">Limassol (Lemesos)</option>
+                <option value="Nicosia">Nicosia (Lefkosia)</option>
+                <option value="Larnaca">Larnaca</option>
+                <option value="Paphos">Paphos</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="input-institution">University / College</label>
+              <input type="text" id="input-institution" placeholder="e.g. UCLan Cyprus, Frederick, CDA, CTL" />
+            </div>
           </div>
 
           <div class="form-group">
-            <label for="input-institution">University / College</label>
-            <input type="text" id="input-institution" placeholder="e.g. UCLan Cyprus, Frederick, European Univ" />
-          </div>
-
-          <div class="form-group">
-            <label for="input-arrival">Cyprus Entry / Arrival Date</label>
+            <label for="input-arrival">Cyprus Entry / Airport Arrival Date</label>
             <input type="date" id="input-arrival" />
-            <small>Used to sync your 90-day Pink Slip countdown tracker automatically.</small>
+            <small>Used across the website to calculate your 90-day Pink Slip countdown seamlessly.</small>
           </div>
         </div>
 
         <div class="settings-card">
-          <h2>💼 Work & Budget Preferences</h2>
-          <p class="card-desc">Pre-set your default numbers to calculate delivery shifts and living costs faster.</p>
+          <div class="card-title-row">
+            <h2>💼 Work, Delivery & Budget Defaults</h2>
+            <span class="auto-badge">⚡ Auto-syncs to Work Tracker & Budget</span>
+          </div>
+          <p class="card-desc">Pre-set your default numbers so you never have to re-type them when logging delivery shifts or monthly living costs.</p>
 
-          <div class="form-group">
-            <label for="input-rate">Default Base Hourly Rate (€)</label>
-            <input type="number" step="0.1" id="input-rate" placeholder="6.50" />
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="input-rate">Default Base Hourly Rate (€)</label>
+              <input type="number" step="0.1" id="input-rate" placeholder="6.50" />
+            </div>
+
+            <div class="form-group">
+              <label for="input-commission">Fleet Agency Commission Split (%)</label>
+              <input type="number" step="0.5" id="input-commission" placeholder="18" />
+            </div>
           </div>
 
-          <div class="form-group">
-            <label for="input-commission">Fleet Manager Commission Split (%)</label>
-            <input type="number" step="1" id="input-commission" placeholder="15" />
-            <small>Default percentage taken by your delivery fleet agency.</small>
-          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="input-rent">Monthly Accommodation Budget (€)</label>
+              <input type="number" id="input-rent" placeholder="450" />
+            </div>
 
-          <div class="form-group">
-            <label for="input-rent">Monthly Accommodation Budget (€)</label>
-            <input type="number" id="input-rent" placeholder="450" />
+            <div class="form-group">
+              <label for="input-grocery">Monthly Groceries Budget (€)</label>
+              <input type="number" id="input-grocery" placeholder="200" />
+            </div>
           </div>
         </div>
 
         <div class="form-actions-bar">
-          <button type="submit" id="btn-save-profile" class="btn-save-primary">Save Profile Changes</button>
-          <span id="save-toast" class="save-toast" style="display: none;">✅ Changes saved to cloud!</span>
+          <button type="submit" id="btn-save-profile" class="btn-save-primary">Save Profile & Global Sync</button>
+          <span id="save-toast" class="save-toast" style="display: none;">✅ Profile & Tool Defaults Saved to Cloud!</span>
         </div>
       </form>
     </div>
   </div>
 </BaseLayout>
 
-<!-- Instant Pre-Hydration Sync for Profile (No Lag) -->
 <script is:inline>
   (function() {
     try {
@@ -136,8 +157,6 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
   import { 
     getAuth, 
     signInWithPopup, 
-    signInWithRedirect, 
-    getRedirectResult, 
     GoogleAuthProvider, 
     signOut, 
     onAuthStateChanged 
@@ -169,6 +188,7 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
   const profileForm = document.getElementById('profile-form');
   const saveToast = document.getElementById('save-toast');
   const loginErrorMsg = document.getElementById('login-error-msg');
+  const avatarFileInput = document.getElementById('avatar-file-input');
 
   const userAvatarImg = document.getElementById('user-avatar-img');
   const userDisplayName = document.getElementById('user-display-name');
@@ -181,31 +201,18 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
   const inputRate = document.getElementById('input-rate');
   const inputCommission = document.getElementById('input-commission');
   const inputRent = document.getElementById('input-rent');
+  const inputGrocery = document.getElementById('input-grocery');
 
   let currentUser = null;
-
-  getRedirectResult(auth)
-    .then((res) => {
-      if (res && res.user) {
-        currentUser = res.user;
-      }
-    })
-    .catch((err) => {
-      console.error('Redirect error:', err);
-    });
 
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       currentUser = user;
       document.documentElement.classList.add('user-is-logged-in');
 
-      const photo = user.photoURL || '/favicon.svg';
+      const photo = localStorage.getItem('csg_cached_user_avatar') || user.photoURL || '/favicon.svg';
       const name = user.displayName || 'Student Member';
       const email = user.email || '';
-
-      localStorage.setItem('csg_cached_user_avatar', photo);
-      localStorage.setItem('csg_cached_user_name', name);
-      localStorage.setItem('csg_cached_user_email', email);
 
       if (userAvatarImg) userAvatarImg.src = photo;
       if (userDisplayName) userDisplayName.innerText = name;
@@ -225,8 +232,18 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
           if (inputArrival) inputArrival.value = p.arrivalDate || '';
 
           if (inputRate) inputRate.value = pref.defaultHourlyRate || 6.5;
-          if (inputCommission) inputCommission.value = pref.fleetCommission || 15;
+          if (inputCommission) inputCommission.value = pref.fleetCommission || 18;
           if (inputRent) inputRent.value = pref.monthlyRentBudget || 450;
+          if (inputGrocery) inputGrocery.value = pref.monthlyGroceryBudget || 200;
+
+          if (p.photoURL) {
+            localStorage.setItem('csg_cached_user_avatar', p.photoURL);
+            if (userAvatarImg) userAvatarImg.src = p.photoURL;
+          }
+
+          if (p.arrivalDate) {
+            localStorage.setItem('csg_user_arrival_date', p.arrivalDate);
+          }
         }
       } catch (err) {
         console.error('Firestore read error:', err);
@@ -240,21 +257,53 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
     }
   });
 
+  if (avatarFileInput) {
+    avatarFileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxDim = 200;
+          canvas.width = maxDim;
+          canvas.height = maxDim;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, maxDim, maxDim);
+          
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          if (userAvatarImg) userAvatarImg.src = compressedDataUrl;
+          localStorage.setItem('csg_cached_user_avatar', compressedDataUrl);
+
+          const navAvatarImg = document.getElementById('nav-user-avatar-img');
+          if (navAvatarImg) navAvatarImg.src = compressedDataUrl;
+
+          if (currentUser) {
+            const userDocRef = doc(db, 'users', currentUser.uid);
+            setDoc(userDocRef, { profile: { photoURL: compressedDataUrl } }, { merge: true });
+          }
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Pure Popup Trigger (Mobile & Desktop Compatible)
   if (btnLoginGate) {
     btnLoginGate.addEventListener('click', async () => {
       provider.setCustomParameters({ prompt: 'select_account' });
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       try {
-        if (isMobile) {
-          await signInWithRedirect(auth, provider);
-        } else {
-          await signInWithPopup(auth, provider);
-        }
+        await signInWithPopup(auth, provider);
       } catch (err) {
-        console.error('Profile Sign In Error:', err);
-        if (loginErrorMsg) {
-          loginErrorMsg.innerText = 'Sign-in notice: ' + (err.message || 'Please check popup settings.');
-          loginErrorMsg.style.display = 'block';
+        console.error('Auth Popup Error:', err);
+        if (err.code !== 'auth/popup-closed-by-user') {
+          if (loginErrorMsg) {
+            loginErrorMsg.innerText = 'Sign-in notice: ' + (err.message || 'Please check browser popup settings.');
+            loginErrorMsg.style.display = 'block';
+          }
         }
       }
     });
@@ -284,6 +333,10 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
 
       try {
         const updatedName = inputName.value.trim() || currentUser.displayName;
+        const arrivalVal = inputArrival.value;
+        const rateVal = parseFloat(inputRate.value) || 6.5;
+        const commVal = parseFloat(inputCommission.value) || 18;
+
         const userDocRef = doc(db, 'users', currentUser.uid);
         await setDoc(userDocRef, {
           profile: {
@@ -291,17 +344,20 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
             email: currentUser.email,
             city: selectCity.value,
             institution: inputInstitution.value.trim(),
-            arrivalDate: inputArrival.value
+            arrivalDate: arrivalVal
           },
           preferences: {
-            defaultHourlyRate: parseFloat(inputRate.value) || 6.5,
-            fleetCommission: parseFloat(inputCommission.value) || 15,
-            monthlyRentBudget: parseFloat(inputRent.value) || 450
+            defaultHourlyRate: rateVal,
+            fleetCommission: commVal,
+            monthlyRentBudget: parseFloat(inputRent.value) || 450,
+            monthlyGroceryBudget: parseFloat(inputGrocery.value) || 200
           },
           updatedAt: new Date().toISOString()
         }, { merge: true });
 
         localStorage.setItem('csg_cached_user_name', updatedName);
+        if (arrivalVal) localStorage.setItem('csg_user_arrival_date', arrivalVal);
+
         if (userDisplayName) userDisplayName.innerText = updatedName;
 
         if (saveToast) {
@@ -314,7 +370,7 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
       } finally {
         if (btn) {
           btn.disabled = false;
-          btn.innerText = 'Save Profile Changes';
+          btn.innerText = 'Save Profile & Global Sync';
         }
       }
     });
@@ -325,26 +381,26 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
   .profile-container {
     max-width: 860px;
     margin: 0 auto;
-    padding: 1.5rem 0.75rem 4rem;
+    padding: 1rem 0.75rem 4rem;
     box-sizing: border-box;
     width: 100%;
   }
 
-  /* ZERO-FLICKER AUTH SYSTEM RULES */
-  /* 1. Default (Not logged in) */
-  #auth-gate {
-    display: block;
-  }
-  #profile-dashboard {
-    display: none;
-  }
+  #auth-gate { display: block; }
+  #profile-dashboard { display: none; }
 
-  /* 2. Instant Pre-Render State (When logged in) */
-  html.user-is-logged-in #auth-gate {
-    display: none !important;
-  }
-  html.user-is-logged-in #profile-dashboard {
-    display: block !important;
+  html.user-is-logged-in #auth-gate { display: none !important; }
+  html.user-is-logged-in #profile-dashboard { display: block !important; }
+
+  .privacy-trust-bar {
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    color: var(--text-main);
+    font-size: 0.82rem;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    line-height: 1.45;
   }
 
   .auth-card {
@@ -394,28 +450,41 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
     margin-bottom: 2rem;
     flex-wrap: wrap;
   }
+
   .profile-avatar-wrap {
     position: relative;
     flex-shrink: 0;
   }
   .profile-avatar {
-    width: 80px;
-    height: 80px;
+    width: 86px;
+    height: 86px;
     border-radius: 50%;
     border: 3px solid var(--primary-blue);
     object-fit: cover;
     background: var(--card-bg);
+    display: block;
   }
-  .status-indicator {
-    width: 14px;
-    height: 14px;
-    background: #16a34a;
-    border: 2px solid var(--card-bg);
-    border-radius: 50%;
+  .avatar-edit-badge {
     position: absolute;
-    bottom: 4px;
-    right: 4px;
+    bottom: -2px;
+    right: -2px;
+    background: var(--card-bg);
+    border: 2px solid var(--primary-blue);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: transform 0.15s;
   }
+  .avatar-edit-badge:hover {
+    transform: scale(1.1);
+  }
+
   .profile-header-info {
     flex-grow: 1;
     min-width: 200px;
@@ -482,16 +551,39 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
     border-radius: 16px;
     padding: 1.75rem;
   }
+  .card-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.35rem;
+  }
   .settings-card h2 {
     font-size: 1.25rem;
     font-weight: 800;
-    margin: 0 0 0.35rem;
+    margin: 0;
     color: var(--text-main);
   }
+  .auto-badge {
+    background: rgba(37, 99, 235, 0.08);
+    color: var(--primary-blue);
+    font-size: 0.74rem;
+    font-weight: 800;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+  }
   .card-desc {
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     color: var(--text-muted);
     margin: 0 0 1.5rem;
+    line-height: 1.5;
+  }
+
+  .form-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
   }
 
   .form-group {
@@ -501,7 +593,7 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
     gap: 0.4rem;
   }
   .form-group label {
-    font-size: 0.88rem;
+    font-size: 0.86rem;
     font-weight: 800;
     color: var(--text-main);
   }
@@ -542,7 +634,7 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
     font-size: 0.95rem;
     border: none;
     border-radius: 10px;
-    padding: 0.8rem 1.6rem;
+    padding: 0.85rem 1.75rem;
     cursor: pointer;
     font-family: inherit;
     transition: background 0.15s;
@@ -556,7 +648,7 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
     color: #16a34a;
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 650px) {
     .profile-header-card {
       flex-direction: column;
       text-align: center;
@@ -564,6 +656,7 @@ const permalink = 'https://cyprusstudentguide.com/profile/';
       padding: 1.5rem 1rem;
     }
     .badge-row { justify-content: center; }
+    .form-grid-2 { grid-template-columns: 1fr; gap: 0; }
     .settings-card { padding: 1.25rem 1rem; }
     .btn-save-primary { width: 100%; }
   }
