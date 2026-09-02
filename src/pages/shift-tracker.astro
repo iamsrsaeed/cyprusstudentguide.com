@@ -17,7 +17,7 @@ const trackerSchema = {
 };
 ---
 
-<BaseLayout title={title} description={description} permalink={permalink} current="tracker">
+<BaseLayout title={title} description={description} permalink={permalink} current="shift">
   <script type="application/ld+json" is:inline set:html={JSON.stringify(trackerSchema)} />
 
   <div class="st-wrapper notranslate">
@@ -244,7 +244,7 @@ const trackerSchema = {
         </div>
       </div>
 
-      <!-- Section D: Individual Shift Sessions History Table & Isolated Reset -->
+      <!-- Section D: Individual Shift Sessions History Table -->
       <div class="st-card">
         <div class="st-filter-row">
           <div>
@@ -525,17 +525,13 @@ const trackerSchema = {
   </div>
 </BaseLayout>
 
-<!-- Firebase Browser Bundle -->
+<!-- Firebase Browser Bundle with Direct Universal Popup Engine -->
 <script is:inline type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
   import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
   import { 
     getAuth, 
-    setPersistence,
-    browserLocalPersistence,
     signInWithPopup, 
-    signInWithRedirect, 
-    getRedirectResult, 
     GoogleAuthProvider, 
     signOut, 
     onAuthStateChanged 
@@ -551,7 +547,7 @@ const trackerSchema = {
     measurementId: "G-1RWQEC5L8D"
   };
 
-  const app = initializeApp(firebaseConfig);
+  const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
@@ -663,7 +659,6 @@ const trackerSchema = {
     }
 
     if (pushToCloud) {
-      // Debounced push to cloud (prevents continuous hammering)
       if (cloudPushTimeout) clearTimeout(cloudPushTimeout);
       cloudPushTimeout = setTimeout(() => {
         syncStateToCloud();
@@ -685,17 +680,6 @@ const trackerSchema = {
     if (openModalBtn) openModalBtn.addEventListener('click', () => modal.classList.add('active'));
     if (closeModalBtn) closeModalBtn.addEventListener('click', () => modal.classList.remove('active'));
 
-    getRedirectResult(auth)
-      .then((result) => {
-        if (result && result.user) {
-          currentUser = result.user;
-          setupUserCloudSync(currentUser.uid, currentUser.displayName || currentUser.email);
-        }
-      })
-      .catch((err) => {
-        console.error("Redirect Auth Error:", err);
-      });
-
     if (createRoomBtn) {
       createRoomBtn.addEventListener('click', () => {
         const randCode = 'CY-' + Math.floor(1000 + Math.random() * 9000);
@@ -716,20 +700,16 @@ const trackerSchema = {
       });
     }
 
+    // Direct Universal Popup Handler (Reliable across Desktop & Mobile)
     if (googleAuthBtn) {
       googleAuthBtn.addEventListener('click', async () => {
         if (currentUser) return;
         provider.setCustomParameters({ prompt: 'select_account' });
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
         try {
-          if (isMobile) {
-            await signInWithRedirect(auth, provider);
-          } else {
-            const res = await signInWithPopup(auth, provider);
-            currentUser = res.user;
-            setupUserCloudSync(currentUser.uid, currentUser.displayName || currentUser.email);
-          }
+          const res = await signInWithPopup(auth, provider);
+          currentUser = res.user;
+          setupUserCloudSync(currentUser.uid, currentUser.displayName || currentUser.email);
         } catch (err) {
           console.error("Sign-In Error:", err);
           if (err.code !== 'auth/popup-closed-by-user') {
@@ -822,7 +802,6 @@ const trackerSchema = {
   function applyRemoteData(remote) {
     if (!remote) return;
 
-    // Deep equality check: If payload is identical, do NOT touch DOM
     const currentPayloadStr = JSON.stringify({
       c: currentCurrency,
       ds: deliverySessions,
@@ -1836,7 +1815,6 @@ const trackerSchema = {
   .st-tool-label { font-size: 0.88rem; font-weight: 700; color: var(--text-main); }
   .st-select-mini { background: var(--bg-color); color: var(--text-main); border: 1px solid var(--card-border); padding: 0.35rem 0.6rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem; outline: none; cursor: pointer; }
   
-  /* Fixed Width Status Label - Kills Jitter Completely */
   .st-save-status { display: flex; align-items: center; gap: 0.45rem; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); min-width: 175px; }
   .st-save-text { display: inline-block; white-space: nowrap; }
   .st-dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; display: inline-block; box-shadow: 0 0 6px #10b981; flex-shrink: 0; }
