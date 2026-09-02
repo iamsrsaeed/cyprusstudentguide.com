@@ -43,14 +43,12 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
 
     <slot name="head" />
 
-    <!-- 1. ZERO-LATENCY PRE-PARSING ENGINE (EXECUTES BEFORE FIRST FRAME) -->
+    <!-- 1. ZERO-LATENCY PRE-PARSING ENGINE -->
     <script is:inline>
       (function() {
-        // Theme Pre-check
         const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         if (theme === 'dark') document.documentElement.classList.add('dark');
 
-        // Instant Auth CSS Rule Injection to eliminate 1ms layout shifts
         const cachedAvatar = localStorage.getItem('csg_cached_user_avatar');
         if (cachedAvatar) {
           document.documentElement.classList.add('user-is-logged-in');
@@ -92,9 +90,8 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
           <a href="/about/" class={current === 'about' ? 'active' : ''}>About</a>
         </nav>
 
-        <!-- Right Side Controls with Direct Google Auth -->
+        <!-- Right Side Controls with Universal Mobile Popup Auth -->
         <div class="csg-nav-actions notranslate">
-          <!-- Auth Container -->
           <div id="nav-auth-container" class="nav-auth-wrap">
             <button type="button" id="nav-login-btn" class="nav-btn-signin" title="Sign in with Google">
               👤 <span>Sign In</span>
@@ -202,14 +199,12 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
       })();
     </script>
 
-    <!-- Global Firebase Auth Listener -->
+    <!-- Global Firebase Auth Listener with Direct Universal Popup Handler -->
     <script is:inline type="module">
       import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
       import { 
         getAuth, 
         signInWithPopup, 
-        signInWithRedirect, 
-        getRedirectResult, 
         GoogleAuthProvider, 
         onAuthStateChanged 
       } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
@@ -232,8 +227,6 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
       const navAvatarBtn = document.getElementById('nav-user-avatar-btn');
       const navAvatarImg = document.getElementById('nav-user-avatar-img');
 
-      getRedirectResult(auth).catch(() => {});
-
       onAuthStateChanged(auth, (user) => {
         if (user) {
           document.documentElement.classList.add('user-is-logged-in');
@@ -251,17 +244,14 @@ const { title, description, permalink, current = '', hideDisclaimer = false } = 
       if (navLoginBtn) {
         navLoginBtn.addEventListener('click', async () => {
           provider.setCustomParameters({ prompt: 'select_account' });
-          const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
           try {
-            if (isMobile) {
-              await signInWithRedirect(auth, provider);
-            } else {
-              await signInWithPopup(auth, provider);
-              window.location.href = '/profile/';
-            }
+            await signInWithPopup(auth, provider);
+            window.location.href = '/profile/';
           } catch (err) {
             console.error('Header Auth Error:', err);
-            window.location.href = '/profile/';
+            if (err.code !== 'auth/popup-closed-by-user') {
+              window.location.href = '/profile/';
+            }
           }
         });
       }
