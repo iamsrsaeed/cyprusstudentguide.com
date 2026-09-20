@@ -46,11 +46,11 @@ const categories = ['All', ...new Set(allPosts.map(p => p.category))];
 ---
 
 <BaseLayout title={title} description={description} permalink={permalink} current="guides">
-  <div class="blog-hub-container notranslate">
+  <div class="blog-hub-container">
     
     <!-- Hero Header -->
     <header class="blog-hub-header">
-      <span class="hub-badge">KNOWLEDGE BASE</span>
+      <span class="hub-badge notranslate">KNOWLEDGE BASE</span>
       <h1>Student Guides & Articles</h1>
       <p class="hub-desc">Practical, ground-tested handbooks on immigration, part-time work, banking, and smart budgeting in Cyprus.</p>
     </header>
@@ -92,7 +92,7 @@ const categories = ['All', ...new Set(allPosts.map(p => p.category))];
           data-search-content={post.rawText}
         >
           <div class="card-header-row">
-            <div class="card-icon-badge">{post.icon}</div>
+            <div class="card-icon-badge notranslate">{post.icon}</div>
             <div class="card-meta">
               <span class="cat-tag">{post.category}</span>
               <span class="date-tag">{new Date(post.publishDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
@@ -110,7 +110,7 @@ const categories = ['All', ...new Set(allPosts.map(p => p.category))];
 
     <!-- Empty State -->
     <div id="no-results-box" class="no-results-card" style="display: none;">
-      <div class="no-results-icon">🔎</div>
+      <div class="no-results-icon notranslate">🔎</div>
       <h3>No matching guides found</h3>
       <p>Try searching with different keywords like "bank", "jobs", "lidl", or clear the category filter.</p>
     </div>
