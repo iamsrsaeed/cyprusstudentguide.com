@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Bio from '../../components/Bio.astro';
 import ShareButtons from '../../components/ShareButtons.astro';
+import MiniTaxCalc from '../../components/MiniTaxCalc.astro';
 
 export async function getStaticPaths() {
   const posts = import.meta.glob('../../data/blog-posts/*.md', { eager: true });
@@ -24,9 +25,10 @@ const description = frontmatter.description;
 const publishDate = frontmatter.publishDate;
 const author = frontmatter.author || 'Saidur Rahman';
 const category = frontmatter.category || 'Living & Survival';
-const permalink = `https://cyprusstudentguide.com/blog/${Astro.params.slug}/`;
+const currentSlug = Astro.params.slug || '';
+const permalink = `https://cyprusstudentguide.com/blog/${currentSlug}/`;
 
-// Category Icon & Theme Mapping
+// Category Icon & Visual Accent Mapping
 let categoryIcon = '📌';
 let categoryThemeClass = 'theme-general';
 
@@ -45,7 +47,15 @@ if (catLower.includes('immigration') || catLower.includes('visa')) {
   categoryThemeClass = 'theme-living';
 }
 
-// Calculate Read Time
+// Smart Filter: Show Interactive Wage & Deduction Calculator only on highly relevant topics
+const showTaxWidget = 
+  catLower.includes('work') || 
+  catLower.includes('job') || 
+  catLower.includes('tax') || 
+  currentSlug.includes('part-time-work') || 
+  currentSlug.includes('gesy');
+
+// Dynamic Read Time Calculation
 const text = typeof rawContent === 'function' ? rawContent() : '';
 const wordCount = text.split(/\s+/g).length;
 const readTime = Math.max(2, Math.ceil(wordCount / 200));
@@ -119,7 +129,7 @@ const breadcrumbSchema = {
   </div>
 
   <article class="post-detail-container">
-    <!-- Clean Minimalist Header Card -->
+    <!-- Minimalist Header Card -->
     <header class={`post-hero-card ${categoryThemeClass}`}>
       <div class="post-hero-meta-row">
         <span class="category-tag"><span class="cat-icon notranslate">{categoryIcon}</span> {category}</span>
@@ -147,6 +157,9 @@ const breadcrumbSchema = {
     <div class="post-content-body">
       <Content />
     </div>
+
+    <!-- Contextual Interactive Mini-Calculator (Only on Work, Tax & Healthcare guides) -->
+    {showTaxWidget && <MiniTaxCalc />}
 
     <!-- Smart Interactive Action Widget -->
     <div class="smart-tool-callout">
@@ -201,7 +214,7 @@ const breadcrumbSchema = {
 </script>
 
 <style>
-  /* Reading Progress Track (Fixed to top of viewport) */
+  /* Reading Progress Track (Fixed to the very top of viewport) */
   .reading-progress-track {
     position: fixed;
     top: 0;
