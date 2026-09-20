@@ -16,12 +16,73 @@ export async function getStaticPaths() {
   });
 }
 
----
-// Existing imports...
 const { post } = Astro.props;
 const { Content, frontmatter, rawContent } = post;
 
-// High-CTR BreadcrumbList Schema for Google Search
+const title = frontmatter.title;
+const description = frontmatter.description;
+const publishDate = frontmatter.publishDate;
+const author = frontmatter.author || 'Saidur Rahman';
+const category = frontmatter.category || 'Living & Survival';
+const permalink = `https://cyprusstudentguide.com/blog/${Astro.params.slug}/`;
+
+// Category Icon & Theme Mapping
+let categoryIcon = '📌';
+let categoryThemeClass = 'theme-general';
+
+const catLower = category.toLowerCase();
+if (catLower.includes('immigration') || catLower.includes('visa')) {
+  categoryIcon = '🏛️';
+  categoryThemeClass = 'theme-immigration';
+} else if (catLower.includes('work') || catLower.includes('job')) {
+  categoryIcon = '💼';
+  categoryThemeClass = 'theme-jobs';
+} else if (catLower.includes('bank') || catLower.includes('tax')) {
+  categoryIcon = '💳';
+  categoryThemeClass = 'theme-banking';
+} else if (catLower.includes('living') || catLower.includes('grocer') || catLower.includes('transport')) {
+  categoryIcon = '🛒';
+  categoryThemeClass = 'theme-living';
+}
+
+// Calculate Read Time
+const text = typeof rawContent === 'function' ? rawContent() : '';
+const wordCount = text.split(/\s+/g).length;
+const readTime = Math.max(2, Math.ceil(wordCount / 200));
+
+// Formatted Date
+const formattedDate = new Date(publishDate).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric'
+});
+
+// 1. Article Schema for Google Rich Snippets
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": title,
+  "description": description,
+  "datePublished": publishDate,
+  "author": {
+    "@type": "Person",
+    "name": author
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Cyprus Student Guide",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cyprusstudentguide.com/favicon.svg"
+    }
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": permalink
+  }
+};
+
+// 2. High-CTR BreadcrumbList Schema for Google Search
 const breadcrumbSchema = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
@@ -51,8 +112,6 @@ const breadcrumbSchema = {
 <BaseLayout title={title} description={description} permalink={permalink} current="blog">
   <script type="application/ld+json" is:inline set:html={JSON.stringify(articleSchema)} />
   <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbSchema)} />
-
-  <!-- Rest of the code... -->
 
   <!-- Live Top Reading Progress Bar -->
   <div class="reading-progress-track">
@@ -99,6 +158,21 @@ const breadcrumbSchema = {
       <a href="/shift-tracker/" class="smart-tool-btn">Open Shift Tracker ➔</a>
     </div>
 
+    <!-- Related Useful Guides (Reduces Bounce Rate & Multiplies Pageviews) -->
+    <div class="related-guides-section notranslate">
+      <h3 class="related-title">📌 Recommended Guides for You</h3>
+      <div class="related-grid">
+        <a href="/blog/cyprus-student-bus-card-discount-guide/" class="related-card">
+          <span class="related-card-tag tag-blue">Transit & Savings</span>
+          <h4 class="related-card-heading">How to Get a Cyprus Student Bus Card (50% Off) ➔</h4>
+        </a>
+        <a href="/blog/non-eu-student-part-time-work-cyprus-legal-guide/" class="related-card">
+          <span class="related-card-tag tag-green">Legal Work Rights</span>
+          <h4 class="related-card-heading">Non-EU Student Part-Time Work Rules & Minimum Wage ➔</h4>
+        </a>
+      </div>
+    </div>
+
     <!-- Share & Author Section -->
     <footer class="post-footer-section">
       <div class="share-box-wrap">
@@ -127,7 +201,7 @@ const breadcrumbSchema = {
 </script>
 
 <style>
- /* Reading Progress Track (Fixed to the very top of viewport) */
+  /* Reading Progress Track (Fixed to top of viewport) */
   .reading-progress-track {
     position: fixed;
     top: 0;
@@ -412,20 +486,53 @@ const breadcrumbSchema = {
     text-decoration: none;
     white-space: nowrap;
   }
-<!-- Related Useful Guides (Reduces Bounce Rate & Multiplies Pageviews) -->
-    <div class="related-guides-section notranslate" style="margin-top: 3rem; padding-top: 2rem; border-top: 1px dashed var(--card-border);">
-      <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1.25rem;">📌 Recommended Guides for You</h3>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
-        <a href="/blog/cyprus-student-bus-card-discount-guide/" style="background: var(--card-bg); border: 1px solid var(--card-border); padding: 1.2rem; border-radius: 12px; text-decoration: none; color: inherit; display: block;">
-          <span style="font-size: 0.75rem; color: var(--primary-blue); font-weight: 800; text-transform: uppercase;">Transit & Savings</span>
-          <h4 style="margin: 0.4rem 0 0; font-size: 0.98rem; font-weight: 800;">How to Get a Cyprus Student Bus Card (50% Off) ➔</h4>
-        </a>
-        <a href="/blog/non-eu-student-part-time-work-cyprus-legal-guide/" style="background: var(--card-bg); border: 1px solid var(--card-border); padding: 1.2rem; border-radius: 12px; text-decoration: none; color: inherit; display: block;">
-          <span style="font-size: 0.75rem; color: #059669; font-weight: 800; text-transform: uppercase;">Legal Work Rights</span>
-          <h4 style="margin: 0.4rem 0 0; font-size: 0.98rem; font-weight: 800;">Non-EU Student Part-Time Work Rules & Minimum Wage ➔</h4>
-        </a>
-      </div>
-    </div>
+
+  /* Related Guides Section */
+  .related-guides-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px dashed var(--card-border);
+  }
+  .related-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin-bottom: 1.25rem;
+  }
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+  .related-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    padding: 1.2rem;
+    border-radius: 12px;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+  .related-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary-blue);
+  }
+  .related-card-tag {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    display: inline-block;
+    margin-bottom: 0.35rem;
+  }
+  .tag-blue { color: var(--primary-blue); }
+  .tag-green { color: #059669; }
+  .related-card-heading {
+    margin: 0;
+    font-size: 0.98rem;
+    font-weight: 800;
+    line-height: 1.4;
+  }
+
   /* Footer Section */
   .post-footer-section {
     border-top: 1px dashed var(--card-border);
