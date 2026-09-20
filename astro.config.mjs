@@ -8,6 +8,10 @@ import rehypeExternalLinks from 'rehype-external-links'
 // https://astro.build/config
 export default defineConfig({
   site: 'https://cyprusstudentguide.com',
+  trailingSlash: 'always',
+  build: {
+    format: 'directory'
+  },
   integrations: [mdx(), svelte()],
   markdown: {
     shikiConfig: {
