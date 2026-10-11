@@ -1,10 +1,11 @@
 ---
-title: "Cyprus Student Working Hours & Minimum Wage 2026: Non-EU Part-Time Legal Guide"
-description: "Complete legal breakdown of part-time work rights for Non-EU students in Cyprus: 20-hour weekly limit, permitted employment sectors, statutory minimum hourly wage (€5.50 - €8.00), and contract stamping."
-publishDate: "2026-08-16"
+title: "Cyprus Student Work Rights: Minimum Wage, Legal Hours & Contract Rules"
 slug: "non-eu-student-part-time-work-cyprus-legal-guide"
+publishDate: "2026-10-11"
+description: "Official legal guide for non-EU students: 20-hour weekly limits, gazetted minimum wage per hour, permitted employment sectors, and Social Insurance deductions."
 author: "Saidur Rahman"
 category: "Work & Legal"
+heroImage: "/assets/blog/casual-life-3d-workspace.webp"
 tags: ["Student Jobs", "Part-Time Work", "Cyprus Labour Law", "Minimum Wage", "Non-EU Students", "Work Permit"]
 ---
 
