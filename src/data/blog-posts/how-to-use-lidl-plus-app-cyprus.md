@@ -1,10 +1,11 @@
 ---
-title: "How to Use Lidl Plus App in Cyprus 2026: Student Grocery Discounts, Coupons & Voucher Hacks"
-description: "Master the Lidl Plus Cyprus loyalty app: manual coupon activation rules, monthly Shop & Win milestones (€1 to €4 off), digital scratch cards, and supermarket savings hacks for students."
-publishDate: "2026-08-15"
+title: "How to Use Lidl Plus in Cyprus: Student App Setup & Coupon Discounts"
 slug: "how-to-use-lidl-plus-app-cyprus"
+publishDate: "2026-10-11"
+description: "Complete setup guide for students in Cyprus. How to download Lidl Plus without country errors, scan QR coupons at checkout, and cut weekly grocery bills."
 author: "Saidur Rahman"
 category: "Living & Groceries"
+heroImage: "/assets/blog/casual-life-3d-shopping-bag.webp"
 tags: ["Lidl Plus Cyprus", "Student Budget", "Grocery Savings", "Discount Coupons", "Living in Cyprus"]
 ---
 
