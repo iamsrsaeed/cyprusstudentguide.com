@@ -144,3 +144,35 @@ Food delivery remains the most popular flexible earning avenue for international
 
 > 🛵 **Working food delivery shifts with shared accounts or fleet agencies?**  
 > Use our free [Delivery Shift Splitter & Wage Tracker](/shift-tracker/) to calculate net pay, split fuel expenses, and generate instant WhatsApp audit statements.
+> <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How many hours can international students work in Cyprus?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Non-EU international students enrolled in recognized higher education institutions in Cyprus can legally work up to 20 hours per week during academic semesters, and up to 38 hours per week during official summer vacation periods."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the minimum hourly wage for student workers in Cyprus?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The statutory minimum wage in Cyprus sets student entry pay typically between €5.50 and €8.00 gross per hour depending on the authorized sector (catering, food delivery, agriculture, or retail cleaning)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "When are new students legally allowed to start working in Cyprus?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "International students must legally complete 6 continuous months of lawful residence in the Republic of Cyprus after their entry stamp date before they are entitled to sign a stamped student employment contract."
+      }
+    }
+  ]
+}
+</script>
