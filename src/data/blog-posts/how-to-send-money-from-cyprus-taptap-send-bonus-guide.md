@@ -1,11 +1,12 @@
 ---
-title: "How to Send Money from Cyprus 2026: TapTap Send, Wise & Remitly Transfer Guide"
-description: "Step-by-step remittance guide for international students in Cyprus: Compare TapTap Send vs Wise vs Western Union, transfer limits, exchange rates, and bonus voucher codes."
-publishDate: "2026-08-16"
+title: "How to Send Money from Cyprus with Taptap Send: Free €10 Promo Code & Zero Fees"
 slug: "how-to-send-money-from-cyprus-taptap-send-bonus-guide"
+publishDate: "2026-08-16"
+description: "Best way to send money home from Cyprus to Asia & Africa with 0% transfer fee. Use promo code MDSAIDUR240 to claim an instant €10 bonus on your first transfer."
 author: "Saidur Rahman"
-category: "Banking & Remittance"
-tags: ["Send Money from Cyprus", "TapTap Send Cyprus", "Wise Transfer", "Cyprus Remittance", "Student Money Transfer"]
+category: "Banking & Finance"
+heroImage: "/assets/blog/casual-life-3d-workspace.webp"
+tags: ["Send Money from Cyprus", "TapTap Send Cyprus", "Wise Transfer", "Cyprus Remittance", "Student Money Transfer", "Send Money from Cyprus", "Student Remittance", "Cyprus Banking"]
 ---
 
 Sending money home from Cyprus—whether remitting family support, repaying student loans, or transferring emergency funds—requires navigating high banking transfer commissions and unfavourable foreign exchange markups. 
