@@ -145,6 +145,30 @@ Food delivery remains the most popular flexible earning avenue for international
 > 🛵 **Working food delivery shifts with shared accounts or fleet agencies?**  
 > Use our free [Delivery Shift Splitter & Wage Tracker](/shift-tracker/) to calculate net pay, split fuel expenses, and generate instant WhatsApp audit statements.
 
+---
+
+## 🛑 Critical Pre-Arrival Rules: Can You Work Immediately After Landing?
+
+Many education agents mislead incoming students by claiming they can work from day one in Cyprus. Under Ministry of Labour and Migration Department regulations, international students must follow strict statutory timelines:
+
+### 1. The Mandatory 6-Month Waiting Period
+Non-EU students **cannot legally work immediately upon arrival**. You must complete **6 continuous months of lawful residence** in the Republic of Cyprus starting from the entry stamp date in your passport. 
+* Any employment during these initial 6 months is classified as unregistered, illegal labour.
+* Employers caught hiring newly arrived students face severe administrative fines (€500+ per month of illegal employment), and students risk Pink Slip cancellation and deportation.
+
+### 2. Can You Live Purely on Part-Time Student Wages?
+Working the legal cap of **20 hours per week** at entry wage rates (€5.50 to €8.00/hour) typically yields a monthly gross income between **€480 and €690**. 
+* Deduct **8.3% Social Insurance** and **2.65% GeSY Healthcare** contributions.
+* Expected net monthly take-home pay: **€420 – €615**.
+* Given that average student shared rent costs €250–€350 and monthly groceries require €150–€200, part-time student wages are designed to offset living expenses—**not to cover annual university tuition fees**.
+
+### 3. Authorized Student Employment Sectors
+Cyprus law restricts third-country students to specific labour shortages:
+1. **Food Delivery & Couriers:** Licensed riders with authorized fleet agencies.
+2. **Catering & Hospitality:** Kitchen assistants, dishwashers, and food prep staff.
+3. **Retail & Wholesale:** Cleaning staff and warehouse inventory helpers.
+4. **Agriculture & Farming:** Seasonal and general farm hands.
+
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
