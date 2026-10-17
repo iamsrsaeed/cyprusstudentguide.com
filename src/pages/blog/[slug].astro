@@ -6,18 +6,32 @@ import MiniTaxCalc from '../../components/MiniTaxCalc.astro';
 
 export async function getStaticPaths() {
   const posts = import.meta.glob('../../data/blog-posts/*.md', { eager: true });
-
-  return Object.entries(posts).map(([filePath, post]: [string, any]) => {
+  const allPostsList = Object.entries(posts).map(([filePath, post]: [string, any]) => {
     const fileSlug = filePath.split('/').pop()?.replace('.md', '') || '';
     const slug = post.frontmatter?.slug || fileSlug;
     return {
-      params: { slug },
-      props: { post },
+      slug,
+      title: post.frontmatter?.title || 'Student Guide',
+      category: post.frontmatter?.category || 'Living & Survival',
+      publishDate: post.frontmatter?.publishDate || '2026-08-16',
+      post
+    };
+  }).sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime());
+
+  return allPostsList.map((item) => {
+    // স্বয়ংক্রিয়ভাবে বর্তমান পোস্ট বাদে ৪টি নতুন ও রিলেটেড পোস্ট বেছে নেবে
+    const relatedPosts = allPostsList
+      .filter((p) => p.slug !== item.slug)
+      .slice(0, 4);
+
+    return {
+      params: { slug: item.slug },
+      props: { post: item.post, relatedPosts },
     };
   });
 }
 
-const { post } = Astro.props;
+const { post, relatedPosts } = Astro.props;
 const { Content, frontmatter, rawContent } = post;
 
 const title = frontmatter.title;
@@ -28,7 +42,7 @@ const category = frontmatter.category || 'Living & Survival';
 const currentSlug = Astro.params.slug || '';
 const permalink = `https://cyprusstudentguide.com/blog/${currentSlug}/`;
 
-// Category Icon & Visual Accent Mapping
+// ক্যাটাগরি কালার ও আইকন ম্যাপিং
 let categoryIcon = '📌';
 let categoryThemeClass = 'theme-general';
 
@@ -47,7 +61,6 @@ if (catLower.includes('immigration') || catLower.includes('visa')) {
   categoryThemeClass = 'theme-living';
 }
 
-// Smart Filter: Show Interactive Wage & Deduction Calculator only on highly relevant topics
 const showTaxWidget = 
   catLower.includes('work') || 
   catLower.includes('job') || 
@@ -55,19 +68,17 @@ const showTaxWidget =
   currentSlug.includes('part-time-work') || 
   currentSlug.includes('gesy');
 
-// Dynamic Read Time Calculation
 const text = typeof rawContent === 'function' ? rawContent() : '';
 const wordCount = text.split(/\s+/g).length;
 const readTime = Math.max(2, Math.ceil(wordCount / 200));
 
-// Formatted Date
 const formattedDate = new Date(publishDate).toLocaleDateString('en-US', {
   year: 'numeric',
   month: 'short',
   day: 'numeric'
 });
 
-// 1. Article Schema for Google Rich Snippets
+// গুগল রিচ স্নsnippet-এর জন্য স্কিমা
 const articleSchema = {
   "@context": "https://schema.org",
   "@type": "Article",
@@ -92,7 +103,6 @@ const articleSchema = {
   }
 };
 
-// 2. High-CTR BreadcrumbList Schema for Google Search
 const breadcrumbSchema = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
@@ -120,16 +130,16 @@ const breadcrumbSchema = {
 ---
 
 <BaseLayout title={title} description={description} permalink={permalink} current="blog">
-  <script type="application/ld+json" is:inline set:html={JSON.stringify(articleSchema)} />
-  <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbSchema)} />
+  <Fragment slot="head">
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(articleSchema)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbSchema)} />
+  </Fragment>
 
-  <!-- Live Top Reading Progress Bar -->
   <div class="reading-progress-track">
     <div id="reading-progress-bar" class="reading-progress-fill"></div>
   </div>
 
   <article class="post-detail-container">
-    <!-- Minimalist Header Card -->
     <header class={`post-hero-card ${categoryThemeClass}`}>
       <div class="post-hero-meta-row">
         <span class="category-tag"><span class="cat-icon notranslate">{categoryIcon}</span> {category}</span>
@@ -144,7 +154,6 @@ const breadcrumbSchema = {
       </div>
     </header>
 
-    <!-- Key Takeaways / Quick TL;DR Card -->
     <div class="tldr-box">
       <div class="tldr-header">
         <span class="tldr-badge notranslate">⚡ SUMMARY</span>
@@ -153,15 +162,12 @@ const breadcrumbSchema = {
       <p>{description}</p>
     </div>
 
-    <!-- Main Markdown Article Body -->
     <div class="post-content-body">
       <Content />
     </div>
 
-    <!-- Contextual Interactive Mini-Calculator (Only on Work, Tax & Healthcare guides) -->
     {showTaxWidget && <MiniTaxCalc />}
 
-    <!-- Smart Interactive Action Widget -->
     <div class="smart-tool-callout">
       <div class="smart-tool-icon notranslate">🛠️</div>
       <div class="smart-tool-info">
@@ -171,22 +177,19 @@ const breadcrumbSchema = {
       <a href="/shift-tracker/" class="smart-tool-btn">Open Shift Tracker ➔</a>
     </div>
 
-    <!-- Related Useful Guides (Reduces Bounce Rate & Multiplies Pageviews) -->
+    <!-- ৪টি ডাইনামিক পোস্টের ইন্টারনাল লিংক ইঞ্জিন (এসইও বুস্টার) -->
     <div class="related-guides-section notranslate">
-      <h3 class="related-title">📌 Recommended Guides for You</h3>
+      <h3 class="related-title">📌 Essential Student Guides & Handbooks</h3>
       <div class="related-grid">
-        <a href="/blog/cyprus-student-bus-card-discount-guide/" class="related-card">
-          <span class="related-card-tag tag-blue">Transit & Savings</span>
-          <h4 class="related-card-heading">How to Get a Cyprus Student Bus Card (50% Off) ➔</h4>
-        </a>
-        <a href="/blog/non-eu-student-part-time-work-cyprus-legal-guide/" class="related-card">
-          <span class="related-card-tag tag-green">Legal Work Rights</span>
-          <h4 class="related-card-heading">Non-EU Student Part-Time Work Rules & Minimum Wage ➔</h4>
-        </a>
+        {relatedPosts.map((rel: any) => (
+          <a href={`/blog/${rel.slug}/`} class="related-card">
+            <span class="related-card-tag tag-blue">{rel.category}</span>
+            <h4 class="related-card-heading">{rel.title} ➔</h4>
+          </a>
+        ))}
       </div>
     </div>
 
-    <!-- Share & Author Section -->
     <footer class="post-footer-section">
       <div class="share-box-wrap">
         <span class="share-label">Help fellow students in Cyprus:</span>
@@ -195,7 +198,6 @@ const breadcrumbSchema = {
       <Bio />
     </footer>
 
-    <!-- Back to Hub Floating Link -->
     <div class="back-hub-wrap">
       <a href="/blog/" class="back-hub-link">← Return to All Guides & Articles</a>
     </div>
@@ -214,7 +216,6 @@ const breadcrumbSchema = {
 </script>
 
 <style>
-  /* Reading Progress Track (Fixed to the very top of viewport) */
   .reading-progress-track {
     position: fixed;
     top: 0;
@@ -238,7 +239,6 @@ const breadcrumbSchema = {
     padding: 1.5rem 0.75rem 4rem;
   }
 
-  /* Header Card */
   .post-hero-card {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
@@ -258,8 +258,8 @@ const breadcrumbSchema = {
   }
   .theme-immigration:before { background: linear-gradient(90deg, #6366f1, #8b5cf6); }
   .theme-banking:before { background: linear-gradient(90deg, #059669, #10b981); }
-  .theme-jobs:before { background: linear-gradient(90deg, #d97706, #f59e0b); }
-  .theme-living:before { background: linear-gradient(90deg, #0284c7, #38bdf8); }
+  .theme-jobs:before { background: linear-gradient(90deg, #f59e0b, #d97706); }
+  .theme-living:before { background: linear-gradient(90deg, #0284c7, #0ea5e9); }
   .theme-general:before { background: linear-gradient(90deg, #2563eb, #3b82f6); }
 
   .post-hero-meta-row {
@@ -268,12 +268,12 @@ const breadcrumbSchema = {
     gap: 0.75rem;
     flex-wrap: wrap;
     margin-bottom: 1.25rem;
-    font-size: 0.82rem;
-    font-weight: 700;
   }
   .category-tag {
     background: rgba(37, 99, 235, 0.1);
     color: var(--primary-blue);
+    font-size: 0.8rem;
+    font-weight: 800;
     padding: 0.25rem 0.65rem;
     border-radius: 6px;
     display: inline-flex;
@@ -281,29 +281,27 @@ const breadcrumbSchema = {
     gap: 0.35rem;
   }
   .read-time-pill, .date-pill {
+    font-size: 0.8rem;
     color: var(--text-muted);
+    font-weight: 600;
   }
-
   .post-title {
-    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-size: clamp(1.6rem, 4vw, 2.35rem);
     font-weight: 900;
     line-height: 1.25;
-    margin: 0 0 1rem;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
+    color: var(--text-main);
+    margin-bottom: 1rem;
   }
   .author-row {
-    font-size: 0.88rem;
+    font-size: 0.85rem;
     color: var(--text-muted);
   }
-  .author-row strong {
-    color: var(--text-main);
-  }
 
-  /* TL;DR Summary Box */
   .tldr-box {
-    background: rgba(37, 99, 235, 0.04);
+    background: rgba(37, 99, 235, 0.05);
     border: 1px solid rgba(37, 99, 235, 0.2);
-    border-left: 5px solid var(--primary-blue);
+    border-left: 4px solid var(--primary-blue);
     border-radius: 12px;
     padding: 1.25rem 1.5rem;
     margin-bottom: 2.5rem;
@@ -313,198 +311,66 @@ const breadcrumbSchema = {
     align-items: center;
     gap: 0.5rem;
     margin-bottom: 0.5rem;
-    font-size: 0.9rem;
   }
   .tldr-badge {
     background: var(--primary-blue);
-    color: #ffffff;
+    color: #fff;
     font-size: 0.7rem;
     font-weight: 900;
-    padding: 0.15rem 0.45rem;
+    padding: 0.15rem 0.4rem;
     border-radius: 4px;
-    letter-spacing: 0.05em;
   }
   .tldr-box p {
-    color: var(--text-main);
-    font-size: 0.96rem;
+    font-size: 0.95rem;
     line-height: 1.6;
+    color: var(--text-main);
     margin: 0;
   }
 
-  /* Content Body */
   .post-content-body {
     font-size: 1.05rem;
-    line-height: 1.75;
+    line-height: 1.8;
     color: var(--text-main);
   }
-  .post-content-body :global(h2) {
-    font-size: 1.65rem;
-    font-weight: 800;
-    margin: 2.5rem 0 1rem;
-    line-height: 1.3;
-    letter-spacing: -0.01em;
-    border-bottom: 1px dashed var(--card-border);
-    padding-bottom: 0.5rem;
-  }
-  .post-content-body :global(h3) {
-    font-size: 1.3rem;
-    font-weight: 800;
-    margin: 1.75rem 0 0.75rem;
-  }
-  .post-content-body :global(p) {
-    margin-bottom: 1.35rem;
-  }
-  .post-content-body :global(ul), .post-content-body :global(ol) {
-    margin: 0 0 1.5rem 1.5rem;
-  }
-  .post-content-body :global(li) {
-    margin-bottom: 0.5rem;
-  }
-  .post-content-body :global(blockquote) {
-    background: var(--card-bg);
-    border-left: 4px solid var(--primary-blue);
-    padding: 1rem 1.25rem;
-    margin: 1.5rem 0;
-    border-radius: 0 8px 8px 0;
-    font-style: italic;
-  }
-  .post-content-body :global(table) {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 1.5rem 0;
-    font-size: 0.95rem;
-  }
-  .post-content-body :global(th), .post-content-body :global(td) {
-    border: 1px solid var(--card-border);
-    padding: 0.75rem 1rem;
-    text-align: left;
-  }
-  .post-content-body :global(th) {
-    background: var(--card-bg);
-    font-weight: 800;
-  }
 
-  /* Napkin AI Flow Grid */
-  .post-content-body :global(.infographic-wrapper) {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 16px;
-    padding: 1.75rem 1.5rem;
-    margin: 2.25rem 0;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
-  }
-  .post-content-body :global(.infographic-badge) {
-    background: rgba(37, 99, 235, 0.1);
-    color: var(--primary-blue);
-    font-size: 0.75rem;
-    font-weight: 800;
-    padding: 0.25rem 0.65rem;
-    border-radius: 20px;
-    display: inline-block;
-    margin-bottom: 0.5rem;
-  }
-  .post-content-body :global(.infographic-title) {
-    font-size: 1.3rem;
-    font-weight: 800;
-    margin: 0 0 1.25rem 0;
-    border: none;
-    padding: 0;
-  }
-  .post-content-body :global(.napkin-flow-grid) {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1rem;
-  }
-  .post-content-body :global(.napkin-step-card) {
-    background: rgba(150, 150, 150, 0.04);
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    padding: 1.15rem;
-    position: relative;
-  }
-  .post-content-body :global(.step-num-badge) {
-    width: 26px;
-    height: 26px;
-    background: var(--primary-blue);
-    color: #ffffff;
-    font-size: 0.76rem;
-    font-weight: 900;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 0.6rem;
-  }
-  .post-content-body :global(.napkin-step-card h4) {
-    font-size: 0.96rem;
-    font-weight: 800;
-    margin: 0 0 0.35rem 0;
-  }
-  .post-content-body :global(.napkin-step-card p) {
-    font-size: 0.85rem;
-    line-height: 1.5;
-    margin: 0;
-    color: var(--text-muted);
-  }
-
-  /* Napkin Stat Row */
-  .post-content-body :global(.napkin-stat-row) {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    gap: 1rem;
-  }
-  .post-content-body :global(.napkin-stat-box) {
-    background: rgba(150, 150, 150, 0.04);
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    padding: 1.15rem 1rem;
-    text-align: center;
-  }
-  .post-content-body :global(.stat-icon-wrap) { font-size: 1.75rem; margin-bottom: 0.35rem; }
-  .post-content-body :global(.stat-big) {
-    font-size: 1.15rem;
-    font-weight: 900;
-    color: var(--primary-blue);
-    margin-bottom: 0.25rem;
-  }
-  .post-content-body :global(.stat-lbl) {
-    font-size: 0.78rem;
-    color: var(--text-muted);
-    line-height: 1.35;
-  }
-
-  /* Smart Callout */
   .smart-tool-callout {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
     border-radius: 16px;
-    padding: 1.5rem;
-    margin: 3rem 0 2rem;
+    padding: 1.75rem;
     display: flex;
     align-items: center;
     gap: 1.25rem;
-    flex-wrap: wrap;
+    margin: 3rem 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
   }
-  .smart-tool-icon { font-size: 2.2rem; }
-  .smart-tool-info { flex: 1; min-width: 240px; }
-  .smart-tool-info h3 { font-size: 1.15rem; font-weight: 800; margin: 0 0 0.25rem; }
-  .smart-tool-info p { font-size: 0.88rem; color: var(--text-muted); margin: 0; }
+  .smart-tool-icon {
+    font-size: 2.2rem;
+  }
+  .smart-tool-info h3 {
+    font-size: 1.15rem;
+    font-weight: 800;
+    margin-bottom: 0.35rem;
+  }
+  .smart-tool-info p {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
   .smart-tool-btn {
+    margin-left: auto;
+    white-space: nowrap;
     background: var(--primary-blue);
-    color: #ffffff;
+    color: #fff;
+    text-decoration: none;
     font-weight: 800;
     font-size: 0.88rem;
-    padding: 0.65rem 1.15rem;
-    border-radius: 10px;
-    text-decoration: none;
-    white-space: nowrap;
+    padding: 0.65rem 1.2rem;
+    border-radius: 8px;
   }
 
-  /* Related Guides Section */
   .related-guides-section {
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 1px dashed var(--card-border);
+    margin: 3.5rem 0 2rem;
   }
   .related-title {
     font-size: 1.25rem;
@@ -513,73 +379,75 @@ const breadcrumbSchema = {
   }
   .related-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1rem;
   }
   .related-card {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
-    padding: 1.2rem;
     border-radius: 12px;
+    padding: 1.25rem;
     text-decoration: none;
-    color: inherit;
-    display: block;
     transition: transform 0.15s ease, border-color 0.15s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
   .related-card:hover {
     transform: translateY(-2px);
     border-color: var(--primary-blue);
   }
   .related-card-tag {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 800;
+    color: var(--primary-blue);
     text-transform: uppercase;
-    display: inline-block;
-    margin-bottom: 0.35rem;
   }
-  .tag-blue { color: var(--primary-blue); }
-  .tag-green { color: #059669; }
   .related-card-heading {
-    margin: 0;
-    font-size: 0.98rem;
-    font-weight: 800;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-main);
     line-height: 1.4;
+    margin: 0;
   }
 
-  /* Footer Section */
   .post-footer-section {
     border-top: 1px dashed var(--card-border);
     padding-top: 2rem;
-    margin-top: 2rem;
+    margin-top: 3rem;
   }
   .share-box-wrap {
     margin-bottom: 2rem;
+    text-align: center;
   }
   .share-label {
-    font-size: 0.9rem;
+    display: block;
+    font-size: 0.85rem;
     font-weight: 700;
     color: var(--text-muted);
-    display: block;
     margin-bottom: 0.75rem;
   }
-
   .back-hub-wrap {
     text-align: center;
-    margin-top: 3rem;
+    margin-top: 2.5rem;
   }
   .back-hub-link {
-    display: inline-block;
-    color: var(--text-muted);
-    font-size: 0.92rem;
+    font-size: 0.9rem;
     font-weight: 700;
-    text-decoration: none;
-    border: 1px solid var(--card-border);
-    padding: 0.5rem 1.25rem;
-    border-radius: 30px;
-    transition: all 0.15s ease;
-  }
-  .back-hub-link:hover {
     color: var(--primary-blue);
-    border-color: var(--primary-blue);
+    text-decoration: none;
+  }
+  .back-hub-link:hover { text-decoration: underline; }
+
+  @media (max-width: 640px) {
+    .smart-tool-callout {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .smart-tool-btn {
+      margin-left: 0;
+      width: 100%;
+      text-align: center;
+    }
   }
 </style>
