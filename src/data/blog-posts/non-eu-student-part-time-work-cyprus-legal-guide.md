@@ -144,7 +144,8 @@ Food delivery remains the most popular flexible earning avenue for international
 
 > 🛵 **Working food delivery shifts with shared accounts or fleet agencies?**  
 > Use our free [Delivery Shift Splitter & Wage Tracker](/shift-tracker/) to calculate net pay, split fuel expenses, and generate instant WhatsApp audit statements.
-> <script type="application/ld+json">
+
+<script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "FAQPage",
